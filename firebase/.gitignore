@@ -78,3 +78,7 @@ failed_rows/
 # Project-specific ignores
 # -------------------------------------------------------
 clean.py
+firebase/config/firebase-key.json
+*.json
+.env
+__pycache__/
