@@ -1,0 +1,1538 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>Sales Analytics Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-primary: #0F766E;
+        --color-primary-hover: #0D9488;
+        --color-secondary: #475569;
+        --color-accent: #D97706;
+        --color-background: #F8FAFC;
+        --color-surface: #FFFFFF;
+        --color-surface-variant: #F1F5F9;
+        --color-on-background: #0F172A;
+        --color-on-surface: #1E293B;
+        --color-border: #E2E8F0;
+        --color-success: #16A34A;
+        --color-warning: #F59E0B;
+        --color-error: #DC2626;
+        --color-info: #2563EB;
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+      }
+
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Settings and Preferences - Sales Analytics Dashboard</title></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="68" y="68" width="264" height="264" rx="32" stroke="#0F766E" stroke-width="18"></rect>
+                <rect x="109" y="143" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="109" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="109" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                <rect x="206" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="206" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">Sales Analytics Dashboard</h1>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 md:gap-3">
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-600 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-600 truncate"></div>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Analytics</div>
+          <div class="space-y-1">
+            <a href="dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="dashboard">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="sku_performance_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sku_performance">
+              <i data-lucide="package" class="w-5 h-5"></i>
+              <span>SKU Performance</span>
+            </a>
+            <a href="store_performance_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="store_performance">
+              <i data-lucide="store" class="w-5 h-5"></i>
+              <span>Store Performance</span>
+            </a>
+            <a href="staff_performance_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="staff_performance">
+              <i data-lucide="users" class="w-5 h-5"></i>
+              <span>Staff Performance</span>
+            </a>
+            <a href="transaction_history.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="transaction_history">
+              <i data-lucide="receipt" class="w-5 h-5"></i>
+              <span>Transaction History</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="py-6 border-b border-slate-100 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Tools</div>
+          <div class="space-y-1">
+            <a href="reports_configuration.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="reports">
+              <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+              <span>Reports</span>
+            </a>
+            <a href="settings.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="settings">
+              <i data-lucide="settings" class="w-5 h-5"></i>
+              <span>Settings</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="app-main p-6" id="pageContent" role="main"><nav class="mb-6" aria-label="Breadcrumb">
+  <ol class="flex items-center space-x-2 text-sm">
+    <li>
+      <a href="dashboard.html" class="text-teal-700 hover:text-teal-600 transition-colors">
+        Dashboard
+      </a>
+    </li>
+    <li class="text-slate-500">
+      <i data-lucide="chevron-right" class="w-4 h-4"></i>
+    </li>
+    <li class="text-slate-900 font-medium">Settings and Preferences</li>
+  </ol>
+</nav>
+
+<!-- Page Header -->
+<div class="mb-8">
+  <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900 mb-2">Settings and Preferences</h1>
+  <p class="text-sm leading-[1.375rem] text-slate-600">Customize your dashboard experience and application preferences</p>
+</div>
+
+<!-- Main Content Area -->
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+  <!-- Left Sidebar - Settings Categories -->
+  <div class="lg:col-span-1">
+    <nav class="space-y-1 bg-white rounded-lg border border-slate-200 p-4" aria-label="Settings navigation">
+      <button class="settings-nav-btn w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-left rounded transition-colors active bg-teal-50 text-teal-700 border-l-2 border-teal-700" data-section="general">
+        <i data-lucide="user" class="w-4 h-4"></i>
+        General Settings
+      </button>
+      <button class="settings-nav-btn w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-teal-700 text-left rounded transition-colors" data-section="dashboard">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+        Dashboard Preferences
+      </button>
+      <button class="settings-nav-btn w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-teal-700 text-left rounded transition-colors" data-section="dateRange">
+        <i data-lucide="calendar" class="w-4 h-4"></i>
+        Date Range Defaults
+      </button>
+      <button class="settings-nav-btn w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-teal-700 text-left rounded transition-colors" data-section="display">
+        <i data-lucide="monitor" class="w-4 h-4"></i>
+        Display Options
+      </button>
+      <button class="settings-nav-btn w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-teal-700 text-left rounded transition-colors" data-section="data">
+        <i data-lucide="database" class="w-4 h-4"></i>
+        Data and Performance
+      </button>
+    </nav>
+  </div>
+
+  <!-- Main Content - Settings Panels -->
+  <div class="lg:col-span-3">
+    <!-- General Settings Panel -->
+    <div id="general-panel" class="settings-panel bg-white rounded-lg border border-slate-200 p-6">
+      <div class="mb-6">
+        <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900 mb-1">General Settings</h2>
+        <p class="text-sm text-slate-600">View your profile information and application details</p>
+      </div>
+
+      <div class="space-y-6">
+        <!-- User Profile Information -->
+        <div>
+          <h3 class="text-base font-semibold text-slate-900 mb-4">Profile Information</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+              <div id="profile-name" class="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded border">Loading...</div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+              <div id="profile-email" class="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded border">Loading...</div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Role</label>
+              <div id="profile-role" class="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded border">Loading...</div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">User ID</label>
+              <div id="profile-id" class="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded border font-mono">Loading...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Application Information -->
+        <div class="border-t border-slate-200 pt-6">
+          <h3 class="text-base font-semibold text-slate-900 mb-4">Application Information</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Version</label>
+              <div class="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded border">v1.0.0</div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Last Data Sync</label>
+              <div id="last-sync" class="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded border">Loading...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Preferences Panel -->
+    <div id="dashboard-panel" class="settings-panel bg-white rounded-lg border border-slate-200 p-6 hidden">
+      <div class="mb-6">
+        <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900 mb-1">Dashboard Preferences</h2>
+        <p class="text-sm text-slate-600">Customize your dashboard experience and default views</p>
+      </div>
+
+      <form id="dashboard-settings-form" class="space-y-6">
+        <!-- Default Landing Page -->
+        <div>
+          <label for="defaultLandingPage" class="block text-sm font-medium text-slate-700 mb-2">Default Landing Page</label>
+          <select id="defaultLandingPage" class="w-full px-3 py-2 border border-slate-200 rounded focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm">
+            <option value="dashboard">Dashboard</option>
+            <option value="sku_performance">SKU Performance</option>
+            <option value="store_performance">Store Performance</option>
+            <option value="staff_performance">Staff Performance</option>
+            <option value="transaction_history">Transaction History</option>
+          </select>
+        </div>
+
+        <!-- KPI Cards to Display -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-3">KPI Cards to Display on Dashboard</label>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <label class="flex items-center gap-2">
+              <input type="checkbox" id="kpi-total-sales" class="rounded border-slate-300 text-teal-700 focus:ring-teal-500" checked="">
+              <span class="text-sm text-slate-700">Total Sales</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input type="checkbox" id="kpi-transactions" class="rounded border-slate-300 text-teal-700 focus:ring-teal-500" checked="">
+              <span class="text-sm text-slate-700">Total Transactions</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input type="checkbox" id="kpi-avg-transaction" class="rounded border-slate-300 text-teal-700 focus:ring-teal-500" checked="">
+              <span class="text-sm text-slate-700">Average Transaction Value</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input type="checkbox" id="kpi-top-product" class="rounded border-slate-300 text-teal-700 focus:ring-teal-500" checked="">
+              <span class="text-sm text-slate-700">Top Product</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input type="checkbox" id="kpi-staff-performance" class="rounded border-slate-300 text-teal-700 focus:ring-teal-500" checked="">
+              <span class="text-sm text-slate-700">Staff Performance</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input type="checkbox" id="kpi-store-comparison" class="rounded border-slate-300 text-teal-700 focus:ring-teal-500" checked="">
+              <span class="text-sm text-slate-700">Store Comparison</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Default Chart Type -->
+        <div>
+          <label for="defaultChartType" class="block text-sm font-medium text-slate-700 mb-2">Default Chart Type</label>
+          <select id="defaultChartType" class="w-full px-3 py-2 border border-slate-200 rounded focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm">
+            <option value="line">Line Chart</option>
+            <option value="bar">Bar Chart</option>
+            <option value="area">Area Chart</option>
+          </select>
+        </div>
+
+        <!-- Auto-refresh Interval -->
+        <div>
+          <label for="autoRefreshInterval" class="block text-sm font-medium text-slate-700 mb-2">Auto-refresh Interval</label>
+          <select id="autoRefreshInterval" class="w-full px-3 py-2 border border-slate-200 rounded focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm">
+            <option value="never">Never</option>
+            <option value="1">1 minute</option>
+            <option value="5">5 minutes</option>
+            <option value="15">15 minutes</option>
+            <option value="30">30 minutes</option>
+          </select>
+        </div>
+
+        <div class="flex justify-end pt-4 border-t border-slate-200">
+          <button type="submit" class="px-4 py-2 bg-teal-700 text-white text-sm font-medium rounded hover:bg-teal-600 transition-colors focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+            Save Dashboard Preferences
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Date Range Defaults Panel -->
+    <div id="dateRange-panel" class="settings-panel bg-white rounded-lg border border-slate-200 p-6 hidden">
+      <div class="mb-6">
+        <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900 mb-1">Date Range Defaults</h2>
+        <p class="text-sm text-slate-600">Set default date ranges and formatting preferences</p>
+      </div>
+
+      <form id="daterange-settings-form" class="space-y-6">
+        <!-- Default Date Range -->
+        <div>
+          <label for="defaultDateRange" class="block text-sm font-medium text-slate-700 mb-2">Default Date Range for All Views</label>
+          <select id="defaultDateRange" class="w-full px-3 py-2 border border-slate-200 rounded focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm">
+            <option value="today">Today</option>
+            <option value="last7days">Last 7 Days</option>
+            <option value="last30days">Last 30 Days</option>
+            <option value="thisMonth">This Month</option>
+            <option value="custom">Custom Range</option>
+          </select>
+        </div>
+
+        <!-- Custom Date Range (shown when Custom is selected) -->
+        <div id="custom-date-range" class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
+          <div>
+            <label for="customStartDate" class="block text-sm font-medium text-slate-700 mb-2">Start Date</label>
+            <input type="date" id="customStartDate" class="w-full px-3 py-2 border border-slate-200 rounded focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm">
+          </div>
+          <div>
+            <label for="customEndDate" class="block text-sm font-medium text-slate-700 mb-2">End Date</label>
+            <input type="date" id="customEndDate" class="w-full px-3 py-2 border border-slate-200 rounded focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm">
+          </div>
+        </div>
+
+        <!-- Date Format Preference -->
+        <div>
+          <label for="dateFormat" class="block text-sm font-medium text-slate-700 mb-2">Date Display Format</label>
+          <select id="dateFormat" class="w-full px-3 py-2 border border-slate-200 rounded focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm">
+            <option value="MM/DD/YYYY">MM/DD/YYYY (US Format)</option>
+            <option value="DD/MM/YYYY">DD/MM/YYYY (European Format)</option>
+            <option value="YYYY-MM-DD">YYYY-MM-DD (ISO Format)</option>
+          </select>
+        </div>
+
+        <!-- Time Format Preference -->
+        <div>
+          <label for="timeFormat" class="block text-sm font-medium text-slate-700 mb-2">Time Display Format</label>
+          <select id="timeFormat" class="w-full px-3 py-2 border border-slate-200 rounded focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm">
+            <option value="12">12-hour format (2:30 PM)</option>
+            <option value="24">24-hour format (14:30)</option>
+          </select>
+        </div>
+
+        <div class="flex justify-end pt-4 border-t border-slate-200">
+          <button type="submit" class="px-4 py-2 bg-teal-700 text-white text-sm font-medium rounded hover:bg-teal-600 transition-colors focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+            Save Date Range Preferences
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Display Options Panel -->
+    <div id="display-panel" class="settings-panel bg-white rounded-lg border border-slate-200 p-6 hidden">
+      <div class="mb-6">
+        <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900 mb-1">Display Options</h2>
+        <p class="text-sm text-slate-600">Customize visual appearance and table display preferences</p>
+      </div>
+
+      <form id="display-settings-form" class="space-y-6">
+        <!-- Theme Selection -->
+        <div>
+          <label for="themeSelection" class="block text-sm font-medium text-slate-700 mb-2">Theme</label>
+          <select id="themeSelection" class="w-full px-3 py-2 border border-slate-200 rounded focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm">
+            <option value="light">Light Theme</option>
+            <option value="dark">Dark Theme (Coming Soon)</option>
+            <option value="auto">Auto (System Preference)</option>
+          </select>
+        </div>
+
+        <!-- Color Scheme for Charts -->
+        <div>
+          <label for="colorScheme" class="block text-sm font-medium text-slate-700 mb-2">Color Scheme for Charts</label>
+          <select id="colorScheme" class="w-full px-3 py-2 border border-slate-200 rounded focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm">
+            <option value="default">Default Colors</option>
+            <option value="colorblind">Colorblind-friendly</option>
+            <option value="highContrast">High Contrast</option>
+          </select>
+        </div>
+
+        <!-- Table Page Size -->
+        <div>
+          <label for="tablePageSize" class="block text-sm font-medium text-slate-700 mb-2">Table Rows Per Page</label>
+          <select id="tablePageSize" class="w-full px-3 py-2 border border-slate-200 rounded focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm">
+            <option value="25">25 rows</option>
+            <option value="50">50 rows</option>
+            <option value="100">100 rows</option>
+            <option value="200">200 rows</option>
+          </select>
+        </div>
+
+        <!-- Number Formatting -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-3">Number Formatting</label>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="decimalPlaces" class="block text-xs font-medium text-slate-600 mb-1">Decimal Places</label>
+              <select id="decimalPlaces" class="w-full px-3 py-2 border border-slate-200 rounded focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm">
+                <option value="0">0 (1,234)</option>
+                <option value="1">1 (1,234.5)</option>
+                <option value="2">2 (1,234.56)</option>
+                <option value="3">3 (1,234.567)</option>
+              </select>
+            </div>
+            <div>
+              <label for="thousandsSeparator" class="block text-xs font-medium text-slate-600 mb-1">Thousands Separator</label>
+              <select id="thousandsSeparator" class="w-full px-3 py-2 border border-slate-200 rounded focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm">
+                <option value=",">, (Comma)</option>
+                <option value=".">.  (Period)</option>
+                <option value=" ">   (Space)</option>
+                <option value="">None</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end pt-4 border-t border-slate-200">
+          <button type="submit" class="px-4 py-2 bg-teal-700 text-white text-sm font-medium rounded hover:bg-teal-600 transition-colors focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+            Save Display Preferences
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Data and Performance Panel -->
+    <div id="data-panel" class="settings-panel bg-white rounded-lg border border-slate-200 p-6 hidden">
+      <div class="mb-6">
+        <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900 mb-1">Data and Performance</h2>
+        <p class="text-sm text-slate-600">Manage local storage and backup preferences</p>
+      </div>
+
+      <div class="space-y-6">
+        <!-- Storage Usage -->
+        <div>
+          <h3 class="text-base font-semibold text-slate-900 mb-4">Local Storage Usage</h3>
+          <div class="bg-slate-50 p-4 rounded border">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm font-medium text-slate-700">Used Storage:</span>
+              <span id="storage-used" class="text-sm font-mono text-slate-900">Loading...</span>
+            </div>
+            <div class="w-full bg-slate-200 rounded-full h-2">
+              <div id="storage-progress" class="bg-teal-700 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <div class="text-xs text-slate-600 mt-2" id="storage-details">Calculating storage usage...</div>
+          </div>
+        </div>
+
+        <!-- Data Management Actions -->
+        <div class="border-t border-slate-200 pt-6">
+          <h3 class="text-base font-semibold text-slate-900 mb-4">Data Management</h3>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between p-4 bg-amber-50 rounded border border-amber-200">
+              <div>
+                <h4 class="text-sm font-medium text-slate-900">Clear Cached Data</h4>
+                <p class="text-xs text-slate-600">Remove all cached settings and preferences</p>
+              </div>
+              <button id="clear-cache-btn" class="px-3 py-2 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 transition-colors focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                Clear Cache
+              </button>
+            </div>
+            
+            <div class="flex items-center justify-between p-4 bg-blue-50 rounded border border-blue-200">
+              <div>
+                <h4 class="text-sm font-medium text-slate-900">Export Settings</h4>
+                <p class="text-xs text-slate-600">Download your preferences as a backup file</p>
+              </div>
+              <button id="export-settings-btn" class="px-3 py-2 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                Export Settings
+              </button>
+            </div>
+            
+            <div class="flex items-center justify-between p-4 bg-green-50 rounded border border-green-200">
+              <div>
+                <h4 class="text-sm font-medium text-slate-900">Import Settings</h4>
+                <p class="text-xs text-slate-600">Restore preferences from a backup file</p>
+              </div>
+              <button id="import-settings-btn" class="px-3 py-2 bg-green-600 text-white text-xs font-medium rounded hover:bg-green-700 transition-colors focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                Import Settings
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success Message -->
+<div id="success-message" class="fixed top-4 right-4 z-50 bg-green-600 text-white px-4 py-3 rounded shadow-lg hidden">
+  <div class="flex items-center gap-2">
+    <i data-lucide="check-circle" class="w-4 h-4"></i>
+    <span id="success-text">Settings saved successfully!</span>
+  </div>
+</div>
+
+<!-- Clear Cache Confirmation Modal -->
+<div id="clearCacheModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,32rem)] max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
+            <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-slate-900">Clear Cached Data</h3>
+        </div>
+        
+        <div class="mb-6">
+          <p class="text-sm text-slate-700 mb-4">
+            This action will clear all locally cached data including your settings preferences. The application will reload fresh data from localStorage on next page load. Your sales data will not be affected.
+          </p>
+          <p class="text-xs text-slate-600 bg-slate-50 p-3 rounded border">
+            <strong>Important:</strong> This action cannot be undone. You may want to export your settings first.
+          </p>
+          <div class="mt-3 text-xs text-slate-600">
+            Current cache size: <span id="modal-cache-size" class="font-mono">Loading...</span>
+          </div>
+        </div>
+        
+        <div class="flex gap-3 justify-end">
+          <button id="cancel-clear-cache" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded hover:bg-slate-50 transition-colors focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+            Cancel
+          </button>
+          <button id="confirm-clear-cache" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700 transition-colors focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+            Clear Cache and Reload
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Import Settings Modal -->
+<div id="importSettingsModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,28rem)] max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Import Settings</h3>
+        
+        <div class="mb-6">
+          <!-- File Upload Area -->
+          <div class="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-teal-400 transition-colors">
+            <i data-lucide="upload" class="w-8 h-8 text-slate-400 mx-auto mb-2"></i>
+            <p class="text-sm text-slate-600 mb-2">Drag and drop your settings file here, or</p>
+            <input type="file" id="settings-file-input" accept=".json" class="hidden">
+            <button id="choose-file-btn" class="px-4 py-2 bg-teal-700 text-white text-sm font-medium rounded hover:bg-teal-600 transition-colors focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+              Choose File
+            </button>
+          </div>
+          
+          <!-- File Preview -->
+          <div id="file-preview" class="mt-4 hidden">
+            <h4 class="text-sm font-medium text-slate-900 mb-2">Settings Preview:</h4>
+            <div id="settings-preview" class="bg-slate-50 p-3 rounded border text-xs font-mono max-h-32 overflow-y-auto"></div>
+          </div>
+          
+          <!-- Warning Message -->
+          <div class="mt-4 text-xs text-amber-700 bg-amber-50 p-3 rounded border border-amber-200">
+            <strong>Warning:</strong> Importing settings will override your current preferences.
+          </div>
+          
+          <!-- Import Categories -->
+          <div id="import-categories" class="mt-4 hidden">
+            <h4 class="text-sm font-medium text-slate-900 mb-2">Select categories to import:</h4>
+            <div class="space-y-2">
+              <label class="flex items-center gap-2">
+                <input type="checkbox" class="import-category rounded border-slate-300 text-teal-700 focus:ring-teal-500" data-category="dashboard" checked="">
+                <span class="text-sm text-slate-700">Dashboard Preferences</span>
+              </label>
+              <label class="flex items-center gap-2">
+                <input type="checkbox" class="import-category rounded border-slate-300 text-teal-700 focus:ring-teal-500" data-category="dateRange" checked="">
+                <span class="text-sm text-slate-700">Date Range Defaults</span>
+              </label>
+              <label class="flex items-center gap-2">
+                <input type="checkbox" class="import-category rounded border-slate-300 text-teal-700 focus:ring-teal-500" data-category="display" checked="">
+                <span class="text-sm text-slate-700">Display Options</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex gap-3 justify-end">
+          <button id="cancel-import" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded hover:bg-slate-50 transition-colors focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+            Cancel
+          </button>
+          <button id="confirm-import" class="px-4 py-2 text-sm font-medium text-white bg-teal-700 rounded hover:bg-teal-600 transition-colors focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled="">
+            Import Settings
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils = window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_sales_001");
+                    currentUserId = "usr_sales_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent = TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent = TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } = state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail) return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent = TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent = TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active", "bg-teal-50", "text-teal-700");
+            } else {
+              link.classList.remove("active", "bg-teal-50", "text-teal-700");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () => closeMobileSidebar());
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+// Utility: portal a modal by id (idempotent)
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+
+  // Set active navigation
+  if (window.TemplateUtils && window.TemplateUtils.setActiveNavLink) {
+    window.TemplateUtils.setActiveNavLink('settings');
+  }
+
+  // Default user preferences structure
+  const defaultPreferences = {
+    dashboard: {
+      defaultLandingPage: 'dashboard',
+      kpiCards: {
+        totalSales: true,
+        transactions: true,
+        avgTransaction: true,
+        topProduct: true,
+        staffPerformance: true,
+        storeComparison: true
+      },
+      defaultChartType: 'line',
+      autoRefreshInterval: 'never'
+    },
+    dateRange: {
+      defaultDateRange: 'last7days',
+      customStartDate: '',
+      customEndDate: '',
+      dateFormat: 'DD/MM/YYYY',
+      timeFormat: '24'
+    },
+    display: {
+      theme: 'light',
+      colorScheme: 'default',
+      tablePageSize: '50',
+      decimalPlaces: '2',
+      thousandsSeparator: ','
+    }
+  };
+
+  // Load user preferences from localStorage
+  function funLoadUserPreferences() {
+    try {
+      const stored = localStorage.getItem('user_preferences');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return { ...defaultPreferences, ...parsed };
+      }
+    } catch (error) {
+      console.error('Error loading user preferences:', error);
+    }
+    return defaultPreferences;
+  }
+
+  // Save user preferences to localStorage
+  function funSaveUserPreferences(preferences) {
+    try {
+      localStorage.setItem('user_preferences', JSON.stringify(preferences));
+      return true;
+    } catch (error) {
+      console.error('Error saving user preferences:', error);
+      return false;
+    }
+  }
+
+  // Show success message
+  function funShowSuccessMessage(message = 'Settings saved successfully!') {
+    const successMsg = document.getElementById('success-message');
+    const successText = document.getElementById('success-text');
+    if (successMsg && successText) {
+      successText.textContent = message;
+      successMsg.classList.remove('hidden');
+      setTimeout(() => {
+        successMsg.classList.add('hidden');
+      }, 3000);
+    }
+  }
+
+  // Calculate localStorage usage
+  function funCalculateStorageUsage() {
+    let totalSize = 0;
+    let itemCount = 0;
+    
+    for (let key in localStorage) {
+      if (localStorage.hasOwnProperty(key)) {
+        totalSize += localStorage[key].length + key.length;
+        itemCount++;
+      }
+    }
+    
+    const sizeInMB = (totalSize / (1024 * 1024)).toFixed(2);
+    const maxSize = 10; // Typical localStorage limit is ~5-10MB
+    const percentage = Math.min((totalSize / (maxSize * 1024 * 1024)) * 100, 100);
+    
+    return {
+      sizeInMB,
+      percentage,
+      itemCount,
+      totalSize
+    };
+  }
+
+  // Update storage display
+  function funUpdateStorageDisplay() {
+    const usage = funCalculateStorageUsage();
+    const storageUsed = document.getElementById('storage-used');
+    const storageProgress = document.getElementById('storage-progress');
+    const storageDetails = document.getElementById('storage-details');
+    
+    if (storageUsed) storageUsed.textContent = `${usage.sizeInMB} MB`;
+    if (storageProgress) storageProgress.style.width = `${usage.percentage}%`;
+    if (storageDetails) {
+      storageDetails.textContent = `${usage.itemCount} items stored. ${(100 - usage.percentage).toFixed(1)}% space remaining.`;
+    }
+    
+    // Update modal cache size if visible
+    const modalCacheSize = document.getElementById('modal-cache-size');
+    if (modalCacheSize) {
+      modalCacheSize.textContent = `${usage.sizeInMB} MB (${usage.itemCount} items)`;
+    }
+  }
+
+  // Initialize profile information
+  function funInitializeProfile() {
+    if (window.TemplateUtils && window.TemplateUtils.UserUtils) {
+      const currentUser = window.TemplateUtils.UserUtils.getCurrentUser();
+      if (currentUser) {
+        const profileName = document.getElementById('profile-name');
+        const profileEmail = document.getElementById('profile-email');
+        const profileRole = document.getElementById('profile-role');
+        const profileId = document.getElementById('profile-id');
+        
+        if (profileName) profileName.textContent = window.TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+        if (profileEmail) profileEmail.textContent = currentUser.email || 'Not provided';
+        if (profileRole) {
+          const roleMap = {
+            'management': 'Management',
+            'supervisor': 'Supervisor',
+            'promodizer': 'Promodizer',
+            'salesOperations': 'Sales Operations'
+          };
+          profileRole.textContent = roleMap[currentUser.role] || currentUser.role;
+        }
+        if (profileId) profileId.textContent = currentUser.id;
+      }
+    }
+    
+    // Set last sync time
+    const lastSync = document.getElementById('last-sync');
+    if (lastSync) {
+      lastSync.textContent = new Date().toLocaleString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+  }
+
+  // Settings navigation
+  function funHandleSettingsNavigation() {
+    const navButtons = document.querySelectorAll('.settings-nav-btn');
+    const panels = document.querySelectorAll('.settings-panel');
+    
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const section = btn.getAttribute('data-section');
+        
+        // Update active nav button
+        navButtons.forEach(b => {
+          b.classList.remove('active', 'bg-teal-50', 'text-teal-700', 'border-l-2', 'border-teal-700');
+          b.classList.add('text-slate-700', 'hover:bg-slate-50', 'hover:text-teal-700');
+        });
+        btn.classList.remove('text-slate-700', 'hover:bg-slate-50', 'hover:text-teal-700');
+        btn.classList.add('active', 'bg-teal-50', 'text-teal-700', 'border-l-2', 'border-teal-700');
+        
+        // Show corresponding panel
+        panels.forEach(panel => panel.classList.add('hidden'));
+        const targetPanel = document.getElementById(`${section}-panel`);
+        if (targetPanel) targetPanel.classList.remove('hidden');
+      });
+    });
+  }
+
+  // Load preferences into forms
+  function funLoadPreferencesIntoForms() {
+    const preferences = funLoadUserPreferences();
+    
+    // Dashboard preferences
+    const defaultLandingPage = document.getElementById('defaultLandingPage');
+    if (defaultLandingPage) defaultLandingPage.value = preferences.dashboard.defaultLandingPage;
+    
+    const defaultChartType = document.getElementById('defaultChartType');
+    if (defaultChartType) defaultChartType.value = preferences.dashboard.defaultChartType;
+    
+    const autoRefreshInterval = document.getElementById('autoRefreshInterval');
+    if (autoRefreshInterval) autoRefreshInterval.value = preferences.dashboard.autoRefreshInterval;
+    
+    // KPI Cards checkboxes
+    Object.keys(preferences.dashboard.kpiCards).forEach(key => {
+      const checkbox = document.getElementById(`kpi-${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`);
+      if (checkbox) checkbox.checked = preferences.dashboard.kpiCards[key];
+    });
+    
+    // Date Range preferences
+    const defaultDateRange = document.getElementById('defaultDateRange');
+    if (defaultDateRange) {
+      defaultDateRange.value = preferences.dateRange.defaultDateRange;
+      funToggleCustomDateRange(preferences.dateRange.defaultDateRange === 'custom');
+    }
+    
+    const customStartDate = document.getElementById('customStartDate');
+    if (customStartDate) customStartDate.value = preferences.dateRange.customStartDate;
+    
+    const customEndDate = document.getElementById('customEndDate');
+    if (customEndDate) customEndDate.value = preferences.dateRange.customEndDate;
+    
+    const dateFormat = document.getElementById('dateFormat');
+    if (dateFormat) dateFormat.value = preferences.dateRange.dateFormat;
+    
+    const timeFormat = document.getElementById('timeFormat');
+    if (timeFormat) timeFormat.value = preferences.dateRange.timeFormat;
+    
+    // Display preferences
+    const themeSelection = document.getElementById('themeSelection');
+    if (themeSelection) themeSelection.value = preferences.display.theme;
+    
+    const colorScheme = document.getElementById('colorScheme');
+    if (colorScheme) colorScheme.value = preferences.display.colorScheme;
+    
+    const tablePageSize = document.getElementById('tablePageSize');
+    if (tablePageSize) tablePageSize.value = preferences.display.tablePageSize;
+    
+    const decimalPlaces = document.getElementById('decimalPlaces');
+    if (decimalPlaces) decimalPlaces.value = preferences.display.decimalPlaces;
+    
+    const thousandsSeparator = document.getElementById('thousandsSeparator');
+    if (thousandsSeparator) thousandsSeparator.value = preferences.display.thousandsSeparator;
+  }
+
+  // Toggle custom date range visibility
+  function funToggleCustomDateRange(show) {
+    const customDateRange = document.getElementById('custom-date-range');
+    if (customDateRange) {
+      if (show) {
+        customDateRange.classList.remove('hidden');
+      } else {
+        customDateRange.classList.add('hidden');
+      }
+    }
+  }
+
+  // Handle form submissions
+  function funHandleFormSubmissions() {
+    // Dashboard settings form
+    const dashboardForm = document.getElementById('dashboard-settings-form');
+    if (dashboardForm) {
+      dashboardForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const preferences = funLoadUserPreferences();
+        
+        preferences.dashboard.defaultLandingPage = document.getElementById('defaultLandingPage')?.value || 'dashboard';
+        preferences.dashboard.defaultChartType = document.getElementById('defaultChartType')?.value || 'line';
+        preferences.dashboard.autoRefreshInterval = document.getElementById('autoRefreshInterval')?.value || 'never';
+        
+        // Update KPI cards
+        const kpiCheckboxes = ['total-sales', 'transactions', 'avg-transaction', 'top-product', 'staff-performance', 'store-comparison'];
+        const kpiKeys = ['totalSales', 'transactions', 'avgTransaction', 'topProduct', 'staffPerformance', 'storeComparison'];
+        
+        kpiCheckboxes.forEach((id, index) => {
+          const checkbox = document.getElementById(`kpi-${id}`);
+          if (checkbox) {
+            preferences.dashboard.kpiCards[kpiKeys[index]] = checkbox.checked;
+          }
+        });
+        
+        if (funSaveUserPreferences(preferences)) {
+          funShowSuccessMessage('Dashboard preferences saved successfully!');
+        }
+      });
+    }
+    
+    // Date range settings form
+    const dateRangeForm = document.getElementById('daterange-settings-form');
+    if (dateRangeForm) {
+      dateRangeForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const preferences = funLoadUserPreferences();
+        
+        preferences.dateRange.defaultDateRange = document.getElementById('defaultDateRange')?.value || 'last7days';
+        preferences.dateRange.customStartDate = document.getElementById('customStartDate')?.value || '';
+        preferences.dateRange.customEndDate = document.getElementById('customEndDate')?.value || '';
+        preferences.dateRange.dateFormat = document.getElementById('dateFormat')?.value || 'DD/MM/YYYY';
+        preferences.dateRange.timeFormat = document.getElementById('timeFormat')?.value || '24';
+        
+        // Validate custom date range if selected
+        if (preferences.dateRange.defaultDateRange === 'custom') {
+          const startDate = new Date(preferences.dateRange.customStartDate);
+          const endDate = new Date(preferences.dateRange.customEndDate);
+          
+          if (!preferences.dateRange.customStartDate || !preferences.dateRange.customEndDate) {
+            alert('Please specify both start and end dates for custom range.');
+            return;
+          }
+          
+          if (startDate >= endDate) {
+            alert('Start date must be before end date.');
+            return;
+          }
+        }
+        
+        if (funSaveUserPreferences(preferences)) {
+          funShowSuccessMessage('Date range preferences saved successfully!');
+        }
+      });
+    }
+    
+    // Display settings form
+    const displayForm = document.getElementById('display-settings-form');
+    if (displayForm) {
+      displayForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const preferences = funLoadUserPreferences();
+        
+        preferences.display.theme = document.getElementById('themeSelection')?.value || 'light';
+        preferences.display.colorScheme = document.getElementById('colorScheme')?.value || 'default';
+        preferences.display.tablePageSize = document.getElementById('tablePageSize')?.value || '50';
+        preferences.display.decimalPlaces = document.getElementById('decimalPlaces')?.value || '2';
+        preferences.display.thousandsSeparator = document.getElementById('thousandsSeparator')?.value || ',';
+        
+        if (funSaveUserPreferences(preferences)) {
+          funShowSuccessMessage('Display preferences saved successfully!');
+        }
+      });
+    }
+  }
+
+  // Handle data management actions
+  function funHandleDataManagementActions() {
+    // Clear Cache
+    const clearCacheBtn = document.getElementById('clear-cache-btn');
+    const clearCacheModal = document.getElementById('clearCacheModal');
+    const cancelClearCache = document.getElementById('cancel-clear-cache');
+    const confirmClearCache = document.getElementById('confirm-clear-cache');
+    
+    if (clearCacheBtn && clearCacheModal) {
+      clearCacheBtn.addEventListener('click', () => {
+        funUpdateStorageDisplay(); // Update modal cache size
+        clearCacheModal.classList.remove('hidden');
+      });
+    }
+    
+    if (cancelClearCache && clearCacheModal) {
+      cancelClearCache.addEventListener('click', () => {
+        clearCacheModal.classList.add('hidden');
+      });
+    }
+    
+    if (confirmClearCache) {
+      confirmClearCache.addEventListener('click', () => {
+        try {
+          // Clear only user preferences and settings, keep app data
+          localStorage.removeItem('user_preferences');
+          funShowSuccessMessage('Cache cleared successfully! Reloading...');
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } catch (error) {
+          alert('Error clearing cache: ' + error.message);
+        }
+      });
+    }
+    
+    // Export Settings
+    const exportBtn = document.getElementById('export-settings-btn');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', () => {
+        const preferences = funLoadUserPreferences();
+        const dataStr = JSON.stringify(preferences, null, 2);
+        const dataBlob = new Blob([dataStr], {type: 'application/json'});
+        
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `sales-dashboard-settings-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        funShowSuccessMessage('Settings exported successfully!');
+      });
+    }
+    
+    // Import Settings
+    const importBtn = document.getElementById('import-settings-btn');
+    const importModal = document.getElementById('importSettingsModal');
+    const chooseFileBtn = document.getElementById('choose-file-btn');
+    const settingsFileInput = document.getElementById('settings-file-input');
+    const cancelImport = document.getElementById('cancel-import');
+    const confirmImport = document.getElementById('confirm-import');
+    
+    if (importBtn && importModal) {
+      importBtn.addEventListener('click', () => {
+        importModal.classList.remove('hidden');
+      });
+    }
+    
+    if (chooseFileBtn && settingsFileInput) {
+      chooseFileBtn.addEventListener('click', () => {
+        settingsFileInput.click();
+      });
+    }
+    
+    if (settingsFileInput) {
+      settingsFileInput.addEventListener('change', (e) => {
+        funHandleSettingsFileSelection(e.target.files[0]);
+      });
+    }
+    
+    if (cancelImport && importModal) {
+      cancelImport.addEventListener('click', () => {
+        importModal.classList.add('hidden');
+        funResetImportForm();
+      });
+    }
+    
+    if (confirmImport) {
+      confirmImport.addEventListener('click', () => {
+        funImportSettings();
+      });
+    }
+  }
+
+  // Handle settings file selection
+  function funHandleSettingsFileSelection(file) {
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const settings = JSON.parse(e.target.result);
+        funDisplaySettingsPreview(settings);
+        funEnableImportButton(settings);
+      } catch (error) {
+        alert('Invalid JSON file. Please select a valid settings file.');
+        funResetImportForm();
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  // Display settings preview
+  function funDisplaySettingsPreview(settings) {
+    const filePreview = document.getElementById('file-preview');
+    const settingsPreview = document.getElementById('settings-preview');
+    const importCategories = document.getElementById('import-categories');
+    
+    if (filePreview && settingsPreview && importCategories) {
+      const previewText = JSON.stringify(settings, null, 2);
+      settingsPreview.textContent = previewText.length > 500 ? previewText.substring(0, 500) + '...' : previewText;
+      
+      filePreview.classList.remove('hidden');
+      importCategories.classList.remove('hidden');
+    }
+  }
+
+  // Enable import button
+  function funEnableImportButton(settings) {
+    const confirmImport = document.getElementById('confirm-import');
+    if (confirmImport) {
+      confirmImport.disabled = false;
+      confirmImport.dataset.settings = JSON.stringify(settings);
+    }
+  }
+
+  // Reset import form
+  function funResetImportForm() {
+    const filePreview = document.getElementById('file-preview');
+    const importCategories = document.getElementById('import-categories');
+    const confirmImport = document.getElementById('confirm-import');
+    const settingsFileInput = document.getElementById('settings-file-input');
+    
+    if (filePreview) filePreview.classList.add('hidden');
+    if (importCategories) importCategories.classList.add('hidden');
+    if (confirmImport) {
+      confirmImport.disabled = true;
+      delete confirmImport.dataset.settings;
+    }
+    if (settingsFileInput) settingsFileInput.value = '';
+  }
+
+  // Import settings
+  function funImportSettings() {
+    const confirmImport = document.getElementById('confirm-import');
+    if (!confirmImport || !confirmImport.dataset.settings) return;
+    
+    try {
+      const newSettings = JSON.parse(confirmImport.dataset.settings);
+      const currentPreferences = funLoadUserPreferences();
+      const selectedCategories = [];
+      
+      // Get selected categories
+      document.querySelectorAll('.import-category:checked').forEach(checkbox => {
+        selectedCategories.push(checkbox.dataset.category);
+      });
+      
+      // Update preferences based on selected categories
+      selectedCategories.forEach(category => {
+        if (newSettings[category]) {
+          currentPreferences[category] = { ...currentPreferences[category], ...newSettings[category] };
+        }
+      });
+      
+      if (funSaveUserPreferences(currentPreferences)) {
+        const importModal = document.getElementById('importSettingsModal');
+        if (importModal) importModal.classList.add('hidden');
+        
+        funShowSuccessMessage('Settings imported successfully! Reloading...');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
+    } catch (error) {
+      alert('Error importing settings: ' + error.message);
+    }
+  }
+
+  // Handle default date range change
+  const defaultDateRange = document.getElementById('defaultDateRange');
+  if (defaultDateRange) {
+    defaultDateRange.addEventListener('change', (e) => {
+      funToggleCustomDateRange(e.target.value === 'custom');
+    });
+  }
+
+  // Initialize everything
+  funInitializeProfile();
+  funUpdateStorageDisplay();
+  funHandleSettingsNavigation();
+  funLoadPreferencesIntoForms();
+  funHandleFormSubmissions();
+  funHandleDataManagementActions();
+});
+</script></body></html>

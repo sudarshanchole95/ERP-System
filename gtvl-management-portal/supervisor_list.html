@@ -1,0 +1,1348 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>GTVL Management Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        /* GTVL Brand Colors */
+        --color-primary: #0F766E; /* Teal-700 - Primary CTAs, navigation highlights */
+        --color-primary-hover: #0D9488; /* Teal-600 - Hover states */
+        --color-secondary: #475569; /* Slate-600 - Secondary elements */
+        --color-accent: #D97706; /* Amber-600 - Call-to-action highlights */
+        --color-surface: #FFFFFF; /* White - Cards, modals, panels */
+        --color-background: #F8FAFC; /* Slate-50 - Page backgrounds */
+        --color-surface-variant: #F1F5F9; /* Slate-100 - Alternate backgrounds */
+        --color-on-background: #0F172A; /* Slate-900 - Primary headings */
+        --color-on-surface: #1E293B; /* Slate-800 - Body text */
+        --color-border: #E2E8F0; /* Slate-200 - Borders */
+        --color-success: #16A34A; /* Green-600 - Success states */
+        --color-warning: #F59E0B; /* Amber-500 - Warning alerts */
+        --color-error: #DC2626; /* Red-600 - Error messages */
+        --color-info: #2563EB; /* Blue-600 - Info messages */
+
+        /* Layout Constants */
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      /* Smooth scrolling */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      /* Layout with CSS variables */
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      /* Mobile sidebar slide states */
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      /* Active nav link styling */
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+        background-color: #f0fdfa;
+        color: var(--color-primary);
+      }
+
+      /* Popover animation states */
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      /* Sidebar backdrop states */
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Supervisors - GTVL Management Portal</title></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <!-- HEADER SECTION -->
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <!-- Left: Logo & Title -->
+        <div class="flex items-center gap-3">
+          <!-- Mobile Menu Toggle -->
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <!-- Logo -->
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <rect x="68" y="68" width="264" height="264" rx="32" stroke="#0F766E" stroke-width="18"></rect>
+                  <rect x="109" y="143" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                  <rect x="206" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                </g>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">
+              GTVL Management Portal
+            </h1>
+          </div>
+        </div>
+
+        <!-- Right: User Profile -->
+        <div class="flex items-center gap-2 md:gap-3">
+          <!-- User Profile Button -->
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-500 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- User Profile Popover -->
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <!-- User Info Section -->
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-500 truncate"></div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <!-- Main Navigation Section -->
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Management
+          </div>
+          <div class="space-y-1">
+            <a href="management_dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="management_dashboard">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="sku_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sku_list">
+              <i data-lucide="package" class="w-5 h-5"></i>
+              <span>SKUs</span>
+            </a>
+            <a href="store_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="store_list">
+              <i data-lucide="store" class="w-5 h-5"></i>
+              <span>Stores</span>
+            </a>
+            <a href="supervisor_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="supervisor_list">
+              <i data-lucide="user-check" class="w-5 h-5"></i>
+              <span>Supervisors</span>
+            </a>
+            <a href="promodizer_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="promodizer_list">
+              <i data-lucide="users" class="w-5 h-5"></i>
+              <span>Promodizers</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="app-main p-6" id="pageContent" role="main"><nav class="mb-6" aria-label="Breadcrumb">
+  <div class="flex items-center gap-2 text-sm">
+    <a href="management_dashboard.html" class="text-slate-600 hover:text-teal-700 no-underline">
+      Dashboard
+    </a>
+    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+    <span class="text-slate-900 font-medium">Supervisors</span>
+  </div>
+</nav>
+
+<!-- Page Header with Stats -->
+<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900 mb-2">
+      Supervisors
+    </h1>
+    <p class="text-sm text-slate-600">
+      Manage and view all supervisor records with store assignments
+    </p>
+  </div>
+  <button id="addSupervisorBtn" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-teal-700 text-white text-sm font-semibold rounded-lg hover:bg-teal-600 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+    <i data-lucide="plus" class="w-4 h-4"></i>
+    Add New Supervisor
+  </button>
+</div>
+
+<!-- Quick Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+  <div class="bg-white rounded-lg border border-slate-200 p-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-xs text-slate-500 font-medium uppercase tracking-wide">Total Supervisors</p>
+        <p id="totalSupervisors" class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900">0</p>
+      </div>
+      <div class="w-12 h-12 bg-teal-50 rounded-lg flex items-center justify-center">
+        <i data-lucide="user-check" class="w-6 h-6 text-teal-700"></i>
+      </div>
+    </div>
+  </div>
+  <div class="bg-white rounded-lg border border-slate-200 p-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-xs text-slate-500 font-medium uppercase tracking-wide">Assigned</p>
+        <p id="assignedSupervisors" class="text-[1.75rem] leading-[2.25rem] font-bold text-green-600">0</p>
+      </div>
+      <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+        <i data-lucide="link" class="w-6 h-6 text-green-600"></i>
+      </div>
+    </div>
+  </div>
+  <div class="bg-white rounded-lg border border-slate-200 p-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-xs text-slate-500 font-medium uppercase tracking-wide">Unassigned</p>
+        <p id="unassignedSupervisors" class="text-[1.75rem] leading-[2.25rem] font-bold text-amber-600">0</p>
+      </div>
+      <div class="w-12 h-12 bg-amber-50 rounded-lg flex items-center justify-center">
+        <i data-lucide="user-x" class="w-6 h-6 text-amber-600"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filters and Search -->
+<div class="bg-white rounded-lg border border-slate-200 p-4 mb-6">
+  <div class="flex flex-col sm:flex-row gap-4">
+    <!-- Search Input -->
+    <div class="flex-1">
+      <label for="searchInput" class="sr-only">Search supervisors</label>
+      <div class="relative">
+        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 transform -translate-y-1/2"></i>
+        <input type="text" id="searchInput" class="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500" placeholder="Search by name or employee ID...">
+      </div>
+    </div>
+    
+    <!-- Status Filter -->
+    <div class="sm:w-40">
+      <label for="statusFilter" class="sr-only">Filter by status</label>
+      <select id="statusFilter" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+        <option value="">All Status</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+    </div>
+    
+    <!-- Assignment Filter -->
+    <div class="sm:w-44">
+      <label for="assignmentFilter" class="sr-only">Filter by assignment</label>
+      <select id="assignmentFilter" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+        <option value="">All Assignments</option>
+        <option value="assigned">Assigned</option>
+        <option value="unassigned">Unassigned</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- Supervisors Table -->
+<div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead class="bg-slate-50 border-b border-slate-200">
+        <tr>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide cursor-pointer hover:bg-slate-100 transition-colors duration-200" data-sort="employeeId">
+            <div class="flex items-center gap-2">
+              Employee ID
+              <i data-lucide="arrow-up-down" class="w-3 h-3"></i>
+            </div>
+          </th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide cursor-pointer hover:bg-slate-100 transition-colors duration-200" data-sort="name">
+            <div class="flex items-center gap-2">
+              Name
+              <i data-lucide="arrow-up-down" class="w-3 h-3"></i>
+            </div>
+          </th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide cursor-pointer hover:bg-slate-100 transition-colors duration-200" data-sort="phone">
+            <div class="flex items-center gap-2">
+              Phone
+              <i data-lucide="arrow-up-down" class="w-3 h-3"></i>
+            </div>
+          </th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide cursor-pointer hover:bg-slate-100 transition-colors duration-200" data-sort="email">
+            <div class="flex items-center gap-2">
+              Email
+              <i data-lucide="arrow-up-down" class="w-3 h-3"></i>
+            </div>
+          </th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide cursor-pointer hover:bg-slate-100 transition-colors duration-200" data-sort="store">
+            <div class="flex items-center gap-2">
+              Assigned Store
+              <i data-lucide="arrow-up-down" class="w-3 h-3"></i>
+            </div>
+          </th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide cursor-pointer hover:bg-slate-100 transition-colors duration-200" data-sort="status">
+            <div class="flex items-center gap-2">
+              Status
+              <i data-lucide="arrow-up-down" class="w-3 h-3"></i>
+            </div>
+          </th>
+          <th class="px-4 py-3 text-right text-xs font-semibold text-slate-600 uppercase tracking-wide">
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody id="supervisorsTableBody" class="divide-y divide-slate-200">
+        <!-- Table rows will be populated by JavaScript -->
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- Empty State -->
+  <div id="emptyState" class="hidden p-12 text-center">
+    <div class="w-12 h-12 mx-auto mb-4 bg-slate-100 rounded-lg flex items-center justify-center">
+      <i data-lucide="users" class="w-6 h-6 text-slate-400"></i>
+    </div>
+    <h3 class="text-base font-semibold text-slate-900 mb-2">No supervisors found</h3>
+    <p class="text-sm text-slate-500 mb-4">Get started by creating your first supervisor.</p>
+    <button id="emptyStateAddBtn" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-teal-700 text-white text-sm font-semibold rounded-lg hover:bg-teal-600 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+      <i data-lucide="plus" class="w-4 h-4"></i>
+      Add New Supervisor
+    </button>
+  </div>
+</div>
+
+<!-- Quick Allocate Modal -->
+<div id="quickAllocateModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,42rem)] max-h-[90vh] overflow-y-auto">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+        <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Quick Allocate</h2>
+        <button id="quickAllocateCloseBtn" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Close modal">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      
+      <!-- Modal Body -->
+      <div class="p-6">
+        <div class="mb-6">
+          <h3 class="text-base font-semibold text-slate-900 mb-2">Supervisor Details</h3>
+          <div class="bg-slate-50 rounded-lg p-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                <span id="supervisorInitials"></span>
+              </div>
+              <div>
+                <p id="supervisorName" class="font-semibold text-slate-900"></p>
+                <p id="supervisorEmployeeId" class="text-sm text-slate-500"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-6">
+          <label for="storeSelect" class="block text-sm font-semibold text-slate-800 mb-2">
+            Select Store
+          </label>
+          <select id="storeSelect" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500" required="">
+            <option value="">Choose a store...</option>
+          </select>
+        </div>
+      </div>
+      
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200">
+        <button id="quickAllocateCancelBtn" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+          Cancel
+        </button>
+        <button id="quickAllocateSubmitBtn" class="px-4 py-2 bg-teal-700 text-white text-sm font-semibold rounded-lg hover:bg-teal-600 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled="">
+          Allocate
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,42rem)] max-h-[90vh] overflow-y-auto">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+        <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Delete Supervisor</h2>
+        <button id="deleteCloseBtn" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Close modal">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      
+      <!-- Modal Body -->
+      <div class="p-6">
+        <div class="mb-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-red-100 text-red-600 rounded-full flex items-center justify-center">
+              <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-semibold text-slate-900">Confirm Deletion</h3>
+              <p class="text-sm text-slate-600">This action cannot be undone.</p>
+            </div>
+          </div>
+          
+          <div class="bg-slate-50 rounded-lg p-4 mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                <span id="deleteSupervisorInitials"></span>
+              </div>
+              <div>
+                <p id="deleteSupervisorName" class="font-semibold text-slate-900"></p>
+                <p id="deleteSupervisorEmployeeId" class="text-sm text-slate-500"></p>
+              </div>
+            </div>
+          </div>
+          
+          <div id="assignmentWarning" class="hidden bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <div class="flex items-start gap-3">
+              <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600 mt-0.5"></i>
+              <div>
+                <h4 class="font-semibold text-amber-800 mb-1">Assignment Warning</h4>
+                <p class="text-sm text-amber-700" id="assignmentWarningText"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200">
+        <button id="deleteCancelBtn" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+          Cancel
+        </button>
+        <button id="unassignDeleteBtn" class="hidden px-4 py-2 bg-amber-600 text-white text-sm font-semibold rounded-lg hover:bg-amber-500 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-600 focus-visible:outline-offset-2">
+          Unassign and Delete
+        </button>
+        <button id="forceDeleteBtn" class="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-500 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-600 focus-visible:outline-offset-2">
+          <span id="deleteButtonText">Delete</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="fixed top-4 right-4 z-50 hidden">
+  <div class="bg-white border border-slate-200 rounded-lg shadow-lg p-4 max-w-sm">
+    <div class="flex items-center gap-3">
+      <div id="toastIcon" class="w-5 h-5"></div>
+      <p id="toastMessage" class="text-sm font-medium text-slate-900"></p>
+    </div>
+  </div>
+</div>
+
+</main>
+
+    <!-- JAVASCRIPT INITIALIZATION -->
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils =
+          window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_mgmt_001");
+                    currentUserId = "usr_mgmt_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } =
+            state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail)
+            return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute(
+            "aria-expanded",
+            shouldOpen ? "true" : "false"
+          );
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active");
+            } else {
+              link.classList.remove("active");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () =>
+            closeMobileSidebar()
+          );
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+// Utility: portal a modal by id (idempotent)
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+
+  // Set active nav link
+  if (window.TemplateUtils?.setActiveNavLink) {
+    window.TemplateUtils.setActiveNavLink('supervisor_list');
+  }
+
+  // State management
+  let supervisorsData = [];
+  let supervisorAllocations = [];
+  let storesData = [];
+  let filteredSupervisors = [];
+  let currentSort = { field: null, direction: 'asc' };
+  let selectedSupervisorForAction = null;
+
+  // DOM elements
+  const searchInput = document.getElementById('searchInput');
+  const statusFilter = document.getElementById('statusFilter');
+  const assignmentFilter = document.getElementById('assignmentFilter');
+  const supervisorsTableBody = document.getElementById('supervisorsTableBody');
+  const emptyState = document.getElementById('emptyState');
+  const addSupervisorBtn = document.getElementById('addSupervisorBtn');
+  const emptyStateAddBtn = document.getElementById('emptyStateAddBtn');
+  
+  // Quick Allocate Modal elements
+  const quickAllocateModal = document.getElementById('quickAllocateModal');
+  const quickAllocateCloseBtn = document.getElementById('quickAllocateCloseBtn');
+  const quickAllocateCancelBtn = document.getElementById('quickAllocateCancelBtn');
+  const quickAllocateSubmitBtn = document.getElementById('quickAllocateSubmitBtn');
+  const supervisorInitials = document.getElementById('supervisorInitials');
+  const supervisorName = document.getElementById('supervisorName');
+  const supervisorEmployeeId = document.getElementById('supervisorEmployeeId');
+  const storeSelect = document.getElementById('storeSelect');
+  
+  // Delete Modal elements
+  const deleteModal = document.getElementById('deleteModal');
+  const deleteCloseBtn = document.getElementById('deleteCloseBtn');
+  const deleteCancelBtn = document.getElementById('deleteCancelBtn');
+  const unassignDeleteBtn = document.getElementById('unassignDeleteBtn');
+  const forceDeleteBtn = document.getElementById('forceDeleteBtn');
+  const deleteSupervisorInitials = document.getElementById('deleteSupervisorInitials');
+  const deleteSupervisorName = document.getElementById('deleteSupervisorName');
+  const deleteSupervisorEmployeeId = document.getElementById('deleteSupervisorEmployeeId');
+  const assignmentWarning = document.getElementById('assignmentWarning');
+  const assignmentWarningText = document.getElementById('assignmentWarningText');
+  const deleteButtonText = document.getElementById('deleteButtonText');
+
+  // Stats elements
+  const totalSupervisors = document.getElementById('totalSupervisors');
+  const assignedSupervisors = document.getElementById('assignedSupervisors');
+  const unassignedSupervisors = document.getElementById('unassignedSupervisors');
+
+  // Toast elements
+  const toast = document.getElementById('toast');
+  const toastIcon = document.getElementById('toastIcon');
+  const toastMessage = document.getElementById('toastMessage');
+
+  // Utility functions
+  function funGetUserInitials(user) {
+    if (!user) return '?';
+    const first = user.firstName?.charAt(0) || '';
+    const last = user.lastName?.charAt(0) || '';
+    return (first + last).toUpperCase() || 'U';
+  }
+
+  function funGetFullName(user) {
+    if (!user) return '';
+    return `${user.firstName || ''} ${user.lastName || ''}`.trim();
+  }
+
+  function funShowToast(message, type = 'success') {
+    toastMessage.textContent = message;
+    
+    if (type === 'success') {
+      toastIcon.innerHTML = '<i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>';
+    } else if (type === 'error') {
+      toastIcon.innerHTML = '<i data-lucide="x-circle" class="w-5 h-5 text-red-600"></i>';
+    }
+    
+    // Create icons for the new content
+    if (window.lucide?.createIcons) {
+      window.lucide.createIcons();
+    }
+    
+    toast.classList.remove('hidden');
+    setTimeout(() => {
+      toast.classList.add('hidden');
+    }, 3000);
+  }
+
+  function funShowModal(modal) {
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function funHideModal(modal) {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  // Data loading functions
+  function funLoadSupervisorsData() {
+    try {
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      supervisorsData = users.filter(user => user.role === 'supervisor');
+      
+      supervisorAllocations = JSON.parse(localStorage.getItem('supervisorAllocations') || '[]');
+      storesData = JSON.parse(localStorage.getItem('stores') || '[]');
+      
+      funUpdateStats();
+      funApplyFilters();
+    } catch (error) {
+      console.error('Error loading supervisors data:', error);
+      funShowToast('Error loading data', 'error');
+    }
+  }
+
+  function funUpdateStats() {
+    const assigned = supervisorsData.filter(supervisor => 
+      supervisorAllocations.some(allocation => allocation.supervisorId === supervisor.id)
+    );
+    
+    totalSupervisors.textContent = supervisorsData.length;
+    assignedSupervisors.textContent = assigned.length;
+    unassignedSupervisors.textContent = supervisorsData.length - assigned.length;
+  }
+
+  // Filtering and sorting
+  function funApplyFilters() {
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    const statusValue = statusFilter.value;
+    const assignmentValue = assignmentFilter.value;
+
+    filteredSupervisors = supervisorsData.filter(supervisor => {
+      // Search filter
+      const fullName = funGetFullName(supervisor).toLowerCase();
+      const employeeId = supervisor.employeeId?.toLowerCase() || '';
+      const matchesSearch = !searchTerm || 
+        fullName.includes(searchTerm) || 
+        employeeId.includes(searchTerm);
+
+      // Status filter
+      const matchesStatus = !statusValue || supervisor.status === statusValue;
+
+      // Assignment filter
+      const isAssigned = supervisorAllocations.some(allocation => 
+        allocation.supervisorId === supervisor.id
+      );
+      const matchesAssignment = !assignmentValue || 
+        (assignmentValue === 'assigned' && isAssigned) ||
+        (assignmentValue === 'unassigned' && !isAssigned);
+
+      return matchesSearch && matchesStatus && matchesAssignment;
+    });
+
+    funApplySort();
+    funRenderTable();
+  }
+
+  function funApplySort() {
+    if (!currentSort.field) return;
+
+    filteredSupervisors.sort((a, b) => {
+      let valueA, valueB;
+
+      switch (currentSort.field) {
+        case 'employeeId':
+          valueA = a.employeeId || '';
+          valueB = b.employeeId || '';
+          break;
+        case 'name':
+          valueA = funGetFullName(a);
+          valueB = funGetFullName(b);
+          break;
+        case 'phone':
+          valueA = a.phone || '';
+          valueB = b.phone || '';
+          break;
+        case 'email':
+          valueA = a.email || '';
+          valueB = b.email || '';
+          break;
+        case 'store':
+          const allocationA = supervisorAllocations.find(allocation => allocation.supervisorId === a.id);
+          const allocationB = supervisorAllocations.find(allocation => allocation.supervisorId === b.id);
+          const storeA = allocationA ? storesData.find(store => store.id === allocationA.storeId) : null;
+          const storeB = allocationB ? storesData.find(store => store.id === allocationB.storeId) : null;
+          valueA = storeA ? storeA.storeName : '';
+          valueB = storeB ? storeB.storeName : '';
+          break;
+        case 'status':
+          valueA = a.status || '';
+          valueB = b.status || '';
+          break;
+        default:
+          return 0;
+      }
+
+      if (valueA < valueB) return currentSort.direction === 'asc' ? -1 : 1;
+      if (valueA > valueB) return currentSort.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
+  function funHandleSort(field) {
+    if (currentSort.field === field) {
+      currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+      currentSort.field = field;
+      currentSort.direction = 'asc';
+    }
+    
+    funApplySort();
+    funRenderTable();
+  }
+
+  // Table rendering
+  function funRenderTable() {
+    if (filteredSupervisors.length === 0) {
+      supervisorsTableBody.innerHTML = '';
+      emptyState.classList.remove('hidden');
+      return;
+    }
+
+    emptyState.classList.add('hidden');
+
+    supervisorsTableBody.innerHTML = filteredSupervisors.map(supervisor => {
+      const allocation = supervisorAllocations.find(allocation => 
+        allocation.supervisorId === supervisor.id
+      );
+      const assignedStore = allocation ? 
+        storesData.find(store => store.id === allocation.storeId) : null;
+      
+      const statusBadge = supervisor.status === 'active' 
+        ? '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>'
+        : '<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">Inactive</span>';
+
+      const storeDisplay = assignedStore 
+        ? `<a href="store_details.html?id=${assignedStore.id}" class="text-teal-700 hover:text-teal-600 no-underline font-medium">${assignedStore.storeName}</a>`
+        : '<span class="text-slate-400 flex items-center gap-2"><i data-lucide="user-x" class="w-4 h-4"></i>Unassigned</span>';
+
+      const isAssigned = !!assignedStore;
+
+      return `
+        <tr class="hover:bg-slate-50 transition-colors duration-150">
+          <td class="px-4 py-3 text-sm text-slate-900 font-medium">
+            ${supervisor.employeeId || 'N/A'}
+          </td>
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-xs font-semibold">
+                ${funGetUserInitials(supervisor)}
+              </div>
+              <span class="text-sm font-medium text-slate-900">
+                ${funGetFullName(supervisor)}
+              </span>
+            </div>
+          </td>
+          <td class="px-4 py-3 text-sm text-slate-600">
+            ${supervisor.phone || 'N/A'}
+          </td>
+          <td class="px-4 py-3 text-sm text-slate-600">
+            ${supervisor.email || 'N/A'}
+          </td>
+          <td class="px-4 py-3 text-sm">
+            ${storeDisplay}
+          </td>
+          <td class="px-4 py-3">
+            ${statusBadge}
+          </td>
+          <td class="px-4 py-3 text-right">
+            <div class="flex items-center justify-end gap-1">
+              <button
+                onclick="funViewSupervisor('${supervisor.id}')"
+                class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600 focus-visible:outline-offset-2"
+                title="View Details"
+              >
+                <i data-lucide="eye" class="w-4 h-4"></i>
+              </button>
+              <button
+                onclick="funEditSupervisor('${supervisor.id}')"
+                class="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-600 focus-visible:outline-offset-2"
+                title="Edit"
+              >
+                <i data-lucide="edit" class="w-4 h-4"></i>
+              </button>
+              <button
+                onclick="funQuickAllocate('${supervisor.id}')"
+                class="p-2 text-slate-400 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-600 focus-visible:outline-offset-2 ${isAssigned ? 'opacity-50 cursor-not-allowed' : ''}"
+                title="Quick Allocate"
+                ${isAssigned ? 'disabled' : ''}
+              >
+                <i data-lucide="link" class="w-4 h-4"></i>
+              </button>
+              <button
+                onclick="funDeleteSupervisor('${supervisor.id}')"
+                class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-600 focus-visible:outline-offset-2"
+                title="Delete"
+              >
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    // Create icons for the new content
+    if (window.lucide?.createIcons) {
+      window.lucide.createIcons();
+    }
+  }
+
+  // Action functions
+  window.funViewSupervisor = function(supervisorId) {
+    window.location.href = `supervisor_details.html?id=${supervisorId}`;
+  };
+
+  window.funEditSupervisor = function(supervisorId) {
+    window.location.href = `supervisor_edit.html?id=${supervisorId}`;
+  };
+
+  window.funQuickAllocate = function(supervisorId) {
+    selectedSupervisorForAction = supervisorsData.find(s => s.id === supervisorId);
+    if (!selectedSupervisorForAction) return;
+
+    // Check if supervisor is already assigned
+    const existingAllocation = supervisorAllocations.find(allocation => 
+      allocation.supervisorId === supervisorId
+    );
+    if (existingAllocation) {
+      funShowToast('Supervisor is already assigned to a store', 'error');
+      return;
+    }
+
+    // Populate supervisor details
+    supervisorInitials.textContent = funGetUserInitials(selectedSupervisorForAction);
+    supervisorName.textContent = funGetFullName(selectedSupervisorForAction);
+    supervisorEmployeeId.textContent = selectedSupervisorForAction.employeeId || 'N/A';
+
+    // Populate available stores
+    const assignedStoreIds = supervisorAllocations.map(allocation => allocation.storeId);
+    const availableStores = storesData.filter(store => 
+      !assignedStoreIds.includes(store.id) && store.status === 'active'
+    );
+
+    storeSelect.innerHTML = '<option value="">Choose a store...</option>' +
+      availableStores.map(store => 
+        `<option value="${store.id}">${store.storeName} - ${store.city}, ${store.state}</option>`
+      ).join('');
+
+    quickAllocateSubmitBtn.disabled = true;
+    funShowModal(quickAllocateModal);
+  };
+
+  window.funDeleteSupervisor = function(supervisorId) {
+    selectedSupervisorForAction = supervisorsData.find(s => s.id === supervisorId);
+    if (!selectedSupervisorForAction) return;
+
+    // Populate supervisor details
+    deleteSupervisorInitials.textContent = funGetUserInitials(selectedSupervisorForAction);
+    deleteSupervisorName.textContent = funGetFullName(selectedSupervisorForAction);
+    deleteSupervisorEmployeeId.textContent = selectedSupervisorForAction.employeeId || 'N/A';
+
+    // Check if supervisor is assigned
+    const allocation = supervisorAllocations.find(allocation => 
+      allocation.supervisorId === supervisorId
+    );
+    
+    if (allocation) {
+      const assignedStore = storesData.find(store => store.id === allocation.storeId);
+      assignmentWarning.classList.remove('hidden');
+      assignmentWarningText.textContent = assignedStore 
+        ? `This supervisor is assigned to ${assignedStore.storeName}. Deleting will remove this assignment.`
+        : 'This supervisor has store assignments that will be removed.';
+      unassignDeleteBtn.classList.remove('hidden');
+      deleteButtonText.textContent = 'Force Delete';
+    } else {
+      assignmentWarning.classList.add('hidden');
+      unassignDeleteBtn.classList.add('hidden');
+      deleteButtonText.textContent = 'Delete';
+    }
+
+    funShowModal(deleteModal);
+  };
+
+  // Modal event handlers
+  [quickAllocateCloseBtn, quickAllocateCancelBtn].forEach(btn => {
+    btn?.addEventListener('click', () => {
+      funHideModal(quickAllocateModal);
+      selectedSupervisorForAction = null;
+    });
+  });
+
+  [deleteCloseBtn, deleteCancelBtn].forEach(btn => {
+    btn?.addEventListener('click', () => {
+      funHideModal(deleteModal);
+      selectedSupervisorForAction = null;
+    });
+  });
+
+  storeSelect?.addEventListener('change', () => {
+    quickAllocateSubmitBtn.disabled = !storeSelect.value;
+  });
+
+  quickAllocateSubmitBtn?.addEventListener('click', () => {
+    if (!selectedSupervisorForAction || !storeSelect.value) return;
+
+    try {
+      // Create new allocation
+      const newAllocation = {
+        id: `supalc_${Date.now()}`,
+        supervisorId: selectedSupervisorForAction.id,
+        storeId: storeSelect.value,
+        allocatedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString()
+      };
+
+      supervisorAllocations.push(newAllocation);
+      localStorage.setItem('supervisorAllocations', JSON.stringify(supervisorAllocations));
+
+      const selectedStore = storesData.find(store => store.id === storeSelect.value);
+      const supervisorFullName = funGetFullName(selectedSupervisorForAction);
+      
+      funHideModal(quickAllocateModal);
+      funShowToast(`${supervisorFullName} has been allocated to ${selectedStore?.storeName || 'the selected store'}`, 'success');
+      
+      selectedSupervisorForAction = null;
+      funLoadSupervisorsData();
+    } catch (error) {
+      console.error('Error allocating supervisor:', error);
+      funShowToast('Error allocating supervisor', 'error');
+    }
+  });
+
+  unassignDeleteBtn?.addEventListener('click', () => {
+    funPerformDelete(true);
+  });
+
+  forceDeleteBtn?.addEventListener('click', () => {
+    funPerformDelete(false);
+  });
+
+  function funPerformDelete(unassignFirst) {
+    if (!selectedSupervisorForAction) return;
+
+    try {
+      const supervisorId = selectedSupervisorForAction.id;
+      const supervisorFullName = funGetFullName(selectedSupervisorForAction);
+
+      // Remove from users collection
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const updatedUsers = users.filter(user => user.id !== supervisorId);
+      localStorage.setItem('users', JSON.stringify(updatedUsers));
+
+      // Remove from supervisor allocations
+      const updatedAllocations = supervisorAllocations.filter(allocation => 
+        allocation.supervisorId !== supervisorId
+      );
+      localStorage.setItem('supervisorAllocations', JSON.stringify(updatedAllocations));
+
+      // Remove from promodizer allocations (supervisor reference)
+      const promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+      const updatedPromodizerAllocations = promodizerAllocations.map(allocation => ({
+        ...allocation,
+        supervisorId: allocation.supervisorId === supervisorId ? null : allocation.supervisorId
+      }));
+      localStorage.setItem('promodizerAllocations', JSON.stringify(updatedPromodizerAllocations));
+
+      funHideModal(deleteModal);
+      funShowToast(`${supervisorFullName} has been deleted successfully`, 'success');
+      
+      selectedSupervisorForAction = null;
+      funLoadSupervisorsData();
+    } catch (error) {
+      console.error('Error deleting supervisor:', error);
+      funShowToast('Error deleting supervisor', 'error');
+    }
+  }
+
+  // Navigation handlers
+  [addSupervisorBtn, emptyStateAddBtn].forEach(btn => {
+    btn?.addEventListener('click', () => {
+      window.location.href = 'supervisor_create.html';
+    });
+  });
+
+  // Filter and search handlers
+  searchInput?.addEventListener('input', funApplyFilters);
+  statusFilter?.addEventListener('change', funApplyFilters);
+  assignmentFilter?.addEventListener('change', funApplyFilters);
+
+  // Sort handlers
+  document.querySelectorAll('th[data-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+      funHandleSort(th.dataset.sort);
+    });
+  });
+
+  // Close modals on outside click
+  [quickAllocateModal, deleteModal].forEach(modal => {
+    modal?.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        funHideModal(modal);
+        selectedSupervisorForAction = null;
+      }
+    });
+  });
+
+  // Initialize
+  funLoadSupervisorsData();
+});
+</script></body></html>

@@ -1,0 +1,830 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>GTVL Promodizer Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-primary: #0f766e;
+        --color-primary-hover: #0d9488;
+        --color-secondary: #475569;
+        --color-accent: #d97706;
+        --color-surface: #ffffff;
+        --color-background: #f8fafc;
+        --color-surface-variant: #f1f5f9;
+        --color-on-background: #0f172a;
+        --color-on-surface: #1e293b;
+        --color-border: #e2e8f0;
+        --color-success: #16a34a;
+        --color-warning: #f59e0b;
+        --color-error: #dc2626;
+        --color-info: #2563eb;
+
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+      }
+
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Sales History - GTVL Promodizer Portal</title></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-teal-700 rounded-lg flex items-center justify-center">
+              <svg width="20" height="20" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <rect x="68" y="68" width="264" height="264" rx="32" stroke="#FFFFFF" stroke-width="18"></rect>
+                  <rect x="109" y="143" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="109" y="194" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="109" y="245" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                  <rect x="206" y="194" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="206" y="245" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                </g>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">
+              GTVL Promodizer Portal
+            </h1>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 md:gap-3">
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-600 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-600 truncate"></div>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-600">
+            Main
+          </div>
+          <div class="space-y-1">
+            <a href="dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="dashboard">
+              <i data-lucide="home" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="record_sales.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="record_sales">
+              <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+              <span>Record Sales</span>
+            </a>
+            <a href="sales_history.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sales_history">
+              <i data-lucide="history" class="w-5 h-5"></i>
+              <span>Sales History</span>
+            </a>
+            <a href="attendance.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="attendance">
+              <i data-lucide="clock" class="w-5 h-5"></i>
+              <span>Attendance</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="py-6 border-b border-slate-100 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-600">
+            Records
+          </div>
+          <div class="space-y-1">
+            <a href="attendance_history.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="attendance_history">
+              <i data-lucide="calendar" class="w-5 h-5"></i>
+              <span>Attendance History</span>
+            </a>
+            <a href="my_stores.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="my_stores">
+              <i data-lucide="map-pin" class="w-5 h-5"></i>
+              <span>My Stores</span>
+            </a>
+            <a href="my_profile.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="my_profile">
+              <i data-lucide="user" class="w-5 h-5"></i>
+              <span>My Profile</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="app-main p-6" id="pageContent" role="main"><div class="min-h-screen bg-slate-50">
+  <!-- Page Header -->
+  <div class="bg-white border-b border-slate-200 sticky top-0 z-10">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center gap-4">
+          <button onclick="window.location.href='dashboard.html'" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Go back to dashboard">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+          </button>
+          <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900">Sales History</h1>
+        </div>
+        <button onclick="window.location.href='dashboard.html'" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Go to home">
+          <i data-lucide="home" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="max-w-4xl mx-auto px-4 md:px-6 lg:px-8 py-6">
+    <!-- Loading State -->
+    <div id="loadingState" class="space-y-6">
+      <div class="space-y-4">
+        <div class="h-6 bg-slate-200 rounded animate-pulse w-32"></div>
+        <div class="space-y-3">
+          <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 animate-pulse">
+            <div class="flex items-center justify-between">
+              <div class="space-y-2">
+                <div class="h-4 bg-slate-200 rounded w-20"></div>
+                <div class="h-5 bg-slate-200 rounded w-40"></div>
+                <div class="h-3 bg-slate-200 rounded w-16"></div>
+              </div>
+              <div class="h-5 w-5 bg-slate-200 rounded"></div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 animate-pulse">
+            <div class="flex items-center justify-between">
+              <div class="space-y-2">
+                <div class="h-4 bg-slate-200 rounded w-20"></div>
+                <div class="h-5 bg-slate-200 rounded w-40"></div>
+                <div class="h-3 bg-slate-200 rounded w-16"></div>
+              </div>
+              <div class="h-5 w-5 bg-slate-200 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sales History Content -->
+    <div id="salesHistoryContent" class="hidden">
+      <!-- Dynamic content will be inserted here -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="hidden text-center py-16">
+      <div class="flex justify-center mb-6">
+        <div class="w-16 h-16 bg-slate-100 rounded-lg flex items-center justify-center">
+          <i data-lucide="clipboard-x" class="w-8 h-8 text-slate-400"></i>
+        </div>
+      </div>
+      <h3 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900 mb-2">No sales records yet</h3>
+      <p class="text-sm text-slate-600 mb-6 max-w-sm mx-auto">
+        You haven't recorded any sales yet. Start by recording your first sale to see your history here.
+      </p>
+      <button onclick="window.location.href='record_sales.html'" class="bg-teal-700 hover:bg-teal-600 text-white px-6 py-3 rounded-lg text-sm font-semibold transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+        Record your first sale
+      </button>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="hidden text-center py-16">
+      <div class="flex justify-center mb-6">
+        <div class="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center">
+          <i data-lucide="alert-circle" class="w-8 h-8 text-red-600"></i>
+        </div>
+      </div>
+      <h3 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900 mb-2">Error Loading Sales History</h3>
+      <p class="text-sm text-slate-600 mb-6 max-w-sm mx-auto">
+        There was an error loading your sales history. Please try refreshing the page.
+      </p>
+      <button onclick="window.location.reload()" class="bg-teal-700 hover:bg-teal-600 text-white px-6 py-3 rounded-lg text-sm font-semibold transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+        Refresh Page
+      </button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils =
+          window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_promo_001");
+                    currentUserId = "usr_promo_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } =
+            state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail)
+            return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute(
+            "aria-expanded",
+            shouldOpen ? "true" : "false"
+          );
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active");
+            } else {
+              link.classList.remove("active");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () =>
+            closeMobileSidebar()
+          );
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+// Utility: portal a modal by id (idempotent)
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+});
+
+// Sales History functionality
+const SalesHistory = {
+  currentUser: null,
+  salesRecords: [],
+  stores: [],
+
+  init() {
+    this.currentUser = this.funGetCurrentUser();
+    if (!this.currentUser) {
+      this.funShowError('User not found');
+      return;
+    }
+
+    this.funLoadData();
+  },
+
+  funGetCurrentUser() {
+    try {
+      let currentUserId = localStorage.getItem('currentUserId');
+      if (!currentUserId) {
+        localStorage.setItem('currentUserId', 'usr_promo_001');
+        currentUserId = 'usr_promo_001';
+      }
+
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      return users.find(user => user.id === currentUserId) || null;
+    } catch (error) {
+      console.error('Error getting current user:', error);
+      return null;
+    }
+  },
+
+  funLoadData() {
+    try {
+      // Load sales records and stores from localStorage
+      const allSalesRecords = JSON.parse(localStorage.getItem('salesRecords') || '[]');
+      this.stores = JSON.parse(localStorage.getItem('stores') || '[]');
+
+      // Filter sales records for current promodizer
+      this.salesRecords = allSalesRecords.filter(record => 
+        record.recordedById === this.currentUser.id
+      );
+
+      // Sort by recordedAt descending (most recent first)
+      this.salesRecords.sort((a, b) => new Date(b.recordedAt) - new Date(a.recordedAt));
+
+      this.funRenderSalesHistory();
+    } catch (error) {
+      console.error('Error loading sales data:', error);
+      this.funShowError('Failed to load sales data');
+    }
+  },
+
+  funRenderSalesHistory() {
+    const loadingState = document.getElementById('loadingState');
+    const emptyState = document.getElementById('emptyState');
+    const errorState = document.getElementById('errorState');
+    const salesHistoryContent = document.getElementById('salesHistoryContent');
+
+    // Hide loading state
+    loadingState.classList.add('hidden');
+
+    if (this.salesRecords.length === 0) {
+      // Show empty state
+      emptyState.classList.remove('hidden');
+      return;
+    }
+
+    // Group sales records by date
+    const groupedRecords = this.funGroupRecordsByDate(this.salesRecords);
+
+    // Render grouped records
+    const html = this.funGenerateGroupedHTML(groupedRecords);
+    salesHistoryContent.innerHTML = html;
+    salesHistoryContent.classList.remove('hidden');
+
+    // Initialize lucide icons if available
+    if (typeof window.lucide?.createIcons === 'function') {
+      window.lucide.createIcons();
+    }
+  },
+
+  funGroupRecordsByDate(records) {
+    const groups = {};
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    records.forEach(record => {
+      const recordDate = new Date(record.recordedAt);
+      const dateKey = recordDate.toISOString().split('T')[0];
+
+      if (!groups[dateKey]) {
+        groups[dateKey] = {
+          date: recordDate,
+          displayDate: this.funFormatDateHeader(recordDate, today, yesterday),
+          records: []
+        };
+      }
+
+      groups[dateKey].records.push(record);
+    });
+
+    // Convert to array and sort by date descending
+    return Object.values(groups).sort((a, b) => b.date - a.date);
+  },
+
+  funFormatDateHeader(date, today, yesterday) {
+    const dateStr = date.toDateString();
+    const todayStr = today.toDateString();
+    const yesterdayStr = yesterday.toDateString();
+
+    if (dateStr === todayStr) {
+      return 'Today';
+    } else if (dateStr === yesterdayStr) {
+      return 'Yesterday';
+    } else {
+      return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric', 
+        year: 'numeric' 
+      });
+    }
+  },
+
+  funGenerateGroupedHTML(groupedRecords) {
+    return groupedRecords.map(group => `
+      <div class="space-y-4 mb-8">
+        <h2 class="text-base leading-6 font-semibold text-slate-900 px-1">${group.displayDate}</h2>
+        <div class="space-y-3">
+          ${group.records.map(record => this.funGenerateRecordHTML(record)).join('')}
+        </div>
+      </div>
+    `).join('');
+  },
+
+  funGenerateRecordHTML(record) {
+    const store = this.stores.find(s => s.id === record.storeId);
+    const storeName = store ? store.storeName : 'Unknown Store';
+    const recordTime = new Date(record.recordedAt);
+    const timeStr = recordTime.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit', 
+      hour12: true 
+    });
+    const itemCount = record.scannedSkus ? record.scannedSkus.length : 0;
+
+    return `
+      <div 
+        class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 hover:shadow-md hover:border-slate-300 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2"
+        onclick="funNavigateToSalesDetail('${record.id}')"
+        tabindex="0"
+        onkeypress="if(event.key==='Enter') funNavigateToSalesDetail('${record.id}')"
+        role="button"
+        aria-label="View sales detail for submission ${record.submissionId}"
+      >
+        <div class="flex items-center justify-between">
+          <div class="flex-1 min-w-0">
+            <div class="text-sm text-slate-600 mb-1">${timeStr}</div>
+            <div class="text-sm leading-[1.375rem] font-semibold text-slate-900 mb-1">${storeName}</div>
+            <div class="text-xs leading-[1.125rem] text-slate-500">
+              ${itemCount} item${itemCount !== 1 ? 's' : ''} • ${record.submissionId}
+            </div>
+          </div>
+          <div class="flex items-center text-slate-400 ml-4">
+            <i data-lucide="chevron-right" class="w-5 h-5"></i>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  funShowError(message) {
+    const loadingState = document.getElementById('loadingState');
+    const errorState = document.getElementById('errorState');
+    
+    loadingState.classList.add('hidden');
+    errorState.classList.remove('hidden');
+    
+    // Update error message if provided
+    if (message) {
+      const errorText = errorState.querySelector('p');
+      if (errorText) {
+        errorText.textContent = message;
+      }
+    }
+  }
+};
+
+// Navigation function for sales detail
+function funNavigateToSalesDetail(salesRecordId) {
+  // Store the selected sales record ID for the detail page
+  localStorage.setItem('selectedSalesRecordId', salesRecordId);
+  window.location.href = 'sales_detail.html';
+}
+
+// Initialize the page
+SalesHistory.init();
+
+// Set active navigation link
+if (typeof window.TemplateUtils?.setActiveNavLink === 'function') {
+  window.TemplateUtils.setActiveNavLink('sales_history');
+}
+</script></body></html>

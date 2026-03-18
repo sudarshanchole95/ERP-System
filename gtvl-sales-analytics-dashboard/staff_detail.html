@@ -1,0 +1,1236 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>Sales Analytics Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-primary: #0F766E;
+        --color-primary-hover: #0D9488;
+        --color-secondary: #475569;
+        --color-accent: #D97706;
+        --color-background: #F8FAFC;
+        --color-surface: #FFFFFF;
+        --color-surface-variant: #F1F5F9;
+        --color-on-background: #0F172A;
+        --color-on-surface: #1E293B;
+        --color-border: #E2E8F0;
+        --color-success: #16A34A;
+        --color-warning: #F59E0B;
+        --color-error: #DC2626;
+        --color-info: #2563EB;
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+      }
+
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Staff Performance Details - Sales Analytics Dashboard</title></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="68" y="68" width="264" height="264" rx="32" stroke="#0F766E" stroke-width="18"></rect>
+                <rect x="109" y="143" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="109" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="109" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                <rect x="206" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="206" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">Sales Analytics Dashboard</h1>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 md:gap-3">
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-600 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-600 truncate"></div>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Analytics</div>
+          <div class="space-y-1">
+            <a href="dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="dashboard">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="sku_performance_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sku_performance">
+              <i data-lucide="package" class="w-5 h-5"></i>
+              <span>SKU Performance</span>
+            </a>
+            <a href="store_performance_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="store_performance">
+              <i data-lucide="store" class="w-5 h-5"></i>
+              <span>Store Performance</span>
+            </a>
+            <a href="staff_performance_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="staff_performance">
+              <i data-lucide="users" class="w-5 h-5"></i>
+              <span>Staff Performance</span>
+            </a>
+            <a href="transaction_history.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="transaction_history">
+              <i data-lucide="receipt" class="w-5 h-5"></i>
+              <span>Transaction History</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="py-6 border-b border-slate-100 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Tools</div>
+          <div class="space-y-1">
+            <a href="reports_configuration.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="reports">
+              <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+              <span>Reports</span>
+            </a>
+            <a href="settings.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="settings">
+              <i data-lucide="settings" class="w-5 h-5"></i>
+              <span>Settings</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="app-main p-6" id="pageContent" role="main"><nav class="flex items-center space-x-2 text-sm text-slate-600 mb-6">
+  <a href="dashboard.html" class="hover:text-teal-700 transition-colors duration-200">Dashboard</a>
+  <i data-lucide="chevron-right" class="w-4 h-4"></i>
+  <a href="staff_performance_list.html" class="hover:text-teal-700 transition-colors duration-200">Staff Performance</a>
+  <i data-lucide="chevron-right" class="w-4 h-4"></i>
+  <span id="breadcrumbStaffName" class="text-slate-900 font-medium">Staff Details</span>
+</nav>
+
+<!-- Page Header -->
+<div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-6">
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div class="flex-1">
+      <h1 id="staffName" class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900 mb-2">Loading...</h1>
+      <div class="flex flex-wrap items-center gap-4 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">Employee ID:</span>
+          <span id="employeeId" class="text-sm font-semibold text-slate-900">-</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">Role:</span>
+          <span id="rolebadge" class="px-2 py-1 text-xs font-semibold rounded-full bg-teal-100 text-teal-700">-</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">Status:</span>
+          <span id="statusBadge" class="px-2 py-1 text-xs font-semibold rounded-full">-</span>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-4 text-sm text-slate-600">
+        <div class="flex items-center gap-1">
+          <i data-lucide="mail" class="w-4 h-4"></i>
+          <span id="staffEmail">-</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <i data-lucide="phone" class="w-4 h-4"></i>
+          <span id="staffPhone">-</span>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 bg-slate-50 rounded-lg p-3">
+        <label for="dateRangeFilter" class="text-sm font-medium text-slate-700">Date Range:</label>
+        <select id="dateRangeFilter" class="border border-slate-200 rounded text-sm px-3 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+          <option value="currentMonth">Current Month</option>
+          <option value="lastMonth">Last Month</option>
+          <option value="last7Days">Last 7 Days</option>
+          <option value="last30Days">Last 30 Days</option>
+          <option value="last90Days">Last 90 Days</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- KPI Cards Row -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+  <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+    <div class="flex items-center justify-between mb-2">
+      <h3 class="text-sm font-medium text-slate-600">Total Quantity Recorded</h3>
+      <i data-lucide="package" class="w-5 h-5 text-slate-400"></i>
+    </div>
+    <div class="flex items-end gap-2">
+      <span id="totalQuantity" class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900">0</span>
+      <span id="quantityChange" class="text-sm font-medium text-green-600">+0%</span>
+    </div>
+  </div>
+  
+  <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+    <div class="flex items-center justify-between mb-2">
+      <h3 class="text-sm font-medium text-slate-600">Total Transactions</h3>
+      <i data-lucide="receipt" class="w-5 h-5 text-slate-400"></i>
+    </div>
+    <div class="flex items-end gap-2">
+      <span id="totalTransactions" class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900">0</span>
+      <span id="transactionsChange" class="text-sm font-medium text-green-600">+0%</span>
+    </div>
+  </div>
+  
+  <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+    <div class="flex items-center justify-between mb-2">
+      <h3 class="text-sm font-medium text-slate-600">Unique Stores Active</h3>
+      <i data-lucide="store" class="w-5 h-5 text-slate-400"></i>
+    </div>
+    <div class="flex items-end gap-2">
+      <span id="uniqueStores" class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900">0</span>
+      <span id="storesChange" class="text-sm font-medium text-green-600">+0%</span>
+    </div>
+  </div>
+  
+  <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+    <div class="flex items-center justify-between mb-2">
+      <h3 class="text-sm font-medium text-slate-600">Days Active</h3>
+      <i data-lucide="calendar" class="w-5 h-5 text-slate-400"></i>
+    </div>
+    <div class="flex items-end gap-2">
+      <span id="daysActive" class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900">0</span>
+      <span id="daysChange" class="text-sm font-medium text-green-600">+0%</span>
+    </div>
+  </div>
+</div>
+
+<!-- Activity Trend Chart -->
+<div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-8">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Activity Trend</h2>
+    <button class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 border border-slate-200 rounded hover:bg-slate-50 transition-colors duration-200">
+      <i data-lucide="download" class="w-4 h-4"></i>
+      Export
+    </button>
+  </div>
+  <div id="activityChart" class="h-64 flex items-center justify-center text-slate-500">
+    <div class="text-center">
+      <i data-lucide="bar-chart-3" class="w-12 h-12 text-slate-300 mx-auto mb-2"></i>
+      <p>Activity trend visualization will be displayed here</p>
+    </div>
+  </div>
+</div>
+
+<!-- Store Coverage Table -->
+<div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-8">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Store Coverage</h2>
+    <button class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 border border-slate-200 rounded hover:bg-slate-50 transition-colors duration-200">
+      <i data-lucide="download" class="w-4 h-4"></i>
+      Export
+    </button>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b border-slate-200">
+          <th class="text-left py-3 px-4 text-sm font-semibold text-slate-900 cursor-pointer hover:bg-slate-50" data-sort="storeName">
+            <div class="flex items-center gap-1">
+              Store Name
+              <i data-lucide="chevrons-up-down" class="w-4 h-4 text-slate-400"></i>
+            </div>
+          </th>
+          <th class="text-left py-3 px-4 text-sm font-semibold text-slate-900 cursor-pointer hover:bg-slate-50" data-sort="city">
+            <div class="flex items-center gap-1">
+              City
+              <i data-lucide="chevrons-up-down" class="w-4 h-4 text-slate-400"></i>
+            </div>
+          </th>
+          <th class="text-left py-3 px-4 text-sm font-semibold text-slate-900 cursor-pointer hover:bg-slate-50" data-sort="quantity">
+            <div class="flex items-center gap-1">
+              Quantity Recorded
+              <i data-lucide="chevrons-up-down" class="w-4 h-4 text-slate-400"></i>
+            </div>
+          </th>
+          <th class="text-left py-3 px-4 text-sm font-semibold text-slate-900 cursor-pointer hover:bg-slate-50" data-sort="transactions">
+            <div class="flex items-center gap-1">
+              Transactions
+              <i data-lucide="chevrons-up-down" class="w-4 h-4 text-slate-400"></i>
+            </div>
+          </th>
+          <th class="text-left py-3 px-4 text-sm font-semibold text-slate-900 cursor-pointer hover:bg-slate-50" data-sort="lastActivity">
+            <div class="flex items-center gap-1">
+              Last Activity
+              <i data-lucide="chevrons-up-down" class="w-4 h-4 text-slate-400"></i>
+            </div>
+          </th>
+          <th class="text-left py-3 px-4 text-sm font-semibold text-slate-900">Assignment Status</th>
+        </tr>
+      </thead>
+      <tbody id="storeCoverageTable">
+        <tr>
+          <td colspan="6" class="text-center py-8 text-slate-500">
+            <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2"></i>
+            Loading store coverage data...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SKU Performance Table -->
+<div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-8">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">SKU Performance</h2>
+    <button class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 border border-slate-200 rounded hover:bg-slate-50 transition-colors duration-200">
+      <i data-lucide="download" class="w-4 h-4"></i>
+      Export
+    </button>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b border-slate-200">
+          <th class="text-left py-3 px-4 text-sm font-semibold text-slate-900 cursor-pointer hover:bg-slate-50" data-sort="productName">
+            <div class="flex items-center gap-1">
+              Product Name
+              <i data-lucide="chevrons-up-down" class="w-4 h-4 text-slate-400"></i>
+            </div>
+          </th>
+          <th class="text-left py-3 px-4 text-sm font-semibold text-slate-900 cursor-pointer hover:bg-slate-50" data-sort="category">
+            <div class="flex items-center gap-1">
+              Category
+              <i data-lucide="chevrons-up-down" class="w-4 h-4 text-slate-400"></i>
+            </div>
+          </th>
+          <th class="text-left py-3 px-4 text-sm font-semibold text-slate-900 cursor-pointer hover:bg-slate-50" data-sort="quantity">
+            <div class="flex items-center gap-1">
+              Quantity Recorded
+              <i data-lucide="chevrons-up-down" class="w-4 h-4 text-slate-400"></i>
+            </div>
+          </th>
+          <th class="text-left py-3 px-4 text-sm font-semibold text-slate-900 cursor-pointer hover:bg-slate-50" data-sort="transactions">
+            <div class="flex items-center gap-1">
+              Transactions
+              <i data-lucide="chevrons-up-down" class="w-4 h-4 text-slate-400"></i>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody id="skuPerformanceTable">
+        <tr>
+          <td colspan="4" class="text-center py-8 text-slate-500">
+            <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2"></i>
+            Loading SKU performance data...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Activity Pattern Analysis -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+  <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Activity by Hour</h2>
+      <button class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 border border-slate-200 rounded hover:bg-slate-50 transition-colors duration-200">
+        <i data-lucide="download" class="w-4 h-4"></i>
+        Export
+      </button>
+    </div>
+    <div id="hourlyActivityChart" class="h-48 flex items-center justify-center text-slate-500">
+      <div class="text-center">
+        <i data-lucide="clock" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
+        <p class="text-sm">Hourly activity pattern</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Activity by Day of Week</h2>
+      <button class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 border border-slate-200 rounded hover:bg-slate-50 transition-colors duration-200">
+        <i data-lucide="download" class="w-4 h-4"></i>
+        Export
+      </button>
+    </div>
+    <div id="weeklyActivityChart" class="h-48 flex items-center justify-center text-slate-500">
+      <div class="text-center">
+        <i data-lucide="calendar" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
+        <p class="text-sm">Weekly activity pattern</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Transaction History -->
+<div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-8">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Transaction History</h2>
+    <button class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 border border-slate-200 rounded hover:bg-slate-50 transition-colors duration-200">
+      <i data-lucide="download" class="w-4 h-4"></i>
+      Export
+    </button>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b border-slate-200">
+          <th class="text-left py-3 px-4 text-sm font-semibold text-slate-900">Date/Time</th>
+          <th class="text-left py-3 px-4 text-sm font-semibold text-slate-900">Store</th>
+          <th class="text-left py-3 px-4 text-sm font-semibold text-slate-900">Number of SKUs</th>
+          <th class="text-left py-3 px-4 text-sm font-semibold text-slate-900">Total Quantity</th>
+        </tr>
+      </thead>
+      <tbody id="transactionHistoryTable">
+        <tr>
+          <td colspan="4" class="text-center py-8 text-slate-500">
+            <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2"></i>
+            Loading transaction history...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Back Link -->
+<div class="flex justify-center">
+  <a href="staff_performance_list.html" class="flex items-center gap-2 text-sm text-slate-600 hover:text-teal-700 transition-colors duration-200">
+    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+    Back to Staff Performance List
+  </a>
+</div>
+
+</main>
+
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils = window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_sales_001");
+                    currentUserId = "usr_sales_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent = TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent = TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } = state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail) return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent = TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent = TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active", "bg-teal-50", "text-teal-700");
+            } else {
+              link.classList.remove("active", "bg-teal-50", "text-teal-700");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () => closeMobileSidebar());
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+// Utility: portal a modal by id (idempotent)
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+});
+
+// Get staff ID from URL parameter
+function funGetStaffIdFromUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('userId') || urlParams.get('staffId');
+}
+
+// Load data from localStorage
+function funLoadData() {
+  try {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const stores = JSON.parse(localStorage.getItem('stores') || '[]');
+    const skus = JSON.parse(localStorage.getItem('skus') || '[]');
+    const salesRecords = JSON.parse(localStorage.getItem('salesRecords') || '[]');
+    const supervisorAllocations = JSON.parse(localStorage.getItem('supervisorAllocations') || '[]');
+    const promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+    const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+    
+    return { users, stores, skus, salesRecords, supervisorAllocations, promodizerAllocations, attendanceRecords };
+  } catch (error) {
+    console.error('Error loading data:', error);
+    return { users: [], stores: [], skus: [], salesRecords: [], supervisorAllocations: [], promodizerAllocations: [], attendanceRecords: [] };
+  }
+}
+
+// Date filtering functions
+function funGetDateRange(range) {
+  const now = new Date();
+  const start = new Date();
+  const end = new Date();
+  
+  switch (range) {
+    case 'currentMonth':
+      start.setDate(1);
+      start.setHours(0, 0, 0, 0);
+      end.setMonth(end.getMonth() + 1);
+      end.setDate(0);
+      end.setHours(23, 59, 59, 999);
+      break;
+    case 'lastMonth':
+      start.setMonth(start.getMonth() - 1);
+      start.setDate(1);
+      start.setHours(0, 0, 0, 0);
+      end.setMonth(end.getMonth() - 1);
+      end.setDate(0);
+      end.setHours(23, 59, 59, 999);
+      break;
+    case 'last7Days':
+      start.setDate(start.getDate() - 6);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+      break;
+    case 'last30Days':
+      start.setDate(start.getDate() - 29);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+      break;
+    case 'last90Days':
+      start.setDate(start.getDate() - 89);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+      break;
+    default:
+      start.setDate(1);
+      start.setHours(0, 0, 0, 0);
+      end.setMonth(end.getMonth() + 1);
+      end.setDate(0);
+      end.setHours(23, 59, 59, 999);
+  }
+  
+  return { start, end };
+}
+
+function funFilterSalesRecordsByDate(salesRecords, dateRange) {
+  return salesRecords.filter(record => {
+    const recordDate = new Date(record.recordedAt);
+    return recordDate >= dateRange.start && recordDate <= dateRange.end;
+  });
+}
+
+// Calculate KPIs
+function funCalculateKPIs(salesRecords) {
+  const totalQuantity = salesRecords.reduce((sum, record) => {
+    return sum + record.scannedSkus.reduce((skuSum, sku) => skuSum + sku.quantity, 0);
+  }, 0);
+  
+  const totalTransactions = salesRecords.length;
+  
+  const uniqueStores = new Set(salesRecords.map(record => record.storeId)).size;
+  
+  const uniqueDates = new Set(salesRecords.map(record => {
+    return new Date(record.recordedAt).toDateString();
+  })).size;
+  
+  return {
+    totalQuantity,
+    totalTransactions,
+    uniqueStores,
+    daysActive: uniqueDates
+  };
+}
+
+// Initialize staff header
+function funInitializeStaffHeader(staff) {
+  document.getElementById('staffName').textContent = `${staff.firstName} ${staff.lastName}`;
+  document.getElementById('breadcrumbStaffName').textContent = `${staff.firstName} ${staff.lastName}`;
+  document.getElementById('employeeId').textContent = staff.employeeId || 'N/A';
+  document.getElementById('staffEmail').textContent = staff.email;
+  document.getElementById('staffPhone').textContent = staff.phone;
+  
+  // Role badge
+  const roleElement = document.getElementById('rolebadge');
+  roleElement.textContent = staff.role.charAt(0).toUpperCase() + staff.role.slice(1);
+  
+  // Status badge
+  const statusElement = document.getElementById('statusBadge');
+  statusElement.textContent = staff.status.charAt(0).toUpperCase() + staff.status.slice(1);
+  statusElement.className = `px-2 py-1 text-xs font-semibold rounded-full ${
+    staff.status === 'active' 
+      ? 'bg-green-100 text-green-700' 
+      : 'bg-red-100 text-red-700'
+  }`;
+}
+
+// Update KPI cards
+function funUpdateKPICards(currentKPIs, previousKPIs = null) {
+  document.getElementById('totalQuantity').textContent = currentKPIs.totalQuantity.toLocaleString();
+  document.getElementById('totalTransactions').textContent = currentKPIs.totalTransactions.toLocaleString();
+  document.getElementById('uniqueStores').textContent = currentKPIs.uniqueStores.toLocaleString();
+  document.getElementById('daysActive').textContent = currentKPIs.daysActive.toLocaleString();
+  
+  // Calculate and display percentage changes if previous period data is available
+  if (previousKPIs) {
+    funUpdateChangeIndicator('quantityChange', currentKPIs.totalQuantity, previousKPIs.totalQuantity);
+    funUpdateChangeIndicator('transactionsChange', currentKPIs.totalTransactions, previousKPIs.totalTransactions);
+    funUpdateChangeIndicator('storesChange', currentKPIs.uniqueStores, previousKPIs.uniqueStores);
+    funUpdateChangeIndicator('daysChange', currentKPIs.daysActive, previousKPIs.daysActive);
+  }
+}
+
+function funUpdateChangeIndicator(elementId, current, previous) {
+  const element = document.getElementById(elementId);
+  if (previous === 0) {
+    element.textContent = current > 0 ? '+100%' : '0%';
+    element.className = 'text-sm font-medium text-green-600';
+    return;
+  }
+  
+  const change = ((current - previous) / previous * 100).toFixed(1);
+  element.textContent = `${change >= 0 ? '+' : ''}${change}%`;
+  element.className = `text-sm font-medium ${change >= 0 ? 'text-green-600' : 'text-red-600'}`;
+}
+
+// Populate store coverage table
+function funPopulateStoreCoverageTable(salesRecords, stores, supervisorAllocations, promodizerAllocations, staffRole) {
+  const storeData = new Map();
+  
+  // Aggregate data by store
+  salesRecords.forEach(record => {
+    const storeId = record.storeId;
+    const quantity = record.scannedSkus.reduce((sum, sku) => sum + sku.quantity, 0);
+    
+    if (!storeData.has(storeId)) {
+      storeData.set(storeId, {
+        storeId,
+        quantity: 0,
+        transactions: 0,
+        lastActivity: null
+      });
+    }
+    
+    const data = storeData.get(storeId);
+    data.quantity += quantity;
+    data.transactions += 1;
+    
+    const recordDate = new Date(record.recordedAt);
+    if (!data.lastActivity || recordDate > data.lastActivity) {
+      data.lastActivity = recordDate;
+    }
+  });
+  
+  const tableBody = document.getElementById('storeCoverageTable');
+  
+  if (storeData.size === 0) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="6" class="text-center py-8 text-slate-500">
+          <i data-lucide="store" class="w-12 h-12 text-slate-300 mx-auto mb-2"></i>
+          <p>No store activity data found for the selected period</p>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
+  const rows = Array.from(storeData.values()).map(data => {
+    const store = stores.find(s => s.id === data.storeId);
+    if (!store) return null;
+    
+    // Check assignment status
+    let assignmentStatus = 'Not Assigned';
+    if (staffRole === 'supervisor') {
+      const allocation = supervisorAllocations.find(a => a.storeId === data.storeId);
+      if (allocation) assignmentStatus = 'Assigned';
+    } else if (staffRole === 'promodizer') {
+      const allocation = promodizerAllocations.find(a => a.storeId === data.storeId);
+      if (allocation) assignmentStatus = 'Assigned';
+    }
+    
+    return {
+      storeId: data.storeId,
+      storeName: store.storeName,
+      city: store.address.city,
+      quantity: data.quantity,
+      transactions: data.transactions,
+      lastActivity: data.lastActivity,
+      assignmentStatus
+    };
+  }).filter(Boolean);
+  
+  // Sort by store name initially
+  rows.sort((a, b) => a.storeName.localeCompare(b.storeName));
+  
+  tableBody.innerHTML = rows.map(row => `
+    <tr class="border-b border-slate-100 hover:bg-slate-50 cursor-pointer" onclick="window.location.href='store_detail.html?storeId=${row.storeId}'">
+      <td class="py-3 px-4 text-sm font-medium text-slate-900">${row.storeName}</td>
+      <td class="py-3 px-4 text-sm text-slate-600">${row.city}</td>
+      <td class="py-3 px-4 text-sm font-semibold text-slate-900">${row.quantity.toLocaleString()}</td>
+      <td class="py-3 px-4 text-sm text-slate-600">${row.transactions.toLocaleString()}</td>
+      <td class="py-3 px-4 text-sm text-slate-600">${row.lastActivity.toLocaleDateString()} ${row.lastActivity.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
+      <td class="py-3 px-4">
+        <span class="px-2 py-1 text-xs font-medium rounded-full ${
+          row.assignmentStatus === 'Assigned' 
+            ? 'bg-green-100 text-green-700' 
+            : 'bg-slate-100 text-slate-700'
+        }">${row.assignmentStatus}</span>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// Populate SKU performance table
+function funPopulateSKUPerformanceTable(salesRecords, skus) {
+  const skuData = new Map();
+  
+  // Aggregate data by SKU
+  salesRecords.forEach(record => {
+    record.scannedSkus.forEach(scannedSku => {
+      const skuId = scannedSku.skuId;
+      
+      if (!skuData.has(skuId)) {
+        skuData.set(skuId, {
+          skuId,
+          quantity: 0,
+          transactions: 0
+        });
+      }
+      
+      const data = skuData.get(skuId);
+      data.quantity += scannedSku.quantity;
+      data.transactions += 1;
+    });
+  });
+  
+  const tableBody = document.getElementById('skuPerformanceTable');
+  
+  if (skuData.size === 0) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="4" class="text-center py-8 text-slate-500">
+          <i data-lucide="package" class="w-12 h-12 text-slate-300 mx-auto mb-2"></i>
+          <p>No SKU performance data found for the selected period</p>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
+  const rows = Array.from(skuData.values()).map(data => {
+    const sku = skus.find(s => s.id === data.skuId);
+    if (!sku) return null;
+    
+    return {
+      skuId: data.skuId,
+      productName: sku.productName,
+      category: sku.category,
+      quantity: data.quantity,
+      transactions: data.transactions
+    };
+  }).filter(Boolean);
+  
+  // Sort by quantity descending
+  rows.sort((a, b) => b.quantity - a.quantity);
+  
+  tableBody.innerHTML = rows.map(row => `
+    <tr class="border-b border-slate-100 hover:bg-slate-50 cursor-pointer" onclick="window.location.href='sku_detail.html?skuId=${row.skuId}'">
+      <td class="py-3 px-4 text-sm font-medium text-slate-900">${row.productName}</td>
+      <td class="py-3 px-4 text-sm text-slate-600">
+        <span class="px-2 py-1 text-xs font-medium bg-slate-100 text-slate-700 rounded">${row.category}</span>
+      </td>
+      <td class="py-3 px-4 text-sm font-semibold text-slate-900">${row.quantity.toLocaleString()}</td>
+      <td class="py-3 px-4 text-sm text-slate-600">${row.transactions.toLocaleString()}</td>
+    </tr>
+  `).join('');
+}
+
+// Populate transaction history table
+function funPopulateTransactionHistoryTable(salesRecords, stores) {
+  const tableBody = document.getElementById('transactionHistoryTable');
+  
+  if (salesRecords.length === 0) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="4" class="text-center py-8 text-slate-500">
+          <i data-lucide="receipt" class="w-12 h-12 text-slate-300 mx-auto mb-2"></i>
+          <p>No transaction history found for the selected period</p>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
+  // Sort by date descending (most recent first)
+  const sortedRecords = [...salesRecords].sort((a, b) => 
+    new Date(b.recordedAt) - new Date(a.recordedAt)
+  );
+  
+  tableBody.innerHTML = sortedRecords.map(record => {
+    const store = stores.find(s => s.id === record.storeId);
+    const totalQuantity = record.scannedSkus.reduce((sum, sku) => sum + sku.quantity, 0);
+    const recordDate = new Date(record.recordedAt);
+    
+    return `
+      <tr class="border-b border-slate-100 hover:bg-slate-50 cursor-pointer" onclick="window.location.href='transaction_detail.html?transactionId=${record.id}'">
+        <td class="py-3 px-4 text-sm text-slate-900">
+          ${recordDate.toLocaleDateString()}<br>
+          <span class="text-xs text-slate-500">${recordDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+        </td>
+        <td class="py-3 px-4 text-sm font-medium text-slate-900">${store ? store.storeName : 'Unknown Store'}</td>
+        <td class="py-3 px-4 text-sm text-slate-600">${record.scannedSkus.length}</td>
+        <td class="py-3 px-4 text-sm font-semibold text-slate-900">${totalQuantity.toLocaleString()}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// Load and display data
+function funLoadAndDisplayData() {
+  const staffId = funGetStaffIdFromUrl();
+  if (!staffId) {
+    document.getElementById('staffName').textContent = 'Staff Not Found';
+    document.getElementById('breadcrumbStaffName').textContent = 'Staff Not Found';
+    return;
+  }
+  
+  const data = funLoadData();
+  const staff = data.users.find(u => u.id === staffId);
+  
+  if (!staff) {
+    document.getElementById('staffName').textContent = 'Staff Not Found';
+    document.getElementById('breadcrumbStaffName').textContent = 'Staff Not Found';
+    return;
+  }
+  
+  // Initialize header
+  funInitializeStaffHeader(staff);
+  
+  // Filter sales records for this staff member
+  const dateRange = funGetDateRange(document.getElementById('dateRangeFilter').value);
+  const staffSalesRecords = data.salesRecords.filter(record => record.recordedById === staffId);
+  const filteredSalesRecords = funFilterSalesRecordsByDate(staffSalesRecords, dateRange);
+  
+  // Calculate KPIs
+  const currentKPIs = funCalculateKPIs(filteredSalesRecords);
+  
+  // Calculate previous period KPIs for comparison
+  const previousRange = funGetPreviousPeriodRange(document.getElementById('dateRangeFilter').value);
+  const previousSalesRecords = funFilterSalesRecordsByDate(staffSalesRecords, previousRange);
+  const previousKPIs = funCalculateKPIs(previousSalesRecords);
+  
+  // Update UI
+  funUpdateKPICards(currentKPIs, previousKPIs);
+  funPopulateStoreCoverageTable(filteredSalesRecords, data.stores, data.supervisorAllocations, data.promodizerAllocations, staff.role);
+  funPopulateSKUPerformanceTable(filteredSalesRecords, data.skus);
+  funPopulateTransactionHistoryTable(filteredSalesRecords, data.stores);
+}
+
+// Get previous period date range for comparison
+function funGetPreviousPeriodRange(currentRange) {
+  const current = funGetDateRange(currentRange);
+  const durationMs = current.end.getTime() - current.start.getTime();
+  
+  return {
+    start: new Date(current.start.getTime() - durationMs),
+    end: new Date(current.start.getTime() - 1)
+  };
+}
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', () => {
+  // Set active navigation
+  if (typeof TemplateUtils !== 'undefined' && TemplateUtils.setActiveNavLink) {
+    TemplateUtils.setActiveNavLink('staff_performance');
+  }
+  
+  // Load initial data
+  funLoadAndDisplayData();
+  
+  // Add event listener for date range filter
+  document.getElementById('dateRangeFilter').addEventListener('change', funLoadAndDisplayData);
+  
+  // Add table sorting functionality
+  document.querySelectorAll('th[data-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+      // Basic sorting functionality would be implemented here
+      console.log('Sort by:', th.dataset.sort);
+    });
+  });
+});
+</script></body></html>

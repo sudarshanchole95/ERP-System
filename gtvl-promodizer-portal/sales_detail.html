@@ -1,0 +1,887 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>GTVL Promodizer Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-primary: #0f766e;
+        --color-primary-hover: #0d9488;
+        --color-secondary: #475569;
+        --color-accent: #d97706;
+        --color-surface: #ffffff;
+        --color-background: #f8fafc;
+        --color-surface-variant: #f1f5f9;
+        --color-on-background: #0f172a;
+        --color-on-surface: #1e293b;
+        --color-border: #e2e8f0;
+        --color-success: #16a34a;
+        --color-warning: #f59e0b;
+        --color-error: #dc2626;
+        --color-info: #2563eb;
+
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+      }
+
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Sales Detail - GTVL Promodizer Portal</title></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-teal-700 rounded-lg flex items-center justify-center">
+              <svg width="20" height="20" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <rect x="68" y="68" width="264" height="264" rx="32" stroke="#FFFFFF" stroke-width="18"></rect>
+                  <rect x="109" y="143" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="109" y="194" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="109" y="245" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                  <rect x="206" y="194" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="206" y="245" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                </g>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">
+              GTVL Promodizer Portal
+            </h1>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 md:gap-3">
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-600 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-600 truncate"></div>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-600">
+            Main
+          </div>
+          <div class="space-y-1">
+            <a href="dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="dashboard">
+              <i data-lucide="home" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="record_sales.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="record_sales">
+              <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+              <span>Record Sales</span>
+            </a>
+            <a href="sales_history.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sales_history">
+              <i data-lucide="history" class="w-5 h-5"></i>
+              <span>Sales History</span>
+            </a>
+            <a href="attendance.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="attendance">
+              <i data-lucide="clock" class="w-5 h-5"></i>
+              <span>Attendance</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="py-6 border-b border-slate-100 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-600">
+            Records
+          </div>
+          <div class="space-y-1">
+            <a href="attendance_history.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="attendance_history">
+              <i data-lucide="calendar" class="w-5 h-5"></i>
+              <span>Attendance History</span>
+            </a>
+            <a href="my_stores.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="my_stores">
+              <i data-lucide="map-pin" class="w-5 h-5"></i>
+              <span>My Stores</span>
+            </a>
+            <a href="my_profile.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="my_profile">
+              <i data-lucide="user" class="w-5 h-5"></i>
+              <span>My Profile</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="app-main p-6" id="pageContent" role="main"><div class="bg-white border-b border-slate-200 mb-6">
+  <div class="flex items-center justify-between py-4">
+    <div class="flex items-center gap-4">
+      <button onclick="window.location.href='sales_history.html'" class="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-teal-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2" aria-label="Go back to Sales History">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      </button>
+      <div>
+        <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900">Sales Detail</h1>
+        <p class="text-sm text-slate-600 mt-1">Complete submission information</p>
+      </div>
+    </div>
+    <button onclick="window.location.href='dashboard.html'" class="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-teal-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2" aria-label="Go to Dashboard">
+      <i data-lucide="home" class="w-5 h-5"></i>
+    </button>
+  </div>
+</div>
+
+<!-- Main Content Container -->
+<div class="space-y-6">
+  <!-- Loading State -->
+  <div id="loadingState" class="flex items-center justify-center py-12">
+    <div class="flex flex-col items-center gap-3">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-700"></div>
+      <p class="text-sm text-slate-600">Loading sales details...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div id="errorState" class="hidden">
+    <div class="bg-red-50 border border-red-200 rounded-lg p-6">
+      <div class="flex items-center gap-3">
+        <div class="flex-shrink-0">
+          <i data-lucide="alert-circle" class="w-6 h-6 text-red-600"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-semibold text-red-800">Sales record not found</h3>
+          <p class="text-sm text-red-700 mt-1">The requested sales submission could not be found or may have been deleted.</p>
+          <button onclick="window.location.href='sales_history.html'" class="mt-3 inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-700 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            Back to Sales History
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Container -->
+  <div id="contentContainer" class="hidden space-y-6">
+    <!-- Submission Summary Card -->
+    <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+      <div class="px-6 py-4 border-b border-slate-100">
+        <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Submission Summary</h2>
+      </div>
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Submission ID -->
+          <div>
+            <dt class="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Submission ID</dt>
+            <dd id="submissionId" class="text-sm font-medium text-slate-900 font-mono bg-slate-50 px-2 py-1 rounded"></dd>
+          </div>
+          
+          <!-- Recorded Date & Time -->
+          <div>
+            <dt class="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Recorded Date &amp; Time</dt>
+            <dd id="recordedDateTime" class="text-sm font-medium text-slate-900"></dd>
+          </div>
+          
+          <!-- Recorded By -->
+          <div>
+            <dt class="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Recorded By</dt>
+            <dd id="recordedBy" class="text-sm font-medium text-slate-900"></dd>
+          </div>
+          
+          <!-- Store Information -->
+          <div class="md:col-span-2">
+            <dt class="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Store Location</dt>
+            <dd id="storeInfo" class="text-sm font-medium text-slate-900"></dd>
+          </div>
+          
+          <!-- Total Items -->
+          <div>
+            <dt class="text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Total Items</dt>
+            <dd id="totalItemsCount" class="text-sm font-semibold text-teal-700"></dd>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Items List Section -->
+    <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+      <div class="px-6 py-4 border-b border-slate-100">
+        <h2 id="itemsHeader" class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Scanned Items</h2>
+      </div>
+      <div class="p-6">
+        <div id="itemsList" class="space-y-4">
+          <!-- Items will be populated here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Summary (if prices available) -->
+    <div id="totalSummary" class="hidden bg-teal-50 border border-teal-200 rounded-lg p-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="flex-shrink-0">
+            <i data-lucide="calculator" class="w-6 h-6 text-teal-700"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-semibold text-teal-900">Total Summary</h3>
+            <p class="text-sm text-teal-700" id="summaryText"></p>
+          </div>
+        </div>
+        <div class="text-right">
+          <div class="text-[1.75rem] leading-[2.25rem] font-bold text-teal-900" id="totalValue"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils =
+          window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_promo_001");
+                    currentUserId = "usr_promo_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } =
+            state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail)
+            return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute(
+            "aria-expanded",
+            shouldOpen ? "true" : "false"
+          );
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active");
+            } else {
+              link.classList.remove("active");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () =>
+            closeMobileSidebar()
+          );
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+// Utility: portal a modal by id (idempotent)
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+});
+
+// Data Management Functions
+function funGetLocalStorageData(key) {
+  try {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    console.error(`Error retrieving ${key}:`, error);
+    return [];
+  }
+}
+
+function funGetSalesRecordById(salesId) {
+  const salesRecords = funGetLocalStorageData('salesRecords');
+  return salesRecords.find(record => record.id === salesId);
+}
+
+function funGetUserById(userId) {
+  const users = funGetLocalStorageData('users');
+  return users.find(user => user.id === userId);
+}
+
+function funGetStoreById(storeId) {
+  const stores = funGetLocalStorageData('stores');
+  return stores.find(store => store.id === storeId);
+}
+
+function funGetSkuById(skuId) {
+  const skus = funGetLocalStorageData('skus');
+  return skus.find(sku => sku.id === skuId);
+}
+
+// Formatting Functions
+function funFormatDateTime(isoString) {
+  try {
+    const date = new Date(isoString);
+    const options = { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    };
+    return date.toLocaleDateString('en-US', options).replace(' at ', ' at ');
+  } catch (error) {
+    return 'Invalid Date';
+  }
+}
+
+function funFormatCurrency(amount) {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR'
+  }).format(amount);
+}
+
+function funGetCategoryBorderColor(category) {
+  const categoryColors = {
+    'Snacks': 'border-l-amber-500',
+    'Beverages': 'border-l-blue-500', 
+    'Confectionery': 'border-l-pink-500'
+  };
+  return categoryColors[category] || 'border-l-slate-400';
+}
+
+// URL Parameter Functions
+function funGetUrlParameter(name) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(name);
+}
+
+// Main Data Loading Function
+function funLoadSalesDetail() {
+  const salesId = funGetUrlParameter('id');
+  
+  if (!salesId) {
+    funShowError();
+    return;
+  }
+
+  const salesRecord = funGetSalesRecordById(salesId);
+  
+  if (!salesRecord) {
+    funShowError();
+    return;
+  }
+
+  // Get related data
+  const recordedByUser = funGetUserById(salesRecord.recordedById);
+  const store = funGetStoreById(salesRecord.storeId);
+
+  // Populate submission summary
+  funPopulateSubmissionSummary(salesRecord, recordedByUser, store);
+
+  // Populate items list
+  funPopulateItemsList(salesRecord);
+
+  // Show content and hide loading
+  funShowContent();
+}
+
+function funPopulateSubmissionSummary(salesRecord, recordedByUser, store) {
+  // Submission ID
+  document.getElementById('submissionId').textContent = salesRecord.submissionId;
+
+  // Recorded Date & Time
+  document.getElementById('recordedDateTime').textContent = funFormatDateTime(salesRecord.recordedAt);
+
+  // Recorded By
+  const recordedByName = recordedByUser 
+    ? `${recordedByUser.firstName} ${recordedByUser.lastName}`
+    : 'Unknown User';
+  document.getElementById('recordedBy').textContent = recordedByName;
+
+  // Store Information
+  let storeInfo = 'Store information not available';
+  if (store) {
+    storeInfo = `${store.storeName}, ${store.address.street}, ${store.address.city}, ${store.address.state} ${store.address.zipCode}`;
+  }
+  document.getElementById('storeInfo').textContent = storeInfo;
+
+  // Total Items Count
+  const totalItems = salesRecord.scannedSkus.reduce((sum, item) => sum + item.quantity, 0);
+  document.getElementById('totalItemsCount').textContent = `${totalItems} items`;
+}
+
+function funPopulateItemsList(salesRecord) {
+  const itemsListContainer = document.getElementById('itemsList');
+  const itemsHeader = document.getElementById('itemsHeader');
+  
+  // Update header with count
+  const itemCount = salesRecord.scannedSkus.length;
+  itemsHeader.textContent = `Scanned Items (${itemCount})`;
+
+  let totalValue = 0;
+  let hasValidPrices = true;
+
+  salesRecord.scannedSkus.forEach((scannedSku, index) => {
+    const sku = funGetSkuById(scannedSku.skuId);
+    
+    // Calculate line total if unit price is available
+    let lineTotal = 0;
+    if (sku && typeof sku.unitPrice === 'number' && sku.unitPrice > 0) {
+      lineTotal = scannedSku.quantity * sku.unitPrice;
+      totalValue += lineTotal;
+    } else {
+      hasValidPrices = false;
+    }
+
+    const itemCard = document.createElement('div');
+    itemCard.className = `border-l-4 ${funGetCategoryBorderColor(sku?.category)} bg-slate-50 rounded-r-lg p-4`;
+    
+    itemCard.innerHTML = `
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div class="flex-1">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex-1 min-w-0">
+              <h3 class="text-base font-semibold text-slate-900 leading-6">
+                ${sku?.productName || 'Unknown Product'}
+              </h3>
+              <div class="flex flex-wrap items-center gap-4 mt-2">
+                ${sku?.skuCode ? `<span class="text-xs text-slate-600">SKU: <span class="font-mono">${sku.skuCode}</span></span>` : ''}
+                <span class="text-xs text-slate-600">Barcode: <span class="font-mono">${scannedSku.barcode}</span></span>
+                ${sku?.category ? `<span class="inline-flex items-center px-2 py-1 rounded-full text-[0.625rem] font-medium bg-slate-200 text-slate-800">${sku.category}</span>` : ''}
+              </div>
+            </div>
+            <div class="flex-shrink-0 text-right">
+              <div class="text-[1.25rem] font-bold text-teal-700">Qty: ${scannedSku.quantity}</div>
+              ${sku?.unitPrice ? `<div class="text-xs text-slate-600 mt-1">Unit Price: ${funFormatCurrency(sku.unitPrice)}</div>` : ''}
+            </div>
+          </div>
+        </div>
+        ${lineTotal > 0 ? `
+          <div class="flex-shrink-0">
+            <div class="bg-white border border-slate-200 rounded-lg px-3 py-2 text-right">
+              <div class="text-xs text-slate-600">Line Total</div>
+              <div class="text-base font-semibold text-slate-900">${funFormatCurrency(lineTotal)}</div>
+            </div>
+          </div>
+        ` : ''}
+      </div>
+    `;
+
+    itemsListContainer.appendChild(itemCard);
+  });
+
+  // Show total summary if we have valid prices for all items
+  if (hasValidPrices && totalValue > 0) {
+    funShowTotalSummary(salesRecord.scannedSkus.length, totalValue);
+  }
+}
+
+function funShowTotalSummary(itemCount, totalValue) {
+  const totalSummaryElement = document.getElementById('totalSummary');
+  const summaryTextElement = document.getElementById('summaryText');
+  const totalValueElement = document.getElementById('totalValue');
+
+  summaryTextElement.textContent = `${itemCount} unique products`;
+  totalValueElement.textContent = funFormatCurrency(totalValue);
+  
+  totalSummaryElement.classList.remove('hidden');
+}
+
+function funShowContent() {
+  document.getElementById('loadingState').classList.add('hidden');
+  document.getElementById('errorState').classList.add('hidden');
+  document.getElementById('contentContainer').classList.remove('hidden');
+}
+
+function funShowError() {
+  document.getElementById('loadingState').classList.add('hidden');
+  document.getElementById('contentContainer').classList.add('hidden');
+  document.getElementById('errorState').classList.remove('hidden');
+}
+
+// Initialize the page
+document.addEventListener('DOMContentLoaded', () => {
+  // Set active navigation
+  if (typeof TemplateUtils !== 'undefined' && TemplateUtils.setActiveNavLink) {
+    TemplateUtils.setActiveNavLink('sales_history');
+  }
+  
+  // Load sales detail data
+  setTimeout(() => {
+    funLoadSalesDetail();
+  }, 500); // Small delay to show loading state
+});
+</script></body></html>

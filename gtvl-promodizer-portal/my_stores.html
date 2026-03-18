@@ -1,0 +1,881 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>GTVL Promodizer Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-primary: #0f766e;
+        --color-primary-hover: #0d9488;
+        --color-secondary: #475569;
+        --color-accent: #d97706;
+        --color-surface: #ffffff;
+        --color-background: #f8fafc;
+        --color-surface-variant: #f1f5f9;
+        --color-on-background: #0f172a;
+        --color-on-surface: #1e293b;
+        --color-border: #e2e8f0;
+        --color-success: #16a34a;
+        --color-warning: #f59e0b;
+        --color-error: #dc2626;
+        --color-info: #2563eb;
+
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+      }
+
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>My Stores - GTVL Promodizer Portal</title><script>
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+});
+</script></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-teal-700 rounded-lg flex items-center justify-center">
+              <svg width="20" height="20" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <rect x="68" y="68" width="264" height="264" rx="32" stroke="#FFFFFF" stroke-width="18"></rect>
+                  <rect x="109" y="143" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="109" y="194" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="109" y="245" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                  <rect x="206" y="194" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="206" y="245" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                </g>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">
+              GTVL Promodizer Portal
+            </h1>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 md:gap-3">
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-600 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-600 truncate"></div>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-600">
+            Main
+          </div>
+          <div class="space-y-1">
+            <a href="dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="dashboard">
+              <i data-lucide="home" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="record_sales.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="record_sales">
+              <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+              <span>Record Sales</span>
+            </a>
+            <a href="sales_history.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sales_history">
+              <i data-lucide="history" class="w-5 h-5"></i>
+              <span>Sales History</span>
+            </a>
+            <a href="attendance.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="attendance">
+              <i data-lucide="clock" class="w-5 h-5"></i>
+              <span>Attendance</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="py-6 border-b border-slate-100 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-600">
+            Records
+          </div>
+          <div class="space-y-1">
+            <a href="attendance_history.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="attendance_history">
+              <i data-lucide="calendar" class="w-5 h-5"></i>
+              <span>Attendance History</span>
+            </a>
+            <a href="my_stores.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="my_stores">
+              <i data-lucide="map-pin" class="w-5 h-5"></i>
+              <span>My Stores</span>
+            </a>
+            <a href="my_profile.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="my_profile">
+              <i data-lucide="user" class="w-5 h-5"></i>
+              <span>My Profile</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="app-main p-6" id="pageContent" role="main"><div class="flex items-center justify-between mb-6">
+  <div class="flex items-center gap-4">
+    <button onclick="window.history.back()" class="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Go back">
+      <i data-lucide="arrow-left" class="w-5 h-5 text-slate-600"></i>
+    </button>
+    <div>
+      <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900">My Stores</h1>
+      <p class="text-sm leading-[1.375rem] font-normal text-slate-600 mt-1">Stores assigned to you for sales and attendance</p>
+    </div>
+  </div>
+  <a href="dashboard.html" class="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Go to dashboard">
+    <i data-lucide="home" class="w-5 h-5 text-slate-600"></i>
+  </a>
+</div>
+
+<!-- Search Bar -->
+<div class="mb-6">
+  <div class="relative">
+    <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400"></i>
+    <input type="text" id="storeSearchInput" placeholder="Search stores by name..." class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg bg-white text-sm leading-[1.375rem] font-normal text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors duration-200">
+  </div>
+</div>
+
+<!-- Store Count and Status Summary -->
+<div class="flex items-center justify-between mb-6">
+  <div class="flex items-center gap-6">
+    <div class="text-sm leading-[1.375rem] font-normal text-slate-600">
+      <span id="storeCount" class="font-semibold text-slate-800">0</span> stores assigned
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3 rounded-full bg-green-600"></div>
+        <span class="text-xs leading-[1.125rem] font-normal text-slate-600">
+          <span id="activeStoreCount" class="font-semibold">0</span> Active
+        </span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3 rounded-full bg-slate-400"></div>
+        <span class="text-xs leading-[1.125rem] font-normal text-slate-600">
+          <span id="inactiveStoreCount" class="font-semibold">0</span> Inactive
+        </span>
+      </div>
+    </div>
+  </div>
+  <button id="refreshButton" class="flex items-center gap-2 px-3 py-2 text-sm leading-[1.375rem] font-semibold text-slate-700 hover:bg-slate-100 rounded-lg transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+    Refresh
+  </button>
+</div>
+
+<!-- Stores Grid/List -->
+<div id="storesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <!-- Store cards will be populated here -->
+</div>
+
+<!-- Empty State -->
+<div id="emptyState" class="hidden flex flex-col items-center justify-center py-16 px-4">
+  <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+    <i data-lucide="map-pin" class="w-8 h-8 text-slate-400"></i>
+  </div>
+  <h3 class="text-base leading-6 font-semibold text-slate-800 mb-2">No stores assigned</h3>
+  <p class="text-sm leading-[1.375rem] font-normal text-slate-600 text-center mb-6 max-w-sm">
+    Contact your supervisor to get store assignments for recording sales and attendance.
+  </p>
+  <button onclick="funLoadMyStores()" class="flex items-center gap-2 px-4 py-2 bg-teal-700 hover:bg-teal-600 text-white text-sm leading-[1.375rem] font-semibold rounded-lg transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-500 focus-visible:outline-offset-2">
+    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+    Refresh
+  </button>
+</div>
+
+<!-- Loading State -->
+<div id="loadingState" class="flex items-center justify-center py-16">
+  <div class="flex items-center gap-3">
+    <div class="w-5 h-5 border-2 border-teal-700 border-t-transparent rounded-full animate-spin"></div>
+    <span class="text-sm leading-[1.375rem] font-normal text-slate-600">Loading your stores...</span>
+  </div>
+</div>
+
+</main>
+
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils =
+          window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_promo_001");
+                    currentUserId = "usr_promo_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } =
+            state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail)
+            return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute(
+            "aria-expanded",
+            shouldOpen ? "true" : "false"
+          );
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active");
+            } else {
+              link.classList.remove("active");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () =>
+            closeMobileSidebar()
+          );
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+});
+</script>
+<script>
+// Store management functions
+const StoreManager = {
+  currentUserId: null,
+  allStores: [],
+  filteredStores: [],
+
+  init() {
+    this.currentUserId = this.funGetCurrentUserId();
+    this.funLoadMyStores();
+    this.funBindEvents();
+  },
+
+  funGetCurrentUserId() {
+    return localStorage.getItem('currentUserId') || 'usr_promo_001';
+  },
+
+  funGetMyStores() {
+    try {
+      // Get promodizer allocations for current user
+      const promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+      const myAllocations = promodizerAllocations.filter(allocation => allocation.promodizerId === this.currentUserId);
+      
+      if (myAllocations.length === 0) {
+        return [];
+      }
+
+      // Get store IDs
+      const storeIds = myAllocations.map(allocation => allocation.storeId);
+
+      // Get store details
+      const stores = JSON.parse(localStorage.getItem('stores') || '[]');
+      const myStores = stores.filter(store => storeIds.includes(store.id));
+
+      // Sort: active stores first, then by name
+      return myStores.sort((a, b) => {
+        if (a.status !== b.status) {
+          return a.status === 'active' ? -1 : 1;
+        }
+        return a.storeName.localeCompare(b.storeName);
+      });
+    } catch (error) {
+      console.error('Error getting my stores:', error);
+      return [];
+    }
+  },
+
+  funFormatAddress(address) {
+    if (!address) return 'Address not available';
+    
+    const parts = [
+      address.street,
+      address.city,
+      address.state,
+      address.zipCode
+    ].filter(Boolean);
+    
+    return parts.join(', ');
+  },
+
+  funFormatPhoneNumber(phone) {
+    if (!phone) return '';
+    
+    // Remove all non-digit characters
+    const digits = phone.replace(/\D/g, '');
+    
+    // Format as (XXX) XXX-XXXX if US number
+    if (digits.length === 11 && digits.startsWith('1')) {
+      const number = digits.slice(1);
+      return `(${number.slice(0, 3)}) ${number.slice(3, 6)}-${number.slice(6)}`;
+    } else if (digits.length === 10) {
+      return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+    }
+    
+    return phone; // Return original if can't format
+  },
+
+  funCreateStoreCard(store) {
+    const formattedAddress = this.funFormatAddress(store.address);
+    const formattedPhone = this.funFormatPhoneNumber(store.phone);
+    const statusBadgeClass = store.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-600';
+    const statusText = store.status === 'active' ? 'Active' : 'Inactive';
+
+    return `
+      <div class="bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-200 p-6">
+        <!-- Store Header -->
+        <div class="flex items-start justify-between mb-4">
+          <div class="flex-1 min-w-0">
+            <h3 class="text-base leading-6 font-semibold text-slate-900 mb-1 truncate">${store.storeName}</h3>
+            <p class="text-xs leading-[1.125rem] font-normal text-slate-600">${store.storeCode}</p>
+          </div>
+          <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.625rem] leading-4 font-normal ${statusBadgeClass} shrink-0">
+            ${statusText}
+          </span>
+        </div>
+
+        <!-- Store Details -->
+        <div class="space-y-3">
+          <!-- Address -->
+          <div class="flex items-start gap-3">
+            <i data-lucide="map-pin" class="w-4 h-4 text-slate-400 mt-0.5 shrink-0"></i>
+            <p class="text-sm leading-[1.375rem] font-normal text-slate-700">${formattedAddress}</p>
+          </div>
+
+          <!-- Contact Person -->
+          ${store.contactPerson ? `
+          <div class="flex items-center gap-3">
+            <i data-lucide="user" class="w-4 h-4 text-slate-400 shrink-0"></i>
+            <p class="text-sm leading-[1.375rem] font-normal text-slate-700">${store.contactPerson}</p>
+          </div>
+          ` : ''}
+
+          <!-- Phone -->
+          ${store.phone ? `
+          <div class="flex items-center gap-3">
+            <i data-lucide="phone" class="w-4 h-4 text-slate-400 shrink-0"></i>
+            <a href="tel:${store.phone}" class="text-sm leading-[1.375rem] font-normal text-teal-700 hover:text-teal-600 transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2 rounded">
+              ${formattedPhone}
+            </a>
+          </div>
+          ` : ''}
+
+          <!-- Email -->
+          ${store.email ? `
+          <div class="flex items-center gap-3">
+            <i data-lucide="mail" class="w-4 h-4 text-slate-400 shrink-0"></i>
+            <a href="mailto:${store.email}" class="text-sm leading-[1.375rem] font-normal text-teal-700 hover:text-teal-600 transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2 rounded truncate">
+              ${store.email}
+            </a>
+          </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  },
+
+  funRenderStores(stores = this.filteredStores) {
+    const container = document.getElementById('storesContainer');
+    const emptyState = document.getElementById('emptyState');
+    const loadingState = document.getElementById('loadingState');
+
+    // Hide loading state
+    loadingState.classList.add('hidden');
+
+    if (stores.length === 0) {
+      container.innerHTML = '';
+      container.classList.add('hidden');
+      emptyState.classList.remove('hidden');
+      return;
+    }
+
+    // Show stores container and hide empty state
+    container.classList.remove('hidden');
+    emptyState.classList.add('hidden');
+
+    // Render store cards
+    container.innerHTML = stores.map(store => this.funCreateStoreCard(store)).join('');
+
+    // Re-initialize Lucide icons
+    if (typeof window.lucide?.createIcons === 'function') {
+      window.lucide.createIcons();
+    }
+  },
+
+  funUpdateCounts() {
+    const totalCount = this.allStores.length;
+    const activeCount = this.allStores.filter(store => store.status === 'active').length;
+    const inactiveCount = totalCount - activeCount;
+
+    document.getElementById('storeCount').textContent = totalCount;
+    document.getElementById('activeStoreCount').textContent = activeCount;
+    document.getElementById('inactiveStoreCount').textContent = inactiveCount;
+  },
+
+  funFilterStores(searchTerm) {
+    const term = searchTerm.toLowerCase().trim();
+    
+    if (!term) {
+      this.filteredStores = [...this.allStores];
+    } else {
+      this.filteredStores = this.allStores.filter(store => 
+        store.storeName.toLowerCase().includes(term) ||
+        store.storeCode.toLowerCase().includes(term) ||
+        (store.address && (
+          store.address.street?.toLowerCase().includes(term) ||
+          store.address.city?.toLowerCase().includes(term) ||
+          store.address.state?.toLowerCase().includes(term)
+        ))
+      );
+    }
+    
+    this.funRenderStores();
+  },
+
+  funLoadMyStores() {
+    const loadingState = document.getElementById('loadingState');
+    const container = document.getElementById('storesContainer');
+    const emptyState = document.getElementById('emptyState');
+
+    // Show loading state
+    loadingState.classList.remove('hidden');
+    container.classList.add('hidden');
+    emptyState.classList.add('hidden');
+
+    // Simulate loading delay for better UX
+    setTimeout(() => {
+      this.allStores = this.funGetMyStores();
+      this.filteredStores = [...this.allStores];
+      this.funUpdateCounts();
+      this.funRenderStores();
+    }, 300);
+  },
+
+  funBindEvents() {
+    // Search functionality
+    const searchInput = document.getElementById('storeSearchInput');
+    let searchTimeout;
+    
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        this.funFilterStores(e.target.value);
+      }, 300);
+    });
+
+    // Refresh button
+    document.getElementById('refreshButton').addEventListener('click', () => {
+      searchInput.value = '';
+      this.funLoadMyStores();
+    });
+
+    // Clear search on escape
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        e.target.value = '';
+        this.funFilterStores('');
+      }
+    });
+  }
+};
+
+// Global function for refresh button in empty state
+function funLoadMyStores() {
+  StoreManager.funLoadMyStores();
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  // Set active navigation
+  if (typeof window.TemplateUtils?.setActiveNavLink === 'function') {
+    window.TemplateUtils.setActiveNavLink('my_stores');
+  }
+  
+  StoreManager.init();
+});
+</script></body></html>

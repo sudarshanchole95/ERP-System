@@ -1,0 +1,1197 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>GTVL Promodizer Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-primary: #0f766e;
+        --color-primary-hover: #0d9488;
+        --color-secondary: #475569;
+        --color-accent: #d97706;
+        --color-surface: #ffffff;
+        --color-background: #f8fafc;
+        --color-surface-variant: #f1f5f9;
+        --color-on-background: #0f172a;
+        --color-on-surface: #1e293b;
+        --color-border: #e2e8f0;
+        --color-success: #16a34a;
+        --color-warning: #f59e0b;
+        --color-error: #dc2626;
+        --color-info: #2563eb;
+
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+      }
+
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Record Sales - GTVL Promodizer Portal</title></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-teal-700 rounded-lg flex items-center justify-center">
+              <svg width="20" height="20" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <rect x="68" y="68" width="264" height="264" rx="32" stroke="#FFFFFF" stroke-width="18"></rect>
+                  <rect x="109" y="143" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="109" y="194" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="109" y="245" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                  <rect x="206" y="194" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="206" y="245" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                </g>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">
+              GTVL Promodizer Portal
+            </h1>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 md:gap-3">
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-600 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-600 truncate"></div>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-600">
+            Main
+          </div>
+          <div class="space-y-1">
+            <a href="dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="dashboard">
+              <i data-lucide="home" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="record_sales.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="record_sales">
+              <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+              <span>Record Sales</span>
+            </a>
+            <a href="sales_history.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sales_history">
+              <i data-lucide="history" class="w-5 h-5"></i>
+              <span>Sales History</span>
+            </a>
+            <a href="attendance.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="attendance">
+              <i data-lucide="clock" class="w-5 h-5"></i>
+              <span>Attendance</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="py-6 border-b border-slate-100 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-600">
+            Records
+          </div>
+          <div class="space-y-1">
+            <a href="attendance_history.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="attendance_history">
+              <i data-lucide="calendar" class="w-5 h-5"></i>
+              <span>Attendance History</span>
+            </a>
+            <a href="my_stores.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="my_stores">
+              <i data-lucide="map-pin" class="w-5 h-5"></i>
+              <span>My Stores</span>
+            </a>
+            <a href="my_profile.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="my_profile">
+              <i data-lucide="user" class="w-5 h-5"></i>
+              <span>My Profile</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="app-main p-6" id="pageContent" role="main"><div id="clearBatchModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,28rem)] max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+            <i data-lucide="trash-2" class="w-5 h-5 text-red-600"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-slate-900">Clear All Items?</h3>
+        </div>
+        
+        <p class="text-sm text-slate-600 mb-6">
+          This will remove all <span id="clearBatchItemCount" class="font-semibold">0</span> items from the current batch. This action cannot be undone.
+        </p>
+        
+        <div class="flex gap-3 justify-end">
+          <button id="cancelClearBatch" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-colors">
+            Cancel
+          </button>
+          <button id="confirmClearBatch" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors">
+            Clear All
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Page Header -->
+<div class="flex items-center justify-between mb-6">
+  <div class="flex items-center gap-4">
+    <button id="backButton" class="flex items-center justify-center w-10 h-10 text-slate-600 hover:text-teal-700 hover:bg-slate-100 rounded-lg transition-colors focus:ring-2 focus:ring-teal-500 focus:ring-offset-2" aria-label="Go back">
+      <i data-lucide="arrow-left" class="w-5 h-5"></i>
+    </button>
+    <div>
+      <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900">Record Sales</h1>
+      <p class="text-sm text-slate-600 mt-1">Scan barcodes to record sales transactions</p>
+    </div>
+  </div>
+  <button id="homeButton" class="flex items-center justify-center w-10 h-10 text-slate-600 hover:text-teal-700 hover:bg-slate-100 rounded-lg transition-colors focus:ring-2 focus:ring-teal-500 focus:ring-offset-2" aria-label="Go to dashboard">
+    <i data-lucide="home" class="w-5 h-5"></i>
+  </button>
+</div>
+
+<!-- Main Content Container -->
+<div class="space-y-6">
+  
+  <!-- STATE 1: Store Selection -->
+  <div id="storeSelectionState" class="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+    <div class="text-center max-w-md mx-auto">
+      <div class="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="map-pin" class="w-8 h-8 text-teal-700"></i>
+      </div>
+      
+      <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900 mb-2">Select Store Location</h2>
+      <p class="text-sm text-slate-600 mb-6">Select the store location for this sales session</p>
+      
+      <div class="mb-6">
+        <select id="storeSelector" class="w-full px-3 py-3 text-sm border border-slate-300 rounded-md bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors">
+          <option value="">Choose a store...</option>
+        </select>
+      </div>
+      
+      <button id="startScanningButton" disabled="" class="w-full px-6 py-3 text-sm font-semibold text-white bg-teal-700 rounded-md hover:bg-teal-600 disabled:bg-slate-300 disabled:cursor-not-allowed focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-colors">
+        Start Scanning
+      </button>
+    </div>
+  </div>
+
+  <!-- STATE 2: Active Scanning -->
+  <div id="activeScanningState" class="hidden space-y-6">
+    
+    <!-- Selected Store Header -->
+    <div class="bg-white rounded-lg border border-slate-200 shadow-sm p-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 id="selectedStoreName" class="text-base font-semibold text-slate-900">Store Name</h2>
+          <p id="selectedStoreLocation" class="text-sm text-slate-600">Store Location</p>
+        </div>
+        <button id="changeStoreButton" class="text-sm text-teal-700 hover:text-teal-600 font-medium focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 rounded px-2 py-1">
+          Change Store
+        </button>
+      </div>
+    </div>
+
+    <!-- Barcode Scanner Interface -->
+    <div class="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+      <div class="text-center mb-4">
+        <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3">
+          <i data-lucide="scan-line" class="w-8 h-8 text-amber-600"></i>
+        </div>
+        <h3 class="text-base font-semibold text-slate-900 mb-2">Scan Barcode</h3>
+      </div>
+      
+      <div class="max-w-sm mx-auto">
+        <input type="text" id="barcodeInput" placeholder="Scan or enter barcode..." class="w-full px-4 py-3 text-sm border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors text-center font-mono" autocomplete="off">
+        <p class="text-xs text-slate-500 mt-2 text-center">Focus this field and scan or type barcode</p>
+      </div>
+    </div>
+
+    <!-- Batch Items List -->
+    <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+      <div class="p-4 border-b border-slate-200">
+        <h3 class="text-base font-semibold text-slate-900">Current Batch</h3>
+      </div>
+      
+      <!-- Empty State -->
+      <div id="emptyBatchMessage" class="p-8 text-center">
+        <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+          <i data-lucide="package" class="w-6 h-6 text-slate-400"></i>
+        </div>
+        <p class="text-sm text-slate-600">Scan barcodes to add items to this batch</p>
+      </div>
+      
+      <!-- Batch Items -->
+      <div id="batchItemsList" class="divide-y divide-slate-200"></div>
+      
+      <!-- Batch Summary Footer -->
+      <div id="batchSummaryFooter" class="hidden p-4 bg-slate-50 border-t border-slate-200">
+        <div class="flex items-center justify-between mb-4">
+          <span id="batchItemCount" class="text-sm font-medium text-slate-900">0 items in batch</span>
+          <button id="clearAllButton" class="text-sm text-slate-600 hover:text-red-600 font-medium focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded px-2 py-1">
+            Clear All
+          </button>
+        </div>
+        <button id="submitSalesButton" class="w-full px-6 py-3 text-sm font-semibold text-white bg-teal-700 rounded-md hover:bg-teal-600 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-colors">
+          Submit Sales
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATE 3: Submission Confirmation -->
+  <div id="submissionConfirmationState" class="hidden">
+    <div class="bg-white rounded-lg border border-slate-200 shadow-sm p-8 text-center max-w-md mx-auto">
+      <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="check" class="w-8 h-8 text-green-600"></i>
+      </div>
+      
+      <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900 mb-2">Sales Recorded Successfully!</h2>
+      <p id="submissionSummary" class="text-sm text-slate-600 mb-6">
+        0 items submitted for Store Name
+      </p>
+      
+      <div class="space-y-3">
+        <button id="recordMoreSalesButton" class="w-full px-6 py-3 text-sm font-semibold text-white bg-teal-700 rounded-md hover:bg-teal-600 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-colors">
+          Record More Sales
+        </button>
+        <button id="backToDashboardButton" class="w-full px-6 py-3 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-colors">
+          Back to Dashboard
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast Notification Container -->
+<div id="toastContainer" class="fixed top-20 right-4 z-40 space-y-2"></div>
+
+</main>
+
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils =
+          window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_promo_001");
+                    currentUserId = "usr_promo_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } =
+            state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail)
+            return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute(
+            "aria-expanded",
+            shouldOpen ? "true" : "false"
+          );
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active");
+            } else {
+              link.classList.remove("active");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () =>
+            closeMobileSidebar()
+          );
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+// Utility: portal a modal by id (idempotent)
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+
+  // Initialize the record sales page
+  funInitializeRecordSales();
+});
+
+// Application state
+const recordSalesState = {
+  currentState: 'storeSelection', // 'storeSelection', 'activeScanning', 'submissionConfirmation'
+  selectedStore: null,
+  currentBatch: [],
+  userStores: []
+};
+
+// DOM references
+const elements = {
+  // States
+  storeSelectionState: document.getElementById('storeSelectionState'),
+  activeScanningState: document.getElementById('activeScanningState'),
+  submissionConfirmationState: document.getElementById('submissionConfirmationState'),
+  
+  // Store selection
+  storeSelector: document.getElementById('storeSelector'),
+  startScanningButton: document.getElementById('startScanningButton'),
+  
+  // Active scanning
+  selectedStoreName: document.getElementById('selectedStoreName'),
+  selectedStoreLocation: document.getElementById('selectedStoreLocation'),
+  changeStoreButton: document.getElementById('changeStoreButton'),
+  barcodeInput: document.getElementById('barcodeInput'),
+  emptyBatchMessage: document.getElementById('emptyBatchMessage'),
+  batchItemsList: document.getElementById('batchItemsList'),
+  batchSummaryFooter: document.getElementById('batchSummaryFooter'),
+  batchItemCount: document.getElementById('batchItemCount'),
+  clearAllButton: document.getElementById('clearAllButton'),
+  submitSalesButton: document.getElementById('submitSalesButton'),
+  
+  // Submission confirmation
+  submissionSummary: document.getElementById('submissionSummary'),
+  recordMoreSalesButton: document.getElementById('recordMoreSalesButton'),
+  backToDashboardButton: document.getElementById('backToDashboardButton'),
+  
+  // Navigation
+  backButton: document.getElementById('backButton'),
+  homeButton: document.getElementById('homeButton'),
+  
+  // Modal
+  clearBatchModal: document.getElementById('clearBatchModal'),
+  clearBatchItemCount: document.getElementById('clearBatchItemCount'),
+  cancelClearBatch: document.getElementById('cancelClearBatch'),
+  confirmClearBatch: document.getElementById('confirmClearBatch'),
+  
+  // Toast container
+  toastContainer: document.getElementById('toastContainer')
+};
+
+// Initialize the page
+function funInitializeRecordSales() {
+  funLoadUserStores();
+  funBindEventListeners();
+  funSetActiveNavLink();
+}
+
+// Set active navigation link
+function funSetActiveNavLink() {
+  if (typeof window.TemplateUtils?.setActiveNavLink === 'function') {
+    window.TemplateUtils.setActiveNavLink('record_sales');
+  }
+}
+
+// Load stores assigned to the current promodizer
+function funLoadUserStores() {
+  try {
+    const currentUser = window.TemplateUtils?.UserUtils?.getCurrentUser();
+    if (!currentUser || currentUser.role !== 'promodizer') {
+      funShowToast('Access denied. Only promodizers can record sales.', 'error');
+      return;
+    }
+
+    const promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+    const stores = JSON.parse(localStorage.getItem('stores') || '[]');
+    
+    // Get stores assigned to current promodizer
+    const userAllocations = promodizerAllocations.filter(alloc => alloc.promodizerId === currentUser.id);
+    recordSalesState.userStores = userAllocations.map(alloc => {
+      const store = stores.find(s => s.id === alloc.storeId);
+      return store;
+    }).filter(store => store && store.status === 'active');
+
+    funPopulateStoreSelector();
+    
+  } catch (error) {
+    console.error('Error loading user stores:', error);
+    funShowToast('Error loading store assignments', 'error');
+  }
+}
+
+// Populate the store selector dropdown
+function funPopulateStoreSelector() {
+  const selector = elements.storeSelector;
+  if (!selector) return;
+
+  // Clear existing options (except the first placeholder)
+  selector.innerHTML = '<option value="">Choose a store...</option>';
+  
+  recordSalesState.userStores.forEach(store => {
+    const option = document.createElement('option');
+    option.value = store.id;
+    option.textContent = `${store.storeName} - ${store.address.city}, ${store.address.state}`;
+    selector.appendChild(option);
+  });
+}
+
+// Bind all event listeners
+function funBindEventListeners() {
+  // Navigation
+  elements.backButton?.addEventListener('click', () => window.location.href = 'dashboard.html');
+  elements.homeButton?.addEventListener('click', () => window.location.href = 'dashboard.html');
+  
+  // Store selection
+  elements.storeSelector?.addEventListener('change', funHandleStoreSelection);
+  elements.startScanningButton?.addEventListener('click', funStartScanning);
+  
+  // Active scanning
+  elements.changeStoreButton?.addEventListener('click', funChangeStore);
+  elements.barcodeInput?.addEventListener('input', funHandleBarcodeInput);
+  elements.barcodeInput?.addEventListener('keydown', funHandleBarcodeKeydown);
+  elements.clearAllButton?.addEventListener('click', funShowClearBatchModal);
+  elements.submitSalesButton?.addEventListener('click', funSubmitSales);
+  
+  // Submission confirmation
+  elements.recordMoreSalesButton?.addEventListener('click', funRecordMoreSales);
+  elements.backToDashboardButton?.addEventListener('click', () => window.location.href = 'dashboard.html');
+  
+  // Modal
+  elements.cancelClearBatch?.addEventListener('click', funHideClearBatchModal);
+  elements.confirmClearBatch?.addEventListener('click', funConfirmClearBatch);
+}
+
+// Handle store selection
+function funHandleStoreSelection(event) {
+  const storeId = event.target.value;
+  const startButton = elements.startScanningButton;
+  
+  if (storeId) {
+    recordSalesState.selectedStore = recordSalesState.userStores.find(s => s.id === storeId);
+    startButton.disabled = false;
+    startButton.classList.remove('disabled:bg-slate-300', 'disabled:cursor-not-allowed');
+  } else {
+    recordSalesState.selectedStore = null;
+    startButton.disabled = true;
+    startButton.classList.add('disabled:bg-slate-300', 'disabled:cursor-not-allowed');
+  }
+}
+
+// Start scanning (transition to STATE 2)
+function funStartScanning() {
+  if (!recordSalesState.selectedStore) return;
+  
+  funTransitionToState('activeScanning');
+  funUpdateSelectedStoreDisplay();
+  
+  // Focus the barcode input
+  setTimeout(() => {
+    elements.barcodeInput?.focus();
+  }, 100);
+}
+
+// Change store (return to STATE 1)
+function funChangeStore() {
+  funTransitionToState('storeSelection');
+  recordSalesState.selectedStore = null;
+  recordSalesState.currentBatch = [];
+  elements.storeSelector.value = '';
+  elements.startScanningButton.disabled = true;
+}
+
+// Update selected store display
+function funUpdateSelectedStoreDisplay() {
+  if (!recordSalesState.selectedStore) return;
+  
+  const store = recordSalesState.selectedStore;
+  elements.selectedStoreName.textContent = store.storeName;
+  elements.selectedStoreLocation.textContent = `${store.address.street}, ${store.address.city}, ${store.address.state}`;
+}
+
+// Handle barcode input
+function funHandleBarcodeInput(event) {
+  const barcode = event.target.value.trim();
+  if (barcode && barcode.length >= 8) { // Minimum barcode length
+    funProcessBarcode(barcode);
+    event.target.value = ''; // Clear input after processing
+  }
+}
+
+// Handle barcode input keydown
+function funHandleBarcodeKeydown(event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    const barcode = event.target.value.trim();
+    if (barcode) {
+      funProcessBarcode(barcode);
+      event.target.value = '';
+    }
+  }
+}
+
+// Process scanned barcode
+function funProcessBarcode(barcode) {
+  try {
+    const skus = JSON.parse(localStorage.getItem('skus') || '[]');
+    const matchingSku = skus.find(sku => sku.barcode === barcode && sku.status === 'active');
+    
+    if (!matchingSku) {
+      funShowToast('Barcode not recognized', 'error');
+      return;
+    }
+    
+    // Check if item already exists in batch
+    const existingItem = recordSalesState.currentBatch.find(item => item.skuId === matchingSku.id);
+    
+    if (existingItem) {
+      existingItem.quantity += 1;
+    } else {
+      recordSalesState.currentBatch.push({
+        skuId: matchingSku.id,
+        barcode: matchingSku.barcode,
+        productName: matchingSku.productName,
+        category: matchingSku.category,
+        quantity: 1
+      });
+    }
+    
+    funShowToast('Item added to batch', 'success');
+    funUpdateBatchDisplay();
+    
+  } catch (error) {
+    console.error('Error processing barcode:', error);
+    funShowToast('Error processing barcode', 'error');
+  }
+}
+
+// Update batch display
+function funUpdateBatchDisplay() {
+  const isEmpty = recordSalesState.currentBatch.length === 0;
+  
+  elements.emptyBatchMessage.classList.toggle('hidden', !isEmpty);
+  elements.batchSummaryFooter.classList.toggle('hidden', isEmpty);
+  
+  if (isEmpty) {
+    elements.batchItemsList.innerHTML = '';
+    return;
+  }
+  
+  // Update item count
+  const totalItems = recordSalesState.currentBatch.reduce((sum, item) => sum + item.quantity, 0);
+  elements.batchItemCount.textContent = `${totalItems} item${totalItems === 1 ? '' : 's'} in batch`;
+  
+  // Render batch items
+  elements.batchItemsList.innerHTML = recordSalesState.currentBatch.map((item, index) => `
+    <div class="p-4 flex items-center justify-between">
+      <div class="flex-1 min-w-0">
+        <h4 class="text-sm font-medium text-slate-900 truncate">${item.productName}</h4>
+        <p class="text-xs text-slate-600 mt-1">
+          <span class="bg-slate-100 px-2 py-1 rounded text-[0.625rem] font-mono">${item.barcode}</span>
+          <span class="ml-2 text-slate-500">${item.category}</span>
+        </p>
+      </div>
+      
+      <div class="flex items-center gap-3 ml-4">
+        <div class="flex items-center gap-2">
+          <button 
+            onclick="funAdjustQuantity(${index}, -1)"
+            class="flex items-center justify-center w-8 h-8 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors"
+            ${item.quantity <= 1 ? 'disabled' : ''}
+          >
+            <i data-lucide="minus" class="w-4 h-4"></i>
+          </button>
+          
+          <input 
+            type="number" 
+            value="${item.quantity}" 
+            min="1"
+            onchange="funSetQuantity(${index}, this.value)"
+            class="w-16 px-2 py-1 text-sm text-center border border-slate-300 rounded focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+          >
+          
+          <button 
+            onclick="funAdjustQuantity(${index}, 1)"
+            class="flex items-center justify-center w-8 h-8 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors"
+          >
+            <i data-lucide="plus" class="w-4 h-4"></i>
+          </button>
+        </div>
+        
+        <button 
+          onclick="funRemoveItem(${index})"
+          class="flex items-center justify-center w-8 h-8 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+          aria-label="Remove item"
+        >
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+  
+  // Re-create lucide icons
+  if (typeof window.lucide?.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// Adjust item quantity
+function funAdjustQuantity(index, delta) {
+  const item = recordSalesState.currentBatch[index];
+  if (!item) return;
+  
+  const newQuantity = item.quantity + delta;
+  if (newQuantity < 1) return;
+  
+  item.quantity = newQuantity;
+  funUpdateBatchDisplay();
+}
+
+// Set item quantity directly
+function funSetQuantity(index, value) {
+  const item = recordSalesState.currentBatch[index];
+  if (!item) return;
+  
+  const quantity = parseInt(value);
+  if (isNaN(quantity) || quantity < 1) {
+    funUpdateBatchDisplay(); // Reset to current value
+    return;
+  }
+  
+  item.quantity = quantity;
+  funUpdateBatchDisplay();
+}
+
+// Remove item from batch
+function funRemoveItem(index) {
+  recordSalesState.currentBatch.splice(index, 1);
+  funUpdateBatchDisplay();
+  funShowToast('Item removed from batch', 'success');
+}
+
+// Show clear batch modal
+function funShowClearBatchModal() {
+  const totalItems = recordSalesState.currentBatch.reduce((sum, item) => sum + item.quantity, 0);
+  elements.clearBatchItemCount.textContent = totalItems;
+  elements.clearBatchModal.classList.remove('hidden');
+}
+
+// Hide clear batch modal
+function funHideClearBatchModal() {
+  elements.clearBatchModal.classList.add('hidden');
+}
+
+// Confirm clear batch
+function funConfirmClearBatch() {
+  recordSalesState.currentBatch = [];
+  funUpdateBatchDisplay();
+  funHideClearBatchModal();
+  funShowToast('Batch cleared', 'success');
+  
+  // Focus barcode input
+  setTimeout(() => {
+    elements.barcodeInput?.focus();
+  }, 100);
+}
+
+// Submit sales
+function funSubmitSales() {
+  if (recordSalesState.currentBatch.length === 0) {
+    funShowToast('Cannot submit empty batch', 'error');
+    return;
+  }
+  
+  try {
+    const currentUser = window.TemplateUtils?.UserUtils?.getCurrentUser();
+    if (!currentUser) {
+      funShowToast('User not found', 'error');
+      return;
+    }
+    
+    // Generate submission ID
+    const submissionId = `batch_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}_${Date.now()}`;
+    
+    // Create sales record
+    const salesRecord = {
+      id: `sale_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      submissionId: submissionId,
+      recordedById: currentUser.id,
+      recordedByRole: 'promodizer',
+      storeId: recordSalesState.selectedStore.id,
+      scannedSkus: recordSalesState.currentBatch.map(item => ({
+        skuId: item.skuId,
+        barcode: item.barcode,
+        quantity: item.quantity
+      })),
+      recordedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString()
+    };
+    
+    // Save to local storage
+    const salesRecords = JSON.parse(localStorage.getItem('salesRecords') || '[]');
+    salesRecords.push(salesRecord);
+    localStorage.setItem('salesRecords', JSON.stringify(salesRecords));
+    
+    // Transition to confirmation state
+    funTransitionToSubmissionConfirmation();
+    
+  } catch (error) {
+    console.error('Error submitting sales:', error);
+    funShowToast('Error submitting sales', 'error');
+  }
+}
+
+// Transition to submission confirmation state
+function funTransitionToSubmissionConfirmation() {
+  const totalItems = recordSalesState.currentBatch.reduce((sum, item) => sum + item.quantity, 0);
+  const storeName = recordSalesState.selectedStore.storeName;
+  
+  elements.submissionSummary.textContent = `${totalItems} item${totalItems === 1 ? '' : 's'} submitted for ${storeName}`;
+  
+  funTransitionToState('submissionConfirmation');
+  
+  // Clear batch after successful submission
+  recordSalesState.currentBatch = [];
+}
+
+// Record more sales (return to STATE 1)
+function funRecordMoreSales() {
+  recordSalesState.selectedStore = null;
+  recordSalesState.currentBatch = [];
+  elements.storeSelector.value = '';
+  elements.startScanningButton.disabled = true;
+  funTransitionToState('storeSelection');
+}
+
+// Transition between states
+function funTransitionToState(newState) {
+  recordSalesState.currentState = newState;
+  
+  // Hide all states
+  elements.storeSelectionState.classList.add('hidden');
+  elements.activeScanningState.classList.add('hidden');
+  elements.submissionConfirmationState.classList.add('hidden');
+  
+  // Show selected state
+  switch (newState) {
+    case 'storeSelection':
+      elements.storeSelectionState.classList.remove('hidden');
+      break;
+    case 'activeScanning':
+      elements.activeScanningState.classList.remove('hidden');
+      funUpdateBatchDisplay();
+      break;
+    case 'submissionConfirmation':
+      elements.submissionConfirmationState.classList.remove('hidden');
+      break;
+  }
+}
+
+// Show toast notification
+function funShowToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  const bgColor = type === 'success' ? 'bg-green-100 text-green-800 border-green-200' :
+                  type === 'error' ? 'bg-red-100 text-red-800 border-red-200' :
+                  'bg-blue-100 text-blue-800 border-blue-200';
+  
+  toast.className = `${bgColor} border px-4 py-3 rounded-md shadow-lg max-w-sm transition-all duration-300 transform translate-x-full opacity-0`;
+  toast.innerHTML = `
+    <div class="flex items-center gap-2">
+      <i data-lucide="${type === 'success' ? 'check' : type === 'error' ? 'alert-circle' : 'info'}" class="w-4 h-4"></i>
+      <span class="text-sm font-medium">${message}</span>
+    </div>
+  `;
+  
+  elements.toastContainer.appendChild(toast);
+  
+  // Trigger lucide icons
+  if (typeof window.lucide?.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+  
+  // Animate in
+  requestAnimationFrame(() => {
+    toast.classList.remove('translate-x-full', 'opacity-0');
+  });
+  
+  // Remove after 3 seconds
+  setTimeout(() => {
+    toast.classList.add('translate-x-full', 'opacity-0');
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 300);
+  }, 3000);
+}
+</script></body></html>

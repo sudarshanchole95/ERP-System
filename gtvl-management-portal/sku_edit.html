@@ -1,0 +1,1050 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>GTVL Management Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        /* GTVL Brand Colors */
+        --color-primary: #0F766E; /* Teal-700 - Primary CTAs, navigation highlights */
+        --color-primary-hover: #0D9488; /* Teal-600 - Hover states */
+        --color-secondary: #475569; /* Slate-600 - Secondary elements */
+        --color-accent: #D97706; /* Amber-600 - Call-to-action highlights */
+        --color-surface: #FFFFFF; /* White - Cards, modals, panels */
+        --color-background: #F8FAFC; /* Slate-50 - Page backgrounds */
+        --color-surface-variant: #F1F5F9; /* Slate-100 - Alternate backgrounds */
+        --color-on-background: #0F172A; /* Slate-900 - Primary headings */
+        --color-on-surface: #1E293B; /* Slate-800 - Body text */
+        --color-border: #E2E8F0; /* Slate-200 - Borders */
+        --color-success: #16A34A; /* Green-600 - Success states */
+        --color-warning: #F59E0B; /* Amber-500 - Warning alerts */
+        --color-error: #DC2626; /* Red-600 - Error messages */
+        --color-info: #2563EB; /* Blue-600 - Info messages */
+
+        /* Layout Constants */
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      /* Smooth scrolling */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      /* Layout with CSS variables */
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      /* Mobile sidebar slide states */
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      /* Active nav link styling */
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+        background-color: #f0fdfa;
+        color: var(--color-primary);
+      }
+
+      /* Popover animation states */
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      /* Sidebar backdrop states */
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Edit SKU - GTVL Management Portal</title></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <!-- HEADER SECTION -->
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <!-- Left: Logo & Title -->
+        <div class="flex items-center gap-3">
+          <!-- Mobile Menu Toggle -->
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <!-- Logo -->
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <rect x="68" y="68" width="264" height="264" rx="32" stroke="#0F766E" stroke-width="18"></rect>
+                  <rect x="109" y="143" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                  <rect x="206" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                </g>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">
+              GTVL Management Portal
+            </h1>
+          </div>
+        </div>
+
+        <!-- Right: User Profile -->
+        <div class="flex items-center gap-2 md:gap-3">
+          <!-- User Profile Button -->
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-500 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- User Profile Popover -->
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <!-- User Info Section -->
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-500 truncate"></div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <!-- Main Navigation Section -->
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Management
+          </div>
+          <div class="space-y-1">
+            <a href="management_dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="management_dashboard">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="sku_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sku_list">
+              <i data-lucide="package" class="w-5 h-5"></i>
+              <span>SKUs</span>
+            </a>
+            <a href="store_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="store_list">
+              <i data-lucide="store" class="w-5 h-5"></i>
+              <span>Stores</span>
+            </a>
+            <a href="supervisor_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="supervisor_list">
+              <i data-lucide="user-check" class="w-5 h-5"></i>
+              <span>Supervisors</span>
+            </a>
+            <a href="promodizer_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="promodizer_list">
+              <i data-lucide="users" class="w-5 h-5"></i>
+              <span>Promodizers</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="app-main p-6" id="pageContent" role="main"><div class="mb-6">
+  <nav class="flex" aria-label="Breadcrumb">
+    <ol class="flex items-center space-x-2 text-sm">
+      <li>
+        <a href="management_dashboard.html" class="text-slate-600 hover:text-teal-700 transition-colors duration-200">
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+      </li>
+      <li>
+        <a href="sku_list.html" class="text-slate-600 hover:text-teal-700 transition-colors duration-200">
+          SKUs
+        </a>
+      </li>
+      <li>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+      </li>
+      <li>
+        <span id="breadcrumbSku" class="text-slate-600"></span>
+      </li>
+      <li>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+      </li>
+      <li>
+        <span class="text-slate-900 font-medium">Edit</span>
+      </li>
+    </ol>
+  </nav>
+</div>
+
+<!-- Page Header -->
+<div class="mb-8">
+  <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900 mb-2">
+    Edit SKU
+  </h1>
+  <p class="text-sm leading-[1.375rem] font-normal text-slate-600">
+    Update SKU details. Changes will be reflected across the system.
+  </p>
+</div>
+
+<!-- Sales History Warning -->
+<div id="salesWarning" class="hidden mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+  <div class="flex items-start gap-3">
+    <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+    <div>
+      <p class="text-sm font-semibold text-amber-800 mb-1">Sales History Found</p>
+      <p class="text-sm text-amber-700">This SKU has sales history. Changes to barcode or pricing may affect reporting.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Form -->
+<div class="bg-white rounded-lg shadow-sm border border-slate-200">
+  <form id="editSkuForm" class="p-6" novalidate="">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- SKU Code -->
+      <div>
+        <label for="skuCode" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+          SKU Code
+          <span class="text-red-600 ml-1">*</span>
+        </label>
+        <input type="text" id="skuCode" name="skuCode" class="w-full px-4 py-3 border border-slate-200 rounded text-sm leading-[1.375rem] font-normal text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:border-teal-500 transition-all duration-200" placeholder="Enter SKU code" required="">
+        <div id="skuCodeError" class="hidden mt-2 text-xs text-red-600"></div>
+      </div>
+
+      <!-- Barcode -->
+      <div>
+        <label for="barcode" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+          Barcode
+          <span class="text-red-600 ml-1">*</span>
+        </label>
+        <input type="text" id="barcode" name="barcode" class="w-full px-4 py-3 border border-slate-200 rounded text-sm leading-[1.375rem] font-normal text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:border-teal-500 transition-all duration-200" placeholder="Enter barcode" required="">
+        <div id="barcodeError" class="hidden mt-2 text-xs text-red-600"></div>
+      </div>
+
+      <!-- Product Name -->
+      <div class="lg:col-span-2">
+        <label for="productName" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+          Product Name
+          <span class="text-red-600 ml-1">*</span>
+        </label>
+        <input type="text" id="productName" name="productName" class="w-full px-4 py-3 border border-slate-200 rounded text-sm leading-[1.375rem] font-normal text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:border-teal-500 transition-all duration-200" placeholder="Enter product name" required="">
+        <div id="productNameError" class="hidden mt-2 text-xs text-red-600"></div>
+      </div>
+
+      <!-- Description -->
+      <div class="lg:col-span-2">
+        <label for="description" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+          Description
+          <span class="text-slate-500 text-xs font-normal">(Optional)</span>
+        </label>
+        <textarea id="description" name="description" rows="4" maxlength="500" class="w-full px-4 py-3 border border-slate-200 rounded text-sm leading-[1.375rem] font-normal text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:border-teal-500 transition-all duration-200 resize-none" placeholder="Enter product description (max 500 characters)"></textarea>
+        <div class="flex justify-between items-center mt-2">
+          <div id="descriptionError" class="hidden text-xs text-red-600"></div>
+          <div id="descriptionCounter" class="text-xs text-slate-500">0/500</div>
+        </div>
+      </div>
+
+      <!-- Category -->
+      <div>
+        <label for="category" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+          Category
+          <span class="text-red-600 ml-1">*</span>
+        </label>
+        <input type="text" id="category" name="category" class="w-full px-4 py-3 border border-slate-200 rounded text-sm leading-[1.375rem] font-normal text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:border-teal-500 transition-all duration-200" placeholder="Enter category" required="">
+        <div id="categoryError" class="hidden mt-2 text-xs text-red-600"></div>
+      </div>
+
+      <!-- Unit Price -->
+      <div>
+        <label for="unitPrice" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+          Unit Price
+          <span class="text-red-600 ml-1">*</span>
+        </label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <span class="text-slate-500 text-sm">₹</span>
+          </div>
+          <input type="number" id="unitPrice" name="unitPrice" min="0.01" step="0.01" class="w-full pl-8 pr-4 py-3 border border-slate-200 rounded text-sm leading-[1.375rem] font-normal text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:border-teal-500 transition-all duration-200" placeholder="0.00" required="">
+        </div>
+        <div id="unitPriceError" class="hidden mt-2 text-xs text-red-600"></div>
+      </div>
+
+      <!-- Status -->
+      <div class="lg:col-span-2">
+        <fieldset>
+          <legend class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-3">
+            Status
+            <span class="text-red-600 ml-1">*</span>
+          </legend>
+          <div class="flex gap-6">
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input type="radio" name="status" value="active" class="w-4 h-4 text-teal-700 border-slate-300 focus:ring-teal-500 focus:ring-2" required="">
+              <span class="text-sm leading-[1.375rem] font-normal text-slate-800">Active</span>
+            </label>
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input type="radio" name="status" value="inactive" class="w-4 h-4 text-teal-700 border-slate-300 focus:ring-teal-500 focus:ring-2" required="">
+              <span class="text-sm leading-[1.375rem] font-normal text-slate-800">Inactive</span>
+            </label>
+          </div>
+          <div id="statusError" class="hidden mt-2 text-xs text-red-600"></div>
+        </fieldset>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex flex-col sm:flex-row gap-3 justify-end pt-6 mt-6 border-t border-slate-200">
+      <button type="button" id="cancelButton" class="px-6 py-3 text-sm leading-[1.375rem] font-semibold text-slate-700 bg-white border border-slate-300 rounded hover:bg-slate-50 hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all duration-200">
+        Cancel
+      </button>
+      <button type="button" id="viewDetailsButton" class="px-6 py-3 text-sm leading-[1.375rem] font-semibold text-slate-600 bg-slate-100 border border-slate-300 rounded hover:bg-slate-200 hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all duration-200">
+        View Details
+      </button>
+      <button type="submit" id="updateSkuButton" class="px-6 py-3 text-sm leading-[1.375rem] font-semibold text-white bg-teal-700 border border-teal-700 rounded hover:bg-teal-600 hover:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
+        Update SKU
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm mx-4">
+    <div class="flex items-center gap-4">
+      <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-700"></div>
+      <span class="text-sm font-medium text-slate-800">Updating SKU...</span>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="fixed top-4 right-4 z-50 hidden">
+  <div class="bg-green-600 text-white px-6 py-4 rounded-lg shadow-xl max-w-md">
+    <div class="flex items-center gap-3">
+      <i data-lucide="check-circle" class="w-5 h-5"></i>
+      <span id="toastMessage" class="text-sm font-medium"></span>
+    </div>
+  </div>
+</div>
+
+</main>
+
+    <!-- JAVASCRIPT INITIALIZATION -->
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils =
+          window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_mgmt_001");
+                    currentUserId = "usr_mgmt_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } =
+            state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail)
+            return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute(
+            "aria-expanded",
+            shouldOpen ? "true" : "false"
+          );
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active");
+            } else {
+              link.classList.remove("active");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () =>
+            closeMobileSidebar()
+          );
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+// Utility: portal a modal by id (idempotent)
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+  
+  let currentSkuId = null;
+  let originalBarcode = null;
+
+  // Get SKU ID from URL parameters
+  function funGetSkuIdFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('id');
+  }
+
+  // Get SKU data from localStorage
+  function funGetSkuById(id) {
+    try {
+      const skus = JSON.parse(localStorage.getItem('skus') || '[]');
+      return skus.find(sku => sku.id === id);
+    } catch (error) {
+      console.error('Error retrieving SKU data:', error);
+      return null;
+    }
+  }
+
+  // Check if SKU has sales records
+  function funSkuHasSales(skuId) {
+    try {
+      const salesRecords = JSON.parse(localStorage.getItem('salesRecords') || '[]');
+      return salesRecords.some(record => 
+        record.scannedSkus.some(sku => sku.skuId === skuId)
+      );
+    } catch (error) {
+      console.error('Error checking sales records:', error);
+      return false;
+    }
+  }
+
+  // Check barcode uniqueness (excluding current SKU)
+  function funIsBarcodeUnique(barcode, currentSkuId) {
+    if (!barcode.trim()) return false;
+    try {
+      const skus = JSON.parse(localStorage.getItem('skus') || '[]');
+      return !skus.some(sku => sku.barcode === barcode && sku.id !== currentSkuId);
+    } catch (error) {
+      console.error('Error checking barcode uniqueness:', error);
+      return false;
+    }
+  }
+
+  // Show error message
+  function funShowError(fieldId, message) {
+    const errorElement = document.getElementById(`${fieldId}Error`);
+    const inputElement = document.getElementById(fieldId);
+    
+    if (errorElement && inputElement) {
+      errorElement.textContent = message;
+      errorElement.classList.remove('hidden');
+      inputElement.classList.add('border-red-300', 'focus:border-red-500', 'focus:ring-red-500');
+      inputElement.classList.remove('border-slate-200', 'focus:border-teal-500', 'focus:ring-teal-500');
+    }
+  }
+
+  // Clear error message
+  function funClearError(fieldId) {
+    const errorElement = document.getElementById(`${fieldId}Error`);
+    const inputElement = document.getElementById(fieldId);
+    
+    if (errorElement && inputElement) {
+      errorElement.classList.add('hidden');
+      inputElement.classList.remove('border-red-300', 'focus:border-red-500', 'focus:ring-red-500');
+      inputElement.classList.add('border-slate-200', 'focus:border-teal-500', 'focus:ring-teal-500');
+    }
+  }
+
+  // Validate form
+  function funValidateForm() {
+    let isValid = true;
+    
+    // Clear all previous errors
+    ['skuCode', 'barcode', 'productName', 'category', 'unitPrice', 'status'].forEach(funClearError);
+
+    const skuCode = document.getElementById('skuCode').value.trim();
+    const barcode = document.getElementById('barcode').value.trim();
+    const productName = document.getElementById('productName').value.trim();
+    const category = document.getElementById('category').value.trim();
+    const unitPrice = parseFloat(document.getElementById('unitPrice').value);
+    const status = document.querySelector('input[name="status"]:checked')?.value;
+
+    // Validate SKU Code
+    if (!skuCode) {
+      funShowError('skuCode', 'SKU Code is required.');
+      isValid = false;
+    }
+
+    // Validate Barcode
+    if (!barcode) {
+      funShowError('barcode', 'Barcode is required.');
+      isValid = false;
+    } else if (!funIsBarcodeUnique(barcode, currentSkuId)) {
+      funShowError('barcode', 'This barcode already exists. Please use a unique barcode.');
+      isValid = false;
+    }
+
+    // Validate Product Name
+    if (!productName) {
+      funShowError('productName', 'Product Name is required.');
+      isValid = false;
+    }
+
+    // Validate Category
+    if (!category) {
+      funShowError('category', 'Category is required.');
+      isValid = false;
+    }
+
+    // Validate Unit Price
+    if (!unitPrice || unitPrice < 0.01) {
+      funShowError('unitPrice', 'Unit Price must be at least ₹0.01.');
+      isValid = false;
+    }
+
+    // Validate Status
+    if (!status) {
+      funShowError('status', 'Status is required.');
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  // Update SKU in localStorage
+  function funUpdateSku(skuData) {
+    try {
+      const skus = JSON.parse(localStorage.getItem('skus') || '[]');
+      const skuIndex = skus.findIndex(sku => sku.id === currentSkuId);
+      
+      if (skuIndex === -1) {
+        throw new Error('SKU not found');
+      }
+
+      // Update the SKU with new data
+      skus[skuIndex] = {
+        ...skus[skuIndex],
+        ...skuData,
+        updatedAt: new Date().toISOString()
+      };
+
+      localStorage.setItem('skus', JSON.stringify(skus));
+      return true;
+    } catch (error) {
+      console.error('Error updating SKU:', error);
+      return false;
+    }
+  }
+
+  // Show toast notification
+  function funShowToast(message) {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+    
+    if (toast && toastMessage) {
+      toastMessage.textContent = message;
+      toast.classList.remove('hidden');
+      
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3000);
+    }
+  }
+
+  // Show loading overlay
+  function funShowLoading() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+      overlay.classList.remove('hidden');
+    }
+  }
+
+  // Hide loading overlay
+  function funHideLoading() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+      overlay.classList.add('hidden');
+    }
+  }
+
+  // Navigate to details page
+  function funNavigateToDetails() {
+    window.location.href = `sku_details.html?id=${currentSkuId}`;
+  }
+
+  // Load and populate SKU data
+  function funLoadSkuData() {
+    currentSkuId = funGetSkuIdFromUrl();
+    
+    if (!currentSkuId) {
+      alert('No SKU ID provided. Redirecting to SKU list.');
+      window.location.href = 'sku_list.html';
+      return;
+    }
+
+    const sku = funGetSkuById(currentSkuId);
+    
+    if (!sku) {
+      alert('SKU not found. Redirecting to SKU list.');
+      window.location.href = 'sku_list.html';
+      return;
+    }
+
+    // Store original barcode for validation
+    originalBarcode = sku.barcode;
+
+    // Populate form fields
+    document.getElementById('skuCode').value = sku.skuCode || '';
+    document.getElementById('barcode').value = sku.barcode || '';
+    document.getElementById('productName').value = sku.productName || '';
+    document.getElementById('description').value = sku.description || '';
+    document.getElementById('category').value = sku.category || '';
+    document.getElementById('unitPrice').value = sku.unitPrice || '';
+    
+    // Set status radio button
+    const statusRadio = document.querySelector(`input[name="status"][value="${sku.status}"]`);
+    if (statusRadio) {
+      statusRadio.checked = true;
+    }
+
+    // Update breadcrumb
+    const breadcrumbSku = document.getElementById('breadcrumbSku');
+    if (breadcrumbSku) {
+      breadcrumbSku.textContent = sku.skuCode || 'SKU';
+    }
+
+    // Show sales warning if applicable
+    if (funSkuHasSales(currentSkuId)) {
+      const salesWarning = document.getElementById('salesWarning');
+      if (salesWarning) {
+        salesWarning.classList.remove('hidden');
+      }
+    }
+
+    // Update description counter
+    const description = document.getElementById('description');
+    const counter = document.getElementById('descriptionCounter');
+    if (description && counter) {
+      counter.textContent = `${description.value.length}/500`;
+    }
+  }
+
+  // Handle form submission
+  function funHandleSubmit(event) {
+    event.preventDefault();
+    
+    if (!funValidateForm()) {
+      return;
+    }
+
+    funShowLoading();
+
+    // Collect form data
+    const formData = {
+      skuCode: document.getElementById('skuCode').value.trim(),
+      barcode: document.getElementById('barcode').value.trim(),
+      productName: document.getElementById('productName').value.trim(),
+      description: document.getElementById('description').value.trim(),
+      category: document.getElementById('category').value.trim(),
+      unitPrice: parseFloat(document.getElementById('unitPrice').value),
+      status: document.querySelector('input[name="status"]:checked').value
+    };
+
+    // Simulate async operation
+    setTimeout(() => {
+      if (funUpdateSku(formData)) {
+        funHideLoading();
+        funShowToast('SKU updated successfully!');
+        
+        setTimeout(() => {
+          funNavigateToDetails();
+        }, 1000);
+      } else {
+        funHideLoading();
+        alert('Error updating SKU. Please try again.');
+      }
+    }, 500);
+  }
+
+  // Event Listeners
+  document.getElementById('editSkuForm').addEventListener('submit', funHandleSubmit);
+  
+  document.getElementById('cancelButton').addEventListener('click', () => {
+    funNavigateToDetails();
+  });
+  
+  document.getElementById('viewDetailsButton').addEventListener('click', () => {
+    funNavigateToDetails();
+  });
+
+  // Description counter
+  const description = document.getElementById('description');
+  if (description) {
+    description.addEventListener('input', () => {
+      const counter = document.getElementById('descriptionCounter');
+      if (counter) {
+        counter.textContent = `${description.value.length}/500`;
+      }
+    });
+  }
+
+  // Real-time validation
+  document.getElementById('barcode').addEventListener('blur', () => {
+    const barcode = document.getElementById('barcode').value.trim();
+    if (barcode && barcode !== originalBarcode && !funIsBarcodeUnique(barcode, currentSkuId)) {
+      funShowError('barcode', 'This barcode already exists. Please use a unique barcode.');
+    } else {
+      funClearError('barcode');
+    }
+  });
+
+  // Initialize page
+  funLoadSkuData();
+
+  // Set active navigation
+  if (window.TemplateUtils && window.TemplateUtils.setActiveNavLink) {
+    window.TemplateUtils.setActiveNavLink('sku_list');
+  }
+});
+</script></body></html>

@@ -1,0 +1,21 @@
+# Data Manipulation & Export
+pandas>=2.0.0
+openpyxl>=3.0.0
+python-dateutil>=2.8.2
+
+# Database & Cloud
+google-cloud-firestore>=2.9.0
+firebase-admin>=6.0.0
+
+# PDF Extraction
+pdfplumber>=0.7.6
+PyPDF2>=3.0.0
+tabula-py>=2.9.0
+
+# PDF Export
+fpdf>=1.7.0
+
+# Utilities
+python-dotenv>=1.0.0
+tabulate>=0.9.0
+tqdm>=4.60.0

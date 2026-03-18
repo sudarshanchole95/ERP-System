@@ -1,0 +1,1011 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>GTVL Management Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        /* GTVL Brand Colors */
+        --color-primary: #0F766E; /* Teal-700 - Primary CTAs, navigation highlights */
+        --color-primary-hover: #0D9488; /* Teal-600 - Hover states */
+        --color-secondary: #475569; /* Slate-600 - Secondary elements */
+        --color-accent: #D97706; /* Amber-600 - Call-to-action highlights */
+        --color-surface: #FFFFFF; /* White - Cards, modals, panels */
+        --color-background: #F8FAFC; /* Slate-50 - Page backgrounds */
+        --color-surface-variant: #F1F5F9; /* Slate-100 - Alternate backgrounds */
+        --color-on-background: #0F172A; /* Slate-900 - Primary headings */
+        --color-on-surface: #1E293B; /* Slate-800 - Body text */
+        --color-border: #E2E8F0; /* Slate-200 - Borders */
+        --color-success: #16A34A; /* Green-600 - Success states */
+        --color-warning: #F59E0B; /* Amber-500 - Warning alerts */
+        --color-error: #DC2626; /* Red-600 - Error messages */
+        --color-info: #2563EB; /* Blue-600 - Info messages */
+
+        /* Layout Constants */
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      /* Smooth scrolling */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      /* Layout with CSS variables */
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      /* Mobile sidebar slide states */
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      /* Active nav link styling */
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+        background-color: #f0fdfa;
+        color: var(--color-primary);
+      }
+
+      /* Popover animation states */
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      /* Sidebar backdrop states */
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Edit Promodizer - GTVL Management Portal</title></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <!-- HEADER SECTION -->
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <!-- Left: Logo & Title -->
+        <div class="flex items-center gap-3">
+          <!-- Mobile Menu Toggle -->
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <!-- Logo -->
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <rect x="68" y="68" width="264" height="264" rx="32" stroke="#0F766E" stroke-width="18"></rect>
+                  <rect x="109" y="143" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                  <rect x="206" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                </g>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">
+              GTVL Management Portal
+            </h1>
+          </div>
+        </div>
+
+        <!-- Right: User Profile -->
+        <div class="flex items-center gap-2 md:gap-3">
+          <!-- User Profile Button -->
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-500 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- User Profile Popover -->
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <!-- User Info Section -->
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-500 truncate"></div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <!-- Main Navigation Section -->
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Management
+          </div>
+          <div class="space-y-1">
+            <a href="management_dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="management_dashboard">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="sku_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sku_list">
+              <i data-lucide="package" class="w-5 h-5"></i>
+              <span>SKUs</span>
+            </a>
+            <a href="store_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="store_list">
+              <i data-lucide="store" class="w-5 h-5"></i>
+              <span>Stores</span>
+            </a>
+            <a href="supervisor_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="supervisor_list">
+              <i data-lucide="user-check" class="w-5 h-5"></i>
+              <span>Supervisors</span>
+            </a>
+            <a href="promodizer_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="promodizer_list">
+              <i data-lucide="users" class="w-5 h-5"></i>
+              <span>Promodizers</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="app-main p-6" id="pageContent" role="main"><div class="mb-6">
+  <nav class="flex items-center gap-2 text-sm" aria-label="Breadcrumb">
+    <a href="management_dashboard.html" class="text-teal-700 hover:text-teal-600 font-medium">Dashboard</a>
+    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+    <a href="promodizer_list.html" class="text-teal-700 hover:text-teal-600 font-medium">Promodizers</a>
+    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+    <span id="breadcrumbPromodizerName" class="text-slate-600">Loading...</span>
+    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+    <span class="text-slate-900 font-medium">Edit</span>
+  </nav>
+</div>
+
+<!-- Page Header -->
+<div class="mb-8">
+  <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900 mb-2">Edit Promodizer</h1>
+  <p class="text-sm leading-[1.375rem] font-normal text-slate-600">Update promodizer account information and contact details</p>
+</div>
+
+<!-- Store Assignment Info Banner -->
+<div id="storeAssignmentBanner" class="hidden mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+  <div class="flex items-start gap-3">
+    <i data-lucide="info" class="w-5 h-5 text-blue-600 mt-0.5 shrink-0"></i>
+    <div>
+      <p class="text-sm font-medium text-blue-800">Store Assignment Notice</p>
+      <p id="assignmentMessage" class="text-xs text-blue-700 mt-1"></p>
+    </div>
+  </div>
+</div>
+
+<!-- Form Container -->
+<div class="bg-white rounded-lg shadow-sm border border-slate-200">
+  <div class="p-6 border-b border-slate-100">
+    <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Promodizer Information</h2>
+    <p class="text-xs leading-[1.125rem] font-normal text-slate-500 mt-1">Update the promodizer's personal and contact information</p>
+  </div>
+
+  <form id="editPromodizerForm" class="p-6">
+    <!-- Name Fields Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <!-- First Name -->
+      <div>
+        <label for="firstName" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+          First Name <span class="text-red-600">*</span>
+        </label>
+        <input type="text" id="firstName" name="firstName" required="" class="w-full px-4 py-3 border border-slate-200 rounded focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm placeholder-slate-400" placeholder="Enter first name">
+        <div id="firstNameError" class="hidden mt-2 text-xs text-red-600"></div>
+      </div>
+
+      <!-- Last Name -->
+      <div>
+        <label for="lastName" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+          Last Name <span class="text-red-600">*</span>
+        </label>
+        <input type="text" id="lastName" name="lastName" required="" class="w-full px-4 py-3 border border-slate-200 rounded focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm placeholder-slate-400" placeholder="Enter last name">
+        <div id="lastNameError" class="hidden mt-2 text-xs text-red-600"></div>
+      </div>
+    </div>
+
+    <!-- Employee ID -->
+    <div class="mb-6">
+      <label for="employeeId" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+        Employee ID <span class="text-red-600">*</span>
+      </label>
+      <input type="text" id="employeeId" name="employeeId" required="" class="w-full px-4 py-3 border border-slate-200 rounded focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm placeholder-slate-400" placeholder="Enter employee ID (e.g., PRO-2024-001)">
+      <div id="employeeIdError" class="hidden mt-2 text-xs text-red-600"></div>
+      <p class="text-xs text-slate-500 mt-1">Employee ID must be unique across all promodizers</p>
+    </div>
+
+    <!-- Contact Information Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <!-- Phone -->
+      <div>
+        <label for="phone" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+          Phone Number <span class="text-red-600">*</span>
+        </label>
+        <input type="tel" id="phone" name="phone" required="" class="w-full px-4 py-3 border border-slate-200 rounded focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm placeholder-slate-400" placeholder="+1-555-0123">
+        <div id="phoneError" class="hidden mt-2 text-xs text-red-600"></div>
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label for="email" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+          Email Address <span class="text-red-600">*</span>
+        </label>
+        <input type="email" id="email" name="email" required="" class="w-full px-4 py-3 border border-slate-200 rounded focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm placeholder-slate-400" placeholder="promodizer@gtvl.com">
+        <div id="emailError" class="hidden mt-2 text-xs text-red-600"></div>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="mb-8">
+      <label class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-3">
+        Status <span class="text-red-600">*</span>
+      </label>
+      <div class="flex gap-6">
+        <label class="flex items-center">
+          <input type="radio" name="status" value="active" checked="" class="w-4 h-4 text-teal-700 border-slate-300 focus:ring-teal-500 focus:ring-2">
+          <span class="ml-2 text-sm font-medium text-slate-700">Active</span>
+        </label>
+        <label class="flex items-center">
+          <input type="radio" name="status" value="inactive" class="w-4 h-4 text-teal-700 border-slate-300 focus:ring-teal-500 focus:ring-2">
+          <span class="ml-2 text-sm font-medium text-slate-700">Inactive</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-slate-100">
+      <button type="button" id="cancelBtn" class="px-6 py-3 border-2 border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 hover:border-slate-400 transition-all duration-200 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2">
+        Cancel
+      </button>
+      <button type="button" id="viewDetailsBtn" class="px-6 py-3 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-all duration-200 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2">
+        View Details
+      </button>
+      <button type="submit" id="updateBtn" class="px-6 py-3 bg-teal-700 text-white rounded-lg hover:bg-teal-600 transition-all duration-200 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 flex items-center gap-2">
+        <span>Update Promodizer</span>
+        <i data-lucide="save" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Success Toast -->
+<div id="successToast" class="fixed top-20 right-4 transform translate-x-full transition-transform duration-300 bg-green-600 text-white px-6 py-4 rounded-lg shadow-lg z-50">
+  <div class="flex items-center gap-3">
+    <i data-lucide="check-circle" class="w-5 h-5"></i>
+    <span class="text-sm font-medium">Promodizer updated successfully!</span>
+  </div>
+</div>
+
+</main>
+
+    <!-- JAVASCRIPT INITIALIZATION -->
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils =
+          window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_mgmt_001");
+                    currentUserId = "usr_mgmt_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } =
+            state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail)
+            return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute(
+            "aria-expanded",
+            shouldOpen ? "true" : "false"
+          );
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active");
+            } else {
+              link.classList.remove("active");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () =>
+            closeMobileSidebar()
+          );
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+// Utility: portal a modal by id (idempotent)
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+
+  // Set active nav link
+  if (window.TemplateUtils && window.TemplateUtils.setActiveNavLink) {
+    window.TemplateUtils.setActiveNavLink('promodizer_list');
+  }
+
+  // Initialize the form
+  funInitializeEditForm();
+});
+
+let currentPromodizerId = null;
+let currentPromodizerData = null;
+
+function funInitializeEditForm() {
+  // Get promodizer ID from URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  currentPromodizerId = urlParams.get('id');
+  
+  if (!currentPromodizerId) {
+    alert('No promodizer ID provided. Redirecting to promodizer list.');
+    window.location.href = 'promodizer_list.html';
+    return;
+  }
+
+  // Load promodizer data
+  funLoadPromodizerData();
+  
+  // Bind form events
+  funBindFormEvents();
+}
+
+function funLoadPromodizerData() {
+  try {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    currentPromodizerData = users.find(user => user.id === currentPromodizerId && user.role === 'promodizer');
+    
+    if (!currentPromodizerData) {
+      alert('Promodizer not found. Redirecting to promodizer list.');
+      window.location.href = 'promodizer_list.html';
+      return;
+    }
+
+    // Update breadcrumb
+    document.getElementById('breadcrumbPromodizerName').textContent = 
+      `${currentPromodizerData.firstName} ${currentPromodizerData.lastName}`;
+
+    // Populate form fields
+    funPopulateForm();
+    
+    // Check store assignments and show banner if needed
+    funCheckStoreAssignments();
+    
+  } catch (error) {
+    console.error('Error loading promodizer data:', error);
+    alert('Error loading promodizer data. Please try again.');
+  }
+}
+
+function funPopulateForm() {
+  document.getElementById('firstName').value = currentPromodizerData.firstName || '';
+  document.getElementById('lastName').value = currentPromodizerData.lastName || '';
+  document.getElementById('employeeId').value = currentPromodizerData.employeeId || '';
+  document.getElementById('phone').value = currentPromodizerData.phone || '';
+  document.getElementById('email').value = currentPromodizerData.email || '';
+  
+  // Set status radio button
+  const statusRadios = document.querySelectorAll('input[name="status"]');
+  statusRadios.forEach(radio => {
+    radio.checked = radio.value === (currentPromodizerData.status || 'active');
+  });
+}
+
+function funCheckStoreAssignments() {
+  try {
+    const promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+    const assignedStores = promodizerAllocations.filter(allocation => 
+      allocation.promodizerId === currentPromodizerId
+    );
+    
+    if (assignedStores.length > 0) {
+      const banner = document.getElementById('storeAssignmentBanner');
+      const message = document.getElementById('assignmentMessage');
+      
+      message.textContent = `This promodizer is assigned to ${assignedStores.length} store(s). Changes to contact information will be reflected across all assignments.`;
+      banner.classList.remove('hidden');
+    }
+  } catch (error) {
+    console.error('Error checking store assignments:', error);
+  }
+}
+
+function funBindFormEvents() {
+  const form = document.getElementById('editPromodizerForm');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const viewDetailsBtn = document.getElementById('viewDetailsBtn');
+  
+  // Form submission
+  form.addEventListener('submit', funHandleFormSubmit);
+  
+  // Cancel button
+  cancelBtn.addEventListener('click', () => {
+    window.location.href = `promodizer_details.html?id=${currentPromodizerId}`;
+  });
+  
+  // View details button  
+  viewDetailsBtn.addEventListener('click', () => {
+    window.location.href = `promodizer_details.html?id=${currentPromodizerId}`;
+  });
+  
+  // Real-time validation
+  funSetupRealTimeValidation();
+}
+
+function funSetupRealTimeValidation() {
+  const firstName = document.getElementById('firstName');
+  const lastName = document.getElementById('lastName');
+  const employeeId = document.getElementById('employeeId');
+  const phone = document.getElementById('phone');
+  const email = document.getElementById('email');
+  
+  firstName.addEventListener('blur', () => funValidateField('firstName'));
+  lastName.addEventListener('blur', () => funValidateField('lastName'));
+  employeeId.addEventListener('blur', () => funValidateField('employeeId'));
+  phone.addEventListener('blur', () => funValidateField('phone'));
+  email.addEventListener('blur', () => funValidateField('email'));
+  
+  // Clear errors on input
+  [firstName, lastName, employeeId, phone, email].forEach(field => {
+    field.addEventListener('input', () => funClearFieldError(field.id));
+  });
+}
+
+function funValidateField(fieldName) {
+  const field = document.getElementById(fieldName);
+  const value = field.value.trim();
+  const errorElement = document.getElementById(`${fieldName}Error`);
+  
+  funClearFieldError(fieldName);
+  
+  switch (fieldName) {
+    case 'firstName':
+      if (!value) {
+        funShowFieldError(fieldName, 'First name is required');
+        return false;
+      }
+      if (value.length < 2) {
+        funShowFieldError(fieldName, 'First name must be at least 2 characters');
+        return false;
+      }
+      break;
+      
+    case 'lastName':
+      if (!value) {
+        funShowFieldError(fieldName, 'Last name is required');
+        return false;
+      }
+      if (value.length < 2) {
+        funShowFieldError(fieldName, 'Last name must be at least 2 characters');
+        return false;
+      }
+      break;
+      
+    case 'employeeId':
+      if (!value) {
+        funShowFieldError(fieldName, 'Employee ID is required');
+        return false;
+      }
+      if (!/^PRO-\d{4}-\d{3}$/.test(value)) {
+        funShowFieldError(fieldName, 'Employee ID must follow format: PRO-YYYY-XXX (e.g., PRO-2024-001)');
+        return false;
+      }
+      if (!funIsEmployeeIdUnique(value)) {
+        funShowFieldError(fieldName, 'This Employee ID is already in use');
+        return false;
+      }
+      break;
+      
+    case 'phone':
+      if (!value) {
+        funShowFieldError(fieldName, 'Phone number is required');
+        return false;
+      }
+      if (!/^\+?1?-?\d{3}-?\d{3}-?\d{4}$/.test(value.replace(/\s/g, ''))) {
+        funShowFieldError(fieldName, 'Please enter a valid phone number (e.g., +1-555-0123)');
+        return false;
+      }
+      break;
+      
+    case 'email':
+      if (!value) {
+        funShowFieldError(fieldName, 'Email address is required');
+        return false;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        funShowFieldError(fieldName, 'Please enter a valid email address');
+        return false;
+      }
+      break;
+  }
+  
+  return true;
+}
+
+function funIsEmployeeIdUnique(employeeId) {
+  try {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    return !users.some(user => 
+      user.employeeId === employeeId && 
+      user.role === 'promodizer' && 
+      user.id !== currentPromodizerId
+    );
+  } catch (error) {
+    console.error('Error checking employee ID uniqueness:', error);
+    return false;
+  }
+}
+
+function funShowFieldError(fieldName, message) {
+  const field = document.getElementById(fieldName);
+  const errorElement = document.getElementById(`${fieldName}Error`);
+  
+  field.classList.add('border-red-300', 'focus:border-red-500', 'focus:ring-red-500');
+  field.classList.remove('border-slate-200', 'focus:border-teal-500', 'focus:ring-teal-500');
+  
+  errorElement.textContent = message;
+  errorElement.classList.remove('hidden');
+}
+
+function funClearFieldError(fieldName) {
+  const field = document.getElementById(fieldName);
+  const errorElement = document.getElementById(`${fieldName}Error`);
+  
+  field.classList.remove('border-red-300', 'focus:border-red-500', 'focus:ring-red-500');
+  field.classList.add('border-slate-200', 'focus:border-teal-500', 'focus:ring-teal-500');
+  
+  errorElement.classList.add('hidden');
+  errorElement.textContent = '';
+}
+
+function funValidateForm() {
+  const fields = ['firstName', 'lastName', 'employeeId', 'phone', 'email'];
+  let isValid = true;
+  
+  fields.forEach(field => {
+    if (!funValidateField(field)) {
+      isValid = false;
+    }
+  });
+  
+  return isValid;
+}
+
+function funHandleFormSubmit(event) {
+  event.preventDefault();
+  
+  if (!funValidateForm()) {
+    // Focus on first error field
+    const firstError = document.querySelector('.border-red-300');
+    if (firstError) {
+      firstError.focus();
+      firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return;
+  }
+  
+  // Show loading state
+  const updateBtn = document.getElementById('updateBtn');
+  const originalText = updateBtn.innerHTML;
+  updateBtn.innerHTML = '<span>Updating...</span><div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>';
+  updateBtn.disabled = true;
+  
+  try {
+    funUpdatePromodizer();
+  } catch (error) {
+    console.error('Error updating promodizer:', error);
+    alert('Error updating promodizer. Please try again.');
+    
+    // Restore button state
+    updateBtn.innerHTML = originalText;
+    updateBtn.disabled = false;
+  }
+}
+
+function funUpdatePromodizer() {
+  const formData = new FormData(document.getElementById('editPromodizerForm'));
+  const updatedData = {
+    ...currentPromodizerData,
+    firstName: formData.get('firstName').trim(),
+    lastName: formData.get('lastName').trim(),
+    employeeId: formData.get('employeeId').trim(),
+    phone: formData.get('phone').trim(),
+    email: formData.get('email').trim(),
+    status: formData.get('status'),
+    updatedAt: new Date().toISOString()
+  };
+  
+  try {
+    // Get all users
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    
+    // Find and update the promodizer
+    const userIndex = users.findIndex(user => user.id === currentPromodizerId);
+    if (userIndex === -1) {
+      throw new Error('Promodizer not found');
+    }
+    
+    users[userIndex] = updatedData;
+    
+    // Save back to localStorage
+    localStorage.setItem('users', JSON.stringify(users));
+    
+    // Show success toast
+    funShowSuccessToast();
+    
+    // Redirect after short delay
+    setTimeout(() => {
+      window.location.href = `promodizer_details.html?id=${currentPromodizerId}`;
+    }, 1500);
+    
+  } catch (error) {
+    console.error('Error saving promodizer data:', error);
+    throw error;
+  }
+}
+
+function funShowSuccessToast() {
+  const toast = document.getElementById('successToast');
+  toast.classList.remove('translate-x-full');
+  toast.classList.add('translate-x-0');
+  
+  setTimeout(() => {
+    toast.classList.remove('translate-x-0');
+    toast.classList.add('translate-x-full');
+  }, 3000);
+}
+</script></body></html>

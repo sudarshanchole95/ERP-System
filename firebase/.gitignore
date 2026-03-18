@@ -1,0 +1,80 @@
+# -------------------------------------------------------
+# Python bytecode & cache
+# -------------------------------------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.env/
+.env.bak/
+.python-version
+
+# Logs
+logs/
+*.log
+
+# IDE / Editor configs
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# OS-generated files
+Thumbs.db
+.DS_Store
+
+# Python build artifacts
+dist/
+build/
+*.egg-info/
+
+# Jupyter cache
+.ipynb_checkpoints/
+
+# Cache folders
+.cache/
+pytest_cache/
+pip-wheel-metadata/
+
+# Node and frontend build folders (if added later)
+node_modules/
+npm-debug.log
+
+# Local configs / secrets
+firebase/config/firebase-key.json
+*.secret.json
+*.credentials.json
+*.token
+*.env.local
+
+# Sample data (optional)
+# Comment out if you WANT them in GitHub
+sample-data/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Coverage & test reports
+htmlcov/
+.coverage
+coverage.xml
+
+# Backup files
+*.bak
+*.old
+*.orig
+*.swp
+*.swo
+
+# Ignore your import results / artifacts
+failed_rows/
+
+# -------------------------------------------------------
+# Project-specific ignores
+# -------------------------------------------------------
+clean.py

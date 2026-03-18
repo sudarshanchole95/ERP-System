@@ -1,0 +1,1764 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>Sales Analytics Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-primary: #0F766E;
+        --color-primary-hover: #0D9488;
+        --color-secondary: #475569;
+        --color-accent: #D97706;
+        --color-background: #F8FAFC;
+        --color-surface: #FFFFFF;
+        --color-surface-variant: #F1F5F9;
+        --color-on-background: #0F172A;
+        --color-on-surface: #1E293B;
+        --color-border: #E2E8F0;
+        --color-success: #16A34A;
+        --color-warning: #F59E0B;
+        --color-error: #DC2626;
+        --color-info: #2563EB;
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+      }
+
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Transaction History - Sales Analytics Dashboard</title></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="68" y="68" width="264" height="264" rx="32" stroke="#0F766E" stroke-width="18"></rect>
+                <rect x="109" y="143" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="109" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="109" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                <rect x="206" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="206" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">Sales Analytics Dashboard</h1>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 md:gap-3">
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-600 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-600 truncate"></div>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Analytics</div>
+          <div class="space-y-1">
+            <a href="dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="dashboard">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="sku_performance_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sku_performance">
+              <i data-lucide="package" class="w-5 h-5"></i>
+              <span>SKU Performance</span>
+            </a>
+            <a href="store_performance_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="store_performance">
+              <i data-lucide="store" class="w-5 h-5"></i>
+              <span>Store Performance</span>
+            </a>
+            <a href="staff_performance_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="staff_performance">
+              <i data-lucide="users" class="w-5 h-5"></i>
+              <span>Staff Performance</span>
+            </a>
+            <a href="transaction_history.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="transaction_history">
+              <i data-lucide="receipt" class="w-5 h-5"></i>
+              <span>Transaction History</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="py-6 border-b border-slate-100 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Tools</div>
+          <div class="space-y-1">
+            <a href="reports_configuration.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="reports">
+              <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+              <span>Reports</span>
+            </a>
+            <a href="settings.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="settings">
+              <i data-lucide="settings" class="w-5 h-5"></i>
+              <span>Settings</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="app-main p-6" id="pageContent" role="main"><div class="mb-6">
+  <nav class="flex items-center gap-2 text-sm text-slate-600 mb-4">
+    <a href="dashboard.html" class="hover:text-teal-700 transition-colors">Dashboard</a>
+    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+    <span class="text-slate-900 font-medium">Transaction History</span>
+  </nav>
+  
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div>
+      <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900">Transaction History</h1>
+      <p class="text-sm text-slate-600 mt-1">Comprehensive view of all sales transactions across stores and staff</p>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <button id="exportButton" class="flex items-center gap-2 px-4 py-2 bg-teal-700 text-white text-sm font-semibold rounded hover:bg-teal-600 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+        <i data-lucide="download" class="w-4 h-4"></i>
+        Export
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Filters and Search Section -->
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+  <!-- Filters Sidebar -->
+  <div class="lg:col-span-1">
+    <div class="bg-white rounded-lg border border-slate-200 p-4 space-y-6">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-semibold text-slate-900">Filters</h3>
+        <button id="clearFiltersButton" class="text-sm text-slate-600 hover:text-teal-700 transition-colors">
+          Clear All
+        </button>
+      </div>
+
+      <!-- Date Range Filter -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-2">Date Range</label>
+        <div class="space-y-2">
+          <div class="flex flex-wrap gap-1">
+            <button class="date-quick-filter px-2 py-1 text-xs border border-slate-300 rounded hover:bg-slate-50" data-days="0">Today</button>
+            <button class="date-quick-filter px-2 py-1 text-xs border border-slate-300 rounded hover:bg-slate-50" data-days="7">7 Days</button>
+            <button class="date-quick-filter px-2 py-1 text-xs border border-slate-300 rounded hover:bg-slate-50" data-days="30">30 Days</button>
+            <button class="date-quick-filter px-2 py-1 text-xs border border-slate-300 rounded hover:bg-slate-50" data-days="month">This Month</button>
+          </div>
+          <div class="grid grid-cols-1 gap-2">
+            <input type="date" id="startDateFilter" class="px-3 py-2 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500" placeholder="Start Date">
+            <input type="date" id="endDateFilter" class="px-3 py-2 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500" placeholder="End Date">
+          </div>
+        </div>
+      </div>
+
+      <!-- Store Filter -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-2">Stores</label>
+        <div class="max-h-32 overflow-y-auto border border-slate-300 rounded">
+          <div id="storeFilterList" class="space-y-1 p-2"></div>
+        </div>
+      </div>
+
+      <!-- Staff Filter -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-2">Staff</label>
+        <div class="max-h-32 overflow-y-auto border border-slate-300 rounded">
+          <div id="staffFilterList" class="space-y-1 p-2"></div>
+        </div>
+      </div>
+
+      <!-- Role Filter -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-2">Role</label>
+        <div class="space-y-2">
+          <label class="flex items-center">
+            <input type="checkbox" id="promodizerRoleFilter" class="rounded border-slate-300 text-teal-700 focus:ring-teal-500" checked="">
+            <span class="ml-2 text-sm text-slate-700">Promodizer</span>
+          </label>
+          <label class="flex items-center">
+            <input type="checkbox" id="supervisorRoleFilter" class="rounded border-slate-300 text-teal-700 focus:ring-teal-500" checked="">
+            <span class="ml-2 text-sm text-slate-700">Supervisor</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Quantity Range Filter -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-2">Total Quantity Range</label>
+        <div class="grid grid-cols-2 gap-2">
+          <input type="number" id="minQuantityFilter" placeholder="Min" min="0" class="px-3 py-2 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+          <input type="number" id="maxQuantityFilter" placeholder="Max" min="0" class="px-3 py-2 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+        </div>
+      </div>
+
+      <button id="applyFiltersButton" class="w-full px-4 py-2 bg-teal-700 text-white text-sm font-semibold rounded hover:bg-teal-600 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+        Apply Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="lg:col-span-3">
+    <!-- Search and Active Filters -->
+    <div class="bg-white rounded-lg border border-slate-200 p-4 mb-4">
+      <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <div class="flex-1 w-full sm:max-w-md">
+          <div class="relative">
+            <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input type="text" id="searchInput" placeholder="Search transactions, stores, staff..." class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+          </div>
+        </div>
+        
+        <div class="text-sm text-slate-600">
+          <span id="resultsCount">0 transactions</span>
+        </div>
+      </div>
+      
+      <!-- Active Filters Tags -->
+      <div id="activeFilters" class="mt-3 flex flex-wrap gap-2 hidden"></div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+      <!-- Loading State -->
+      <div id="loadingState" class="flex items-center justify-center py-12 hidden">
+        <div class="flex items-center gap-3">
+          <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-700"></div>
+          <span class="text-slate-600">Loading transactions...</span>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div id="tableContainer" class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-slate-50 border-b border-slate-200">
+            <tr>
+              <th class="px-4 py-3 text-left">
+                <button class="sort-header flex items-center gap-1 text-sm font-medium text-slate-700 hover:text-slate-900" data-column="id">
+                  Transaction ID
+                  <i data-lucide="chevrons-up-down" class="w-4 h-4"></i>
+                </button>
+              </th>
+              <th class="px-4 py-3 text-left">
+                <button class="sort-header flex items-center gap-1 text-sm font-medium text-slate-700 hover:text-slate-900" data-column="recordedAt">
+                  Date/Time
+                  <i data-lucide="chevrons-up-down" class="w-4 h-4"></i>
+                </button>
+              </th>
+              <th class="px-4 py-3 text-left">
+                <button class="sort-header flex items-center gap-1 text-sm font-medium text-slate-700 hover:text-slate-900" data-column="storeName">
+                  Store
+                  <i data-lucide="chevrons-up-down" class="w-4 h-4"></i>
+                </button>
+              </th>
+              <th class="px-4 py-3 text-left">
+                <button class="sort-header flex items-center gap-1 text-sm font-medium text-slate-700 hover:text-slate-900" data-column="staffName">
+                  Staff
+                  <i data-lucide="chevrons-up-down" class="w-4 h-4"></i>
+                </button>
+              </th>
+              <th class="px-4 py-3 text-left">Role</th>
+              <th class="px-4 py-3 text-left">
+                <button class="sort-header flex items-center gap-1 text-sm font-medium text-slate-700 hover:text-slate-900" data-column="skuCount">
+                  SKUs
+                  <i data-lucide="chevrons-up-down" class="w-4 h-4"></i>
+                </button>
+              </th>
+              <th class="px-4 py-3 text-left">
+                <button class="sort-header flex items-center gap-1 text-sm font-medium text-slate-700 hover:text-slate-900" data-column="totalQuantity">
+                  Total Qty
+                  <i data-lucide="chevrons-up-down" class="w-4 h-4"></i>
+                </button>
+              </th>
+              <th class="px-4 py-3 text-left">Submission ID</th>
+            </tr>
+          </thead>
+          <tbody id="transactionsTableBody" class="divide-y divide-slate-200">
+            <!-- Table rows will be populated here -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="flex flex-col items-center justify-center py-12 hidden">
+        <i data-lucide="receipt" class="w-12 h-12 text-slate-300 mb-4"></i>
+        <h3 class="text-lg font-medium text-slate-900 mb-2">No Transactions Found</h3>
+        <p class="text-slate-600 text-center max-w-md">No transactions match your current filters. Try adjusting your search criteria or clearing filters.</p>
+      </div>
+
+      <!-- Pagination -->
+      <div id="paginationContainer" class="px-4 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <div class="text-sm text-slate-600">
+          Showing <span id="paginationInfo">0-0 of 0</span> results
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="prevPageButton" class="px-3 py-1 text-sm border border-slate-300 rounded hover:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed" disabled="">
+            Previous
+          </button>
+          <div id="pageNumbers" class="flex items-center gap-1"></div>
+          <button id="nextPageButton" class="px-3 py-1 text-sm border border-slate-300 rounded hover:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed" disabled="">
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Export Modal -->
+<div id="exportModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,28rem)] max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Export Transaction History</h2>
+          <button id="closeExportModal" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="space-y-6">
+          <!-- Export Format -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-3">Export Format</label>
+            <div class="space-y-3">
+              <label class="flex items-center p-3 border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50">
+                <input type="radio" name="exportFormat" value="csv" class="text-teal-700 focus:ring-teal-500" checked="">
+                <div class="ml-3">
+                  <div class="text-sm font-medium text-slate-900">CSV Format</div>
+                  <div class="text-xs text-slate-600">Comma-separated values for spreadsheet applications</div>
+                </div>
+              </label>
+              <label class="flex items-center p-3 border border-slate-300 rounded-lg cursor-pointer hover:bg-slate-50">
+                <input type="radio" name="exportFormat" value="json" class="text-teal-700 focus:ring-teal-500">
+                <div class="ml-3">
+                  <div class="text-sm font-medium text-slate-900">JSON Format</div>
+                  <div class="text-xs text-slate-600">Structured data format for technical use</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Export Options -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-3">Export Options</label>
+            <div class="space-y-3">
+              <label class="flex items-center">
+                <input type="checkbox" id="includeFilteredOnlyCheckbox" class="rounded border-slate-300 text-teal-700 focus:ring-teal-500" checked="">
+                <span class="ml-2 text-sm text-slate-700">Include only filtered results</span>
+              </label>
+              <label class="flex items-center">
+                <input type="checkbox" id="includeDetailedSkuInfoCheckbox" class="rounded border-slate-300 text-teal-700 focus:ring-teal-500">
+                <span class="ml-2 text-sm text-slate-700">Include detailed SKU information</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Export Summary -->
+          <div class="bg-slate-50 rounded-lg p-4">
+            <div class="text-sm">
+              <div class="flex justify-between mb-2">
+                <span class="text-slate-600">Transactions to export:</span>
+                <span id="exportTransactionCount" class="font-medium text-slate-900">0</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-600">Filename:</span>
+                <span id="exportFilename" class="font-medium text-slate-900">transaction_history_2024-01-01</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error Message -->
+          <div id="exportErrorMessage" class="hidden p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div class="flex items-center gap-2">
+              <i data-lucide="alert-circle" class="w-5 h-5 text-red-600"></i>
+              <div>
+                <div class="text-sm font-medium text-red-800">Export Failed</div>
+                <div class="text-sm text-red-700" id="exportErrorText"></div>
+              </div>
+            </div>
+            <button id="retryExportButton" class="mt-3 px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+              Retry
+            </button>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 mt-8">
+          <button id="cancelExportButton" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+            Cancel
+          </button>
+          <button id="confirmExportButton" class="px-4 py-2 text-sm font-semibold bg-teal-700 text-white rounded hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+            Export
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils = window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_sales_001");
+                    currentUserId = "usr_sales_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent = TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent = TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } = state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail) return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent = TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent = TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active", "bg-teal-50", "text-teal-700");
+            } else {
+              link.classList.remove("active", "bg-teal-50", "text-teal-700");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () => closeMobileSidebar());
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+// Utility: portal a modal by id (idempotent)
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+
+  // Set active navigation
+  if (typeof TemplateUtils !== 'undefined' && TemplateUtils.setActiveNavLink) {
+    TemplateUtils.setActiveNavLink('transaction_history');
+  }
+
+  // Transaction History Page Logic
+  class TransactionHistoryManager {
+    constructor() {
+      this.transactions = [];
+      this.filteredTransactions = [];
+      this.stores = [];
+      this.users = [];
+      this.currentPage = 1;
+      this.itemsPerPage = 50;
+      this.sortColumn = 'recordedAt';
+      this.sortDirection = 'desc';
+      this.searchQuery = '';
+      this.searchTimeout = null;
+      
+      this.filters = {
+        startDate: '',
+        endDate: '',
+        stores: new Set(),
+        staff: new Set(),
+        roles: new Set(['promodizer', 'supervisor']),
+        minQuantity: null,
+        maxQuantity: null
+      };
+      
+      this.init();
+    }
+
+    init() {
+      this.loadData();
+      this.setupEventListeners();
+      this.populateFilterOptions();
+      this.applyFiltersAndUpdate();
+    }
+
+    loadData() {
+      try {
+        const salesRecords = JSON.parse(localStorage.getItem('salesRecords') || '[]');
+        const stores = JSON.parse(localStorage.getItem('stores') || '[]');
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        
+        this.stores = stores;
+        this.users = users;
+        
+        // Create lookup maps for better performance
+        const storeMap = new Map(stores.map(store => [store.id, store]));
+        const userMap = new Map(users.map(user => [user.id, user]));
+        
+        // Process transactions with joins
+        this.transactions = salesRecords.map(record => {
+          const store = storeMap.get(record.storeId);
+          const user = userMap.get(record.recordedById);
+          
+          const skuCount = record.scannedSkus?.length || 0;
+          const totalQuantity = record.scannedSkus?.reduce((sum, sku) => sum + (sku.quantity || 0), 0) || 0;
+          
+          return {
+            ...record,
+            storeName: store?.storeName || 'Unknown Store',
+            staffName: user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : 'Unknown Staff',
+            skuCount,
+            totalQuantity,
+            recordedAtDate: new Date(record.recordedAt)
+          };
+        });
+        
+        console.log(`Loaded ${this.transactions.length} transactions`);
+      } catch (error) {
+        console.error('Error loading transaction data:', error);
+        this.transactions = [];
+      }
+    }
+
+    populateFilterOptions() {
+      this.populateStoreFilters();
+      this.populateStaffFilters();
+    }
+
+    populateStoreFilters() {
+      const container = document.getElementById('storeFilterList');
+      if (!container) return;
+
+      const storeOptions = [...new Set(this.transactions.map(t => ({ id: t.storeId, name: t.storeName })))]
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+      container.innerHTML = storeOptions.map(store => `
+        <label class="flex items-center">
+          <input type="checkbox" class="store-filter-checkbox rounded border-slate-300 text-teal-700 focus:ring-teal-500" 
+                 data-store-id="${store.id}" checked>
+          <span class="ml-2 text-sm text-slate-700 truncate">${store.name}</span>
+        </label>
+      `).join('');
+    }
+
+    populateStaffFilters() {
+      const container = document.getElementById('staffFilterList');
+      if (!container) return;
+
+      const staffOptions = [...new Set(this.transactions.map(t => ({ id: t.recordedById, name: t.staffName })))]
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+      container.innerHTML = staffOptions.map(staff => `
+        <label class="flex items-center">
+          <input type="checkbox" class="staff-filter-checkbox rounded border-slate-300 text-teal-700 focus:ring-teal-500" 
+                 data-staff-id="${staff.id}" checked>
+          <span class="ml-2 text-sm text-slate-700 truncate">${staff.name}</span>
+        </label>
+      `).join('');
+    }
+
+    setupEventListeners() {
+      // Search
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          clearTimeout(this.searchTimeout);
+          this.searchTimeout = setTimeout(() => {
+            this.searchQuery = e.target.value.toLowerCase().trim();
+            this.currentPage = 1;
+            this.applyFiltersAndUpdate();
+          }, 300);
+        });
+      }
+
+      // Date quick filters
+      document.querySelectorAll('.date-quick-filter').forEach(button => {
+        button.addEventListener('click', () => {
+          this.funSetQuickDateFilter(button.dataset.days);
+        });
+      });
+
+      // Date inputs
+      ['startDateFilter', 'endDateFilter'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.addEventListener('change', () => {
+            this.updateDateFilters();
+            this.applyFiltersAndUpdate();
+          });
+        }
+      });
+
+      // Role filters
+      ['promodizerRoleFilter', 'supervisorRoleFilter'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.addEventListener('change', () => {
+            this.updateRoleFilters();
+            this.applyFiltersAndUpdate();
+          });
+        }
+      });
+
+      // Quantity filters
+      ['minQuantityFilter', 'maxQuantityFilter'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.addEventListener('input', () => {
+            clearTimeout(this.quantityTimeout);
+            this.quantityTimeout = setTimeout(() => {
+              this.updateQuantityFilters();
+              this.applyFiltersAndUpdate();
+            }, 500);
+          });
+        }
+      });
+
+      // Apply and clear filters
+      const applyButton = document.getElementById('applyFiltersButton');
+      if (applyButton) {
+        applyButton.addEventListener('click', () => {
+          this.updateAllFilters();
+          this.applyFiltersAndUpdate();
+        });
+      }
+
+      const clearButton = document.getElementById('clearFiltersButton');
+      if (clearButton) {
+        clearButton.addEventListener('click', () => {
+          this.funClearAllFilters();
+        });
+      }
+
+      // Table sorting
+      document.querySelectorAll('.sort-header').forEach(header => {
+        header.addEventListener('click', () => {
+          this.funHandleSort(header.dataset.column);
+        });
+      });
+
+      // Pagination
+      const prevButton = document.getElementById('prevPageButton');
+      if (prevButton) {
+        prevButton.addEventListener('click', () => {
+          if (this.currentPage > 1) {
+            this.currentPage--;
+            this.updateTable();
+          }
+        });
+      }
+
+      const nextButton = document.getElementById('nextPageButton');
+      if (nextButton) {
+        nextButton.addEventListener('click', () => {
+          const totalPages = Math.ceil(this.filteredTransactions.length / this.itemsPerPage);
+          if (this.currentPage < totalPages) {
+            this.currentPage++;
+            this.updateTable();
+          }
+        });
+      }
+
+      // Export functionality
+      const exportButton = document.getElementById('exportButton');
+      if (exportButton) {
+        exportButton.addEventListener('click', () => {
+          this.funShowExportModal();
+        });
+      }
+
+      this.setupExportModalListeners();
+    }
+
+    funSetQuickDateFilter(period) {
+      const startDateInput = document.getElementById('startDateFilter');
+      const endDateInput = document.getElementById('endDateFilter');
+      if (!startDateInput || !endDateInput) return;
+
+      const now = new Date();
+      let startDate, endDate;
+
+      if (period === '0') {
+        // Today
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      } else if (period === '7') {
+        // Last 7 days
+        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        endDate = now;
+      } else if (period === '30') {
+        // Last 30 days
+        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        endDate = now;
+      } else if (period === 'month') {
+        // This month
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      }
+
+      if (startDate && endDate) {
+        startDateInput.value = startDate.toISOString().split('T')[0];
+        endDateInput.value = endDate.toISOString().split('T')[0];
+        this.updateDateFilters();
+        this.applyFiltersAndUpdate();
+      }
+    }
+
+    updateDateFilters() {
+      const startDate = document.getElementById('startDateFilter')?.value;
+      const endDate = document.getElementById('endDateFilter')?.value;
+      
+      this.filters.startDate = startDate;
+      this.filters.endDate = endDate;
+    }
+
+    updateRoleFilters() {
+      const roles = new Set();
+      if (document.getElementById('promodizerRoleFilter')?.checked) {
+        roles.add('promodizer');
+      }
+      if (document.getElementById('supervisorRoleFilter')?.checked) {
+        roles.add('supervisor');
+      }
+      this.filters.roles = roles;
+    }
+
+    updateQuantityFilters() {
+      const minQty = document.getElementById('minQuantityFilter')?.value;
+      const maxQty = document.getElementById('maxQuantityFilter')?.value;
+      
+      this.filters.minQuantity = minQty ? parseInt(minQty) : null;
+      this.filters.maxQuantity = maxQty ? parseInt(maxQty) : null;
+    }
+
+    updateAllFilters() {
+      // Update store filters
+      this.filters.stores.clear();
+      document.querySelectorAll('.store-filter-checkbox:checked').forEach(checkbox => {
+        this.filters.stores.add(checkbox.dataset.storeId);
+      });
+
+      // Update staff filters
+      this.filters.staff.clear();
+      document.querySelectorAll('.staff-filter-checkbox:checked').forEach(checkbox => {
+        this.filters.staff.add(checkbox.dataset.staffId);
+      });
+
+      this.updateDateFilters();
+      this.updateRoleFilters();
+      this.updateQuantityFilters();
+    }
+
+    funClearAllFilters() {
+      // Clear date filters
+      document.getElementById('startDateFilter').value = '';
+      document.getElementById('endDateFilter').value = '';
+      
+      // Check all store and staff filters
+      document.querySelectorAll('.store-filter-checkbox, .staff-filter-checkbox').forEach(cb => {
+        cb.checked = true;
+      });
+      
+      // Check all role filters
+      document.getElementById('promodizerRoleFilter').checked = true;
+      document.getElementById('supervisorRoleFilter').checked = true;
+      
+      // Clear quantity filters
+      document.getElementById('minQuantityFilter').value = '';
+      document.getElementById('maxQuantityFilter').value = '';
+      
+      // Clear search
+      document.getElementById('searchInput').value = '';
+      this.searchQuery = '';
+      
+      // Reset filters object
+      this.filters = {
+        startDate: '',
+        endDate: '',
+        stores: new Set(this.stores.map(s => s.id)),
+        staff: new Set(this.users.filter(u => u.role === 'promodizer' || u.role === 'supervisor').map(u => u.id)),
+        roles: new Set(['promodizer', 'supervisor']),
+        minQuantity: null,
+        maxQuantity: null
+      };
+      
+      this.currentPage = 1;
+      this.applyFiltersAndUpdate();
+    }
+
+    applyFiltersAndUpdate() {
+      this.updateAllFilters();
+      this.applyFilters();
+      this.updateTable();
+      this.updateActiveFiltersDisplay();
+    }
+
+    applyFilters() {
+      this.filteredTransactions = this.transactions.filter(transaction => {
+        // Search filter
+        if (this.searchQuery) {
+          const searchFields = [
+            transaction.id,
+            transaction.submissionId,
+            transaction.storeName,
+            transaction.staffName
+          ].map(field => (field || '').toLowerCase());
+          
+          if (!searchFields.some(field => field.includes(this.searchQuery))) {
+            return false;
+          }
+        }
+
+        // Date range filter
+        if (this.filters.startDate || this.filters.endDate) {
+          const transactionDate = transaction.recordedAtDate;
+          if (this.filters.startDate) {
+            const startDate = new Date(this.filters.startDate);
+            if (transactionDate < startDate) return false;
+          }
+          if (this.filters.endDate) {
+            const endDate = new Date(this.filters.endDate);
+            endDate.setHours(23, 59, 59, 999); // End of day
+            if (transactionDate > endDate) return false;
+          }
+        }
+
+        // Store filter
+        if (this.filters.stores.size > 0 && !this.filters.stores.has(transaction.storeId)) {
+          return false;
+        }
+
+        // Staff filter
+        if (this.filters.staff.size > 0 && !this.filters.staff.has(transaction.recordedById)) {
+          return false;
+        }
+
+        // Role filter
+        if (this.filters.roles.size > 0 && !this.filters.roles.has(transaction.recordedByRole)) {
+          return false;
+        }
+
+        // Quantity range filter
+        if (this.filters.minQuantity !== null && transaction.totalQuantity < this.filters.minQuantity) {
+          return false;
+        }
+        if (this.filters.maxQuantity !== null && transaction.totalQuantity > this.filters.maxQuantity) {
+          return false;
+        }
+
+        return true;
+      });
+
+      // Apply sorting
+      this.funSortTransactions();
+    }
+
+    funSortTransactions() {
+      this.filteredTransactions.sort((a, b) => {
+        let valueA, valueB;
+
+        switch (this.sortColumn) {
+          case 'recordedAt':
+            valueA = a.recordedAtDate.getTime();
+            valueB = b.recordedAtDate.getTime();
+            break;
+          case 'id':
+            valueA = a.id;
+            valueB = b.id;
+            break;
+          case 'storeName':
+            valueA = a.storeName.toLowerCase();
+            valueB = b.storeName.toLowerCase();
+            break;
+          case 'staffName':
+            valueA = a.staffName.toLowerCase();
+            valueB = b.staffName.toLowerCase();
+            break;
+          case 'skuCount':
+          case 'totalQuantity':
+            valueA = a[this.sortColumn];
+            valueB = b[this.sortColumn];
+            break;
+          default:
+            return 0;
+        }
+
+        if (valueA < valueB) return this.sortDirection === 'asc' ? -1 : 1;
+        if (valueA > valueB) return this.sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    funHandleSort(column) {
+      if (this.sortColumn === column) {
+        this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        this.sortColumn = column;
+        this.sortDirection = 'asc';
+      }
+      
+      this.currentPage = 1;
+      this.applyFiltersAndUpdate();
+    }
+
+    updateTable() {
+      this.showLoading(true);
+      
+      setTimeout(() => {
+        const tbody = document.getElementById('transactionsTableBody');
+        const emptyState = document.getElementById('emptyState');
+        const tableContainer = document.getElementById('tableContainer');
+        const paginationContainer = document.getElementById('paginationContainer');
+
+        if (!tbody || !emptyState || !tableContainer || !paginationContainer) return;
+
+        if (this.filteredTransactions.length === 0) {
+          tableContainer.style.display = 'none';
+          paginationContainer.style.display = 'none';
+          emptyState.style.display = 'flex';
+        } else {
+          emptyState.style.display = 'none';
+          tableContainer.style.display = 'block';
+          paginationContainer.style.display = 'flex';
+          
+          this.renderTableRows();
+          this.updatePagination();
+        }
+        
+        this.updateResultsCount();
+        this.showLoading(false);
+      }, 100);
+    }
+
+    renderTableRows() {
+      const tbody = document.getElementById('transactionsTableBody');
+      if (!tbody) return;
+
+      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+      const endIndex = Math.min(startIndex + this.itemsPerPage, this.filteredTransactions.length);
+      const pageTransactions = this.filteredTransactions.slice(startIndex, endIndex);
+
+      tbody.innerHTML = pageTransactions.map(transaction => {
+        const roleClass = transaction.recordedByRole === 'supervisor' 
+          ? 'bg-amber-100 text-amber-800' 
+          : 'bg-blue-100 text-blue-800';
+
+        return `
+          <tr class="hover:bg-slate-50 cursor-pointer" onclick="funNavigateToTransactionDetail('${transaction.id}')">
+            <td class="px-4 py-3 text-sm font-medium text-slate-900">${transaction.id}</td>
+            <td class="px-4 py-3 text-sm text-slate-600">${this.funFormatDateTime(transaction.recordedAtDate)}</td>
+            <td class="px-4 py-3 text-sm text-slate-900">${transaction.storeName}</td>
+            <td class="px-4 py-3 text-sm text-slate-900">${transaction.staffName}</td>
+            <td class="px-4 py-3">
+              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${roleClass}">
+                ${transaction.recordedByRole}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-sm text-slate-900">${transaction.skuCount}</td>
+            <td class="px-4 py-3 text-sm font-medium text-slate-900">${transaction.totalQuantity}</td>
+            <td class="px-4 py-3 text-sm text-slate-600">${transaction.submissionId}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    updatePagination() {
+      const totalPages = Math.ceil(this.filteredTransactions.length / this.itemsPerPage);
+      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+      const endIndex = Math.min(startIndex + this.itemsPerPage, this.filteredTransactions.length);
+
+      // Update pagination info
+      const paginationInfo = document.getElementById('paginationInfo');
+      if (paginationInfo) {
+        paginationInfo.textContent = `${startIndex + 1}-${endIndex} of ${this.filteredTransactions.length}`;
+      }
+
+      // Update navigation buttons
+      const prevButton = document.getElementById('prevPageButton');
+      const nextButton = document.getElementById('nextPageButton');
+      
+      if (prevButton) {
+        prevButton.disabled = this.currentPage <= 1;
+      }
+      
+      if (nextButton) {
+        nextButton.disabled = this.currentPage >= totalPages;
+      }
+
+      // Update page numbers
+      this.renderPageNumbers(totalPages);
+    }
+
+    renderPageNumbers(totalPages) {
+      const container = document.getElementById('pageNumbers');
+      if (!container) return;
+
+      const maxVisiblePages = 5;
+      let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+      
+      if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      }
+
+      const pageNumbers = [];
+      for (let i = startPage; i <= endPage; i++) {
+        const isActive = i === this.currentPage;
+        pageNumbers.push(`
+          <button
+            class="px-3 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-teal-500 ${
+              isActive 
+                ? 'bg-teal-700 text-white border-teal-700' 
+                : 'border-slate-300 hover:bg-slate-50'
+            }"
+            onclick="window.transactionManager.funGoToPage(${i})"
+            ${isActive ? 'disabled' : ''}
+          >
+            ${i}
+          </button>
+        `);
+      }
+
+      container.innerHTML = pageNumbers.join('');
+    }
+
+    funGoToPage(page) {
+      this.currentPage = page;
+      this.updateTable();
+    }
+
+    updateResultsCount() {
+      const element = document.getElementById('resultsCount');
+      if (element) {
+        const count = this.filteredTransactions.length;
+        element.textContent = `${count} transaction${count !== 1 ? 's' : ''}`;
+      }
+    }
+
+    updateActiveFiltersDisplay() {
+      const container = document.getElementById('activeFilters');
+      if (!container) return;
+
+      const activeFilters = [];
+
+      // Date range
+      if (this.filters.startDate || this.filters.endDate) {
+        let dateLabel = 'Date: ';
+        if (this.filters.startDate && this.filters.endDate) {
+          dateLabel += `${this.filters.startDate} to ${this.filters.endDate}`;
+        } else if (this.filters.startDate) {
+          dateLabel += `from ${this.filters.startDate}`;
+        } else {
+          dateLabel += `until ${this.filters.endDate}`;
+        }
+        activeFilters.push({ label: dateLabel, type: 'date' });
+      }
+
+      // Store filters
+      if (this.filters.stores.size > 0 && this.filters.stores.size < this.stores.length) {
+        const selectedStores = this.stores.filter(s => this.filters.stores.has(s.id));
+        if (selectedStores.length <= 3) {
+          activeFilters.push({ label: `Stores: ${selectedStores.map(s => s.storeName).join(', ')}`, type: 'stores' });
+        } else {
+          activeFilters.push({ label: `Stores: ${selectedStores.length} selected`, type: 'stores' });
+        }
+      }
+
+      // Staff filters
+      const allStaff = this.users.filter(u => u.role === 'promodizer' || u.role === 'supervisor');
+      if (this.filters.staff.size > 0 && this.filters.staff.size < allStaff.length) {
+        const selectedStaff = allStaff.filter(s => this.filters.staff.has(s.id));
+        if (selectedStaff.length <= 3) {
+          const staffNames = selectedStaff.map(s => `${s.firstName} ${s.lastName}`.trim());
+          activeFilters.push({ label: `Staff: ${staffNames.join(', ')}`, type: 'staff' });
+        } else {
+          activeFilters.push({ label: `Staff: ${selectedStaff.length} selected`, type: 'staff' });
+        }
+      }
+
+      // Role filters
+      if (this.filters.roles.size < 2) {
+        const roles = Array.from(this.filters.roles);
+        activeFilters.push({ label: `Role: ${roles.join(', ')}`, type: 'roles' });
+      }
+
+      // Quantity range
+      if (this.filters.minQuantity !== null || this.filters.maxQuantity !== null) {
+        let qtyLabel = 'Quantity: ';
+        if (this.filters.minQuantity !== null && this.filters.maxQuantity !== null) {
+          qtyLabel += `${this.filters.minQuantity} - ${this.filters.maxQuantity}`;
+        } else if (this.filters.minQuantity !== null) {
+          qtyLabel += `≥ ${this.filters.minQuantity}`;
+        } else {
+          qtyLabel += `≤ ${this.filters.maxQuantity}`;
+        }
+        activeFilters.push({ label: qtyLabel, type: 'quantity' });
+      }
+
+      if (activeFilters.length > 0) {
+        container.classList.remove('hidden');
+        container.innerHTML = activeFilters.map(filter => `
+          <span class="inline-flex items-center gap-1 px-3 py-1 bg-teal-100 text-teal-800 text-sm rounded-full">
+            ${filter.label}
+            <button 
+              class="ml-1 hover:text-teal-900 focus:outline-none"
+              onclick="window.transactionManager.funRemoveFilter('${filter.type}')"
+            >
+              <i data-lucide="x" class="w-3 h-3"></i>
+            </button>
+          </span>
+        `).join('');
+        
+        // Reinitialize Lucide icons for the new content
+        if (typeof lucide !== 'undefined' && lucide.createIcons) {
+          lucide.createIcons();
+        }
+      } else {
+        container.classList.add('hidden');
+      }
+    }
+
+    funRemoveFilter(type) {
+      switch (type) {
+        case 'date':
+          document.getElementById('startDateFilter').value = '';
+          document.getElementById('endDateFilter').value = '';
+          this.filters.startDate = '';
+          this.filters.endDate = '';
+          break;
+        case 'stores':
+          document.querySelectorAll('.store-filter-checkbox').forEach(cb => cb.checked = true);
+          this.filters.stores = new Set(this.stores.map(s => s.id));
+          break;
+        case 'staff':
+          document.querySelectorAll('.staff-filter-checkbox').forEach(cb => cb.checked = true);
+          this.filters.staff = new Set(this.users.filter(u => u.role === 'promodizer' || u.role === 'supervisor').map(u => u.id));
+          break;
+        case 'roles':
+          document.getElementById('promodizerRoleFilter').checked = true;
+          document.getElementById('supervisorRoleFilter').checked = true;
+          this.filters.roles = new Set(['promodizer', 'supervisor']);
+          break;
+        case 'quantity':
+          document.getElementById('minQuantityFilter').value = '';
+          document.getElementById('maxQuantityFilter').value = '';
+          this.filters.minQuantity = null;
+          this.filters.maxQuantity = null;
+          break;
+      }
+      
+      this.currentPage = 1;
+      this.applyFiltersAndUpdate();
+    }
+
+    showLoading(show) {
+      const loadingState = document.getElementById('loadingState');
+      const tableContainer = document.getElementById('tableContainer');
+      
+      if (loadingState && tableContainer) {
+        if (show) {
+          loadingState.classList.remove('hidden');
+          tableContainer.style.opacity = '0.5';
+        } else {
+          loadingState.classList.add('hidden');
+          tableContainer.style.opacity = '1';
+        }
+      }
+    }
+
+    funFormatDateTime(date) {
+      return date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+    }
+
+    // Export functionality
+    setupExportModalListeners() {
+      const exportModal = document.getElementById('exportModal');
+      const closeButton = document.getElementById('closeExportModal');
+      const cancelButton = document.getElementById('cancelExportButton');
+      const confirmButton = document.getElementById('confirmExportButton');
+      const retryButton = document.getElementById('retryExportButton');
+
+      [closeButton, cancelButton].forEach(button => {
+        if (button) {
+          button.addEventListener('click', () => {
+            this.funHideExportModal();
+          });
+        }
+      });
+
+      if (confirmButton) {
+        confirmButton.addEventListener('click', () => {
+          this.funExecuteExport();
+        });
+      }
+
+      if (retryButton) {
+        retryButton.addEventListener('click', () => {
+          this.funExecuteExport();
+        });
+      }
+
+      // Update export info when options change
+      ['exportFormat', 'includeFilteredOnlyCheckbox', 'includeDetailedSkuInfoCheckbox'].forEach(name => {
+        const elements = name === 'exportFormat' 
+          ? document.querySelectorAll(`input[name="${name}"]`) 
+          : [document.getElementById(name)];
+        
+        elements.forEach(element => {
+          if (element) {
+            element.addEventListener('change', () => {
+              this.funUpdateExportInfo();
+            });
+          }
+        });
+      });
+    }
+
+    funShowExportModal() {
+      const modal = document.getElementById('exportModal');
+      if (modal) {
+        this.funUpdateExportInfo();
+        this.funHideExportError();
+        modal.classList.remove('hidden');
+      }
+    }
+
+    funHideExportModal() {
+      const modal = document.getElementById('exportModal');
+      if (modal) {
+        modal.classList.add('hidden');
+      }
+    }
+
+    funUpdateExportInfo() {
+      const includeFiltered = document.getElementById('includeFilteredOnlyCheckbox')?.checked ?? true;
+      const transactionCount = includeFiltered ? this.filteredTransactions.length : this.transactions.length;
+      
+      const countElement = document.getElementById('exportTransactionCount');
+      if (countElement) {
+        countElement.textContent = transactionCount.toLocaleString();
+      }
+
+      const filenameElement = document.getElementById('exportFilename');
+      if (filenameElement) {
+        const today = new Date().toISOString().split('T')[0];
+        const format = document.querySelector('input[name="exportFormat"]:checked')?.value || 'csv';
+        filenameElement.textContent = `transaction_history_${today}.${format}`;
+      }
+    }
+
+    funExecuteExport() {
+      try {
+        this.funHideExportError();
+        
+        const format = document.querySelector('input[name="exportFormat"]:checked')?.value || 'csv';
+        const includeFiltered = document.getElementById('includeFilteredOnlyCheckbox')?.checked ?? true;
+        const includeDetailedSku = document.getElementById('includeDetailedSkuInfoCheckbox')?.checked ?? false;
+        
+        const dataToExport = includeFiltered ? this.filteredTransactions : this.transactions;
+        
+        let content, filename, mimeType;
+        const today = new Date().toISOString().split('T')[0];
+        
+        if (format === 'csv') {
+          content = this.funGenerateCSV(dataToExport, includeDetailedSku);
+          filename = `transaction_history_${today}.csv`;
+          mimeType = 'text/csv;charset=utf-8;';
+        } else {
+          content = JSON.stringify(this.funGenerateJSONData(dataToExport, includeDetailedSku), null, 2);
+          filename = `transaction_history_${today}.json`;
+          mimeType = 'application/json;charset=utf-8;';
+        }
+        
+        this.funDownloadFile(content, filename, mimeType);
+        this.funHideExportModal();
+        
+      } catch (error) {
+        console.error('Export failed:', error);
+        this.funShowExportError('Failed to export data. Please try again.');
+      }
+    }
+
+    funGenerateCSV(data, includeDetailedSku) {
+      const headers = [
+        'Transaction ID',
+        'Submission ID',
+        'Date/Time',
+        'Store Name',
+        'Staff Name',
+        'Role',
+        'SKU Count',
+        'Total Quantity'
+      ];
+
+      if (includeDetailedSku) {
+        headers.push('SKU Details');
+      }
+
+      const csvRows = [headers.join(',')];
+
+      data.forEach(transaction => {
+        const row = [
+          `"${transaction.id}"`,
+          `"${transaction.submissionId}"`,
+          `"${this.funFormatDateTime(transaction.recordedAtDate)}"`,
+          `"${transaction.storeName}"`,
+          `"${transaction.staffName}"`,
+          `"${transaction.recordedByRole}"`,
+          transaction.skuCount,
+          transaction.totalQuantity
+        ];
+
+        if (includeDetailedSku) {
+          const skuDetails = transaction.scannedSkus?.map(sku => 
+            `${sku.skuId}:${sku.quantity}`
+          ).join('|') || '';
+          row.push(`"${skuDetails}"`);
+        }
+
+        csvRows.push(row.join(','));
+      });
+
+      return csvRows.join('\n');
+    }
+
+    funGenerateJSONData(data, includeDetailedSku) {
+      return data.map(transaction => {
+        const exportData = {
+          transactionId: transaction.id,
+          submissionId: transaction.submissionId,
+          dateTime: transaction.recordedAt,
+          storeName: transaction.storeName,
+          staffName: transaction.staffName,
+          role: transaction.recordedByRole,
+          skuCount: transaction.skuCount,
+          totalQuantity: transaction.totalQuantity
+        };
+
+        if (includeDetailedSku) {
+          exportData.scannedSkus = transaction.scannedSkus || [];
+        }
+
+        return exportData;
+      });
+    }
+
+    funDownloadFile(content, filename, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const link = document.createElement('a');
+      
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+    }
+
+    funShowExportError(message) {
+      const errorContainer = document.getElementById('exportErrorMessage');
+      const errorText = document.getElementById('exportErrorText');
+      
+      if (errorContainer && errorText) {
+        errorText.textContent = message;
+        errorContainer.classList.remove('hidden');
+      }
+    }
+
+    funHideExportError() {
+      const errorContainer = document.getElementById('exportErrorMessage');
+      if (errorContainer) {
+        errorContainer.classList.add('hidden');
+      }
+    }
+  }
+
+  // Navigation function
+  window.funNavigateToTransactionDetail = function(transactionId) {
+    if (transactionId) {
+      window.location.href = `transaction_detail.html?id=${encodeURIComponent(transactionId)}`;
+    }
+  };
+
+  // Initialize the transaction manager
+  window.transactionManager = new TransactionHistoryManager();
+});
+</script></body></html>

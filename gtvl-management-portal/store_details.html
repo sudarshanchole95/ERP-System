@@ -1,0 +1,1554 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>GTVL Management Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        /* GTVL Brand Colors */
+        --color-primary: #0F766E; /* Teal-700 - Primary CTAs, navigation highlights */
+        --color-primary-hover: #0D9488; /* Teal-600 - Hover states */
+        --color-secondary: #475569; /* Slate-600 - Secondary elements */
+        --color-accent: #D97706; /* Amber-600 - Call-to-action highlights */
+        --color-surface: #FFFFFF; /* White - Cards, modals, panels */
+        --color-background: #F8FAFC; /* Slate-50 - Page backgrounds */
+        --color-surface-variant: #F1F5F9; /* Slate-100 - Alternate backgrounds */
+        --color-on-background: #0F172A; /* Slate-900 - Primary headings */
+        --color-on-surface: #1E293B; /* Slate-800 - Body text */
+        --color-border: #E2E8F0; /* Slate-200 - Borders */
+        --color-success: #16A34A; /* Green-600 - Success states */
+        --color-warning: #F59E0B; /* Amber-500 - Warning alerts */
+        --color-error: #DC2626; /* Red-600 - Error messages */
+        --color-info: #2563EB; /* Blue-600 - Info messages */
+
+        /* Layout Constants */
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      /* Smooth scrolling */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      /* Layout with CSS variables */
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      /* Mobile sidebar slide states */
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      /* Active nav link styling */
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+        background-color: #f0fdfa;
+        color: var(--color-primary);
+      }
+
+      /* Popover animation states */
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      /* Sidebar backdrop states */
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Store Details - GTVL Management Portal</title><script>
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+});
+</script></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <!-- HEADER SECTION -->
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <!-- Left: Logo & Title -->
+        <div class="flex items-center gap-3">
+          <!-- Mobile Menu Toggle -->
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <!-- Logo -->
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <rect x="68" y="68" width="264" height="264" rx="32" stroke="#0F766E" stroke-width="18"></rect>
+                  <rect x="109" y="143" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                  <rect x="206" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                </g>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">
+              GTVL Management Portal
+            </h1>
+          </div>
+        </div>
+
+        <!-- Right: User Profile -->
+        <div class="flex items-center gap-2 md:gap-3">
+          <!-- User Profile Button -->
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-500 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- User Profile Popover -->
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <!-- User Info Section -->
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-500 truncate"></div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <!-- Main Navigation Section -->
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Management
+          </div>
+          <div class="space-y-1">
+            <a href="management_dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="management_dashboard">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="sku_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sku_list">
+              <i data-lucide="package" class="w-5 h-5"></i>
+              <span>SKUs</span>
+            </a>
+            <a href="store_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="store_list">
+              <i data-lucide="store" class="w-5 h-5"></i>
+              <span>Stores</span>
+            </a>
+            <a href="supervisor_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="supervisor_list">
+              <i data-lucide="user-check" class="w-5 h-5"></i>
+              <span>Supervisors</span>
+            </a>
+            <a href="promodizer_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="promodizer_list">
+              <i data-lucide="users" class="w-5 h-5"></i>
+              <span>Promodizers</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="app-main p-6" id="pageContent" role="main"><div class="mb-6">
+  <nav class="flex items-center gap-2 text-sm">
+    <a href="management_dashboard.html" class="text-teal-700 hover:text-teal-600 font-medium">Dashboard</a>
+    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+    <a href="store_list.html" class="text-teal-700 hover:text-teal-600 font-medium">Stores</a>
+    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+    <span id="breadcrumbStoreName" class="text-slate-600">Loading...</span>
+  </nav>
+</div>
+
+<!-- Page Header -->
+<div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+  <div class="flex-1">
+    <div class="flex items-center gap-3 mb-2">
+      <h1 id="pageTitle" class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900">Loading...</h1>
+      <span id="storeStatusBadge" class="px-2 py-1 text-xs font-semibold rounded-full"></span>
+    </div>
+    <div class="flex flex-wrap items-center gap-4 text-sm text-slate-600">
+      <div class="flex items-center gap-2">
+        <i data-lucide="users" class="w-4 h-4"></i>
+        <span>Promodizers: <span id="promodizerCount" class="font-semibold">0</span></span>
+      </div>
+      <div class="flex items-center gap-2">
+        <i data-lucide="user-check" class="w-4 h-4"></i>
+        <span>Supervisor: <span id="supervisorStatus" class="font-semibold">Not Assigned</span></span>
+      </div>
+    </div>
+  </div>
+  <div class="flex items-center gap-2">
+    <button onclick="funEditStore()" class="px-4 py-2 bg-teal-700 text-white text-sm font-semibold rounded hover:bg-teal-600 transition-colors duration-200 flex items-center gap-2">
+      <i data-lucide="edit" class="w-4 h-4"></i>
+      Edit Store
+    </button>
+    <button onclick="funShowDeleteModal()" class="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded hover:bg-red-700 transition-colors duration-200 flex items-center gap-2">
+      <i data-lucide="trash-2" class="w-4 h-4"></i>
+      Delete Store
+    </button>
+  </div>
+</div>
+
+<!-- Store Information Card -->
+<div class="bg-white rounded-lg shadow border border-slate-200 mb-6">
+  <div class="p-6 border-b border-slate-100">
+    <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900 mb-4">Store Information</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div>
+        <label class="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-1">Store Name</label>
+        <p id="storeName" class="text-sm leading-[1.375rem] font-normal text-slate-800">-</p>
+      </div>
+      <div>
+        <label class="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-1">Address</label>
+        <p id="storeAddress" class="text-sm leading-[1.375rem] font-normal text-slate-800">-</p>
+      </div>
+      <div>
+        <label class="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-1">Contact Person</label>
+        <p id="contactPerson" class="text-sm leading-[1.375rem] font-normal text-slate-800">-</p>
+      </div>
+      <div>
+        <label class="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-1">Phone</label>
+        <p id="storePhone" class="text-sm leading-[1.375rem] font-normal text-slate-800">-</p>
+      </div>
+      <div>
+        <label class="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-1">Email</label>
+        <p id="storeEmail" class="text-sm leading-[1.375rem] font-normal text-slate-800">-</p>
+      </div>
+      <div>
+        <label class="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-1">Created Date</label>
+        <p id="createdDate" class="text-sm leading-[1.375rem] font-normal text-slate-800">-</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Supervisor Assignment Card -->
+<div class="bg-white rounded-lg shadow border border-slate-200 mb-6">
+  <div class="p-6 border-b border-slate-100">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Supervisor Assignment</h2>
+    </div>
+    <div id="supervisorSection">
+      <!-- Supervisor content will be populated here -->
+    </div>
+  </div>
+</div>
+
+<!-- Promodizers Section -->
+<div class="bg-white rounded-lg shadow border border-slate-200">
+  <div class="p-6 border-b border-slate-100">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Assigned Promodizers</h2>
+      <button onclick="funShowAddPromodizersModal()" class="px-4 py-2 bg-teal-700 text-white text-sm font-semibold rounded hover:bg-teal-600 transition-colors duration-200 flex items-center gap-2">
+        <i data-lucide="plus" class="w-4 h-4"></i>
+        Add Promodizers
+      </button>
+    </div>
+    <div id="promodizersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- Promodizer cards will be populated here -->
+    </div>
+    <div id="noPromodizersMessage" class="text-center py-12 hidden">
+      <i data-lucide="users" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
+      <h3 class="text-base leading-6 font-semibold text-slate-800 mb-1">No Promodizers Assigned</h3>
+      <p class="text-sm leading-[1.375rem] text-slate-600">Add promodizers to this store to get started.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Allocate Supervisor Modal -->
+<div id="allocateSupervisorModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,42rem)] max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-slate-100">
+        <h3 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Allocate Supervisor</h3>
+      </div>
+      <div class="p-6">
+        <div class="mb-4">
+          <label class="block text-sm font-semibold text-slate-800 mb-2">Select Supervisor</label>
+          <select id="supervisorSelect" class="w-full px-3 py-2 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+            <option value="">Choose a supervisor...</option>
+          </select>
+        </div>
+        <div id="supervisorDetails" class="hidden p-4 bg-slate-50 rounded-lg">
+          <!-- Selected supervisor details will be shown here -->
+        </div>
+      </div>
+      <div class="p-6 border-t border-slate-100 flex justify-end gap-3">
+        <button onclick="funCloseAllocateSupervisorModal()" class="px-4 py-2 text-slate-600 hover:text-slate-800 font-medium transition-colors duration-200">
+          Cancel
+        </button>
+        <button onclick="funAllocateSupervisor()" class="px-4 py-2 bg-teal-700 text-white font-semibold rounded hover:bg-teal-600 transition-colors duration-200">
+          Allocate
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Reassign Supervisor Modal -->
+<div id="reassignSupervisorModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,42rem)] max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-slate-100">
+        <h3 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Reassign Supervisor</h3>
+      </div>
+      <div class="p-6">
+        <div class="mb-6 p-4 bg-slate-50 rounded-lg">
+          <h4 class="text-sm font-semibold text-slate-800 mb-2">Current Supervisor</h4>
+          <div id="currentSupervisorInfo">
+            <!-- Current supervisor info -->
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-semibold text-slate-800 mb-2">Select New Supervisor</label>
+          <select id="newSupervisorSelect" class="w-full px-3 py-2 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+            <option value="">Choose a new supervisor...</option>
+          </select>
+        </div>
+        <div id="newSupervisorDetails" class="hidden p-4 bg-slate-50 rounded-lg">
+          <!-- New supervisor details will be shown here -->
+        </div>
+      </div>
+      <div class="p-6 border-t border-slate-100 flex justify-end gap-3">
+        <button onclick="funCloseReassignSupervisorModal()" class="px-4 py-2 text-slate-600 hover:text-slate-800 font-medium transition-colors duration-200">
+          Cancel
+        </button>
+        <button onclick="funReassignSupervisor()" class="px-4 py-2 bg-teal-700 text-white font-semibold rounded hover:bg-teal-600 transition-colors duration-200">
+          Reassign
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Deallocate Supervisor Modal -->
+<div id="deallocateSupervisorModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,42rem)] max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-slate-100">
+        <h3 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Deallocate Supervisor</h3>
+      </div>
+      <div class="p-6">
+        <div class="flex items-start gap-3 mb-4">
+          <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0"></i>
+          <div>
+            <p class="text-sm text-slate-800 mb-2">
+              This will remove <span id="deallocateSupervisorName" class="font-semibold"></span> from <span id="deallocateStoreName" class="font-semibold"></span>.
+            </p>
+            <p class="text-sm text-slate-600">The store will become unassigned.</p>
+          </div>
+        </div>
+      </div>
+      <div class="p-6 border-t border-slate-100 flex justify-end gap-3">
+        <button onclick="funCloseDeallocateSupervisorModal()" class="px-4 py-2 text-slate-600 hover:text-slate-800 font-medium transition-colors duration-200">
+          Cancel
+        </button>
+        <button onclick="funDeallocateSupervisor()" class="px-4 py-2 bg-red-600 text-white font-semibold rounded hover:bg-red-700 transition-colors duration-200">
+          Confirm Deallocation
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Promodizers Modal -->
+<div id="addPromodizersModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,42rem)] max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-slate-100">
+        <h3 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Add Promodizers</h3>
+      </div>
+      <div class="p-6">
+        <p class="text-sm text-slate-600 mb-4">Select promodizers to assign to this store:</p>
+        <div id="promodizersList" class="space-y-3 max-h-96 overflow-y-auto">
+          <!-- Promodizers checkboxes will be populated here -->
+        </div>
+      </div>
+      <div class="p-6 border-t border-slate-100 flex justify-end gap-3">
+        <button onclick="funCloseAddPromodizersModal()" class="px-4 py-2 text-slate-600 hover:text-slate-800 font-medium transition-colors duration-200">
+          Cancel
+        </button>
+        <button onclick="funAddSelectedPromodizers()" class="px-4 py-2 bg-teal-700 text-white font-semibold rounded hover:bg-teal-600 transition-colors duration-200">
+          Add Selected
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Remove Promodizer Modal -->
+<div id="removePromodizerModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,42rem)] max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-slate-100">
+        <h3 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Remove Promodizer</h3>
+      </div>
+      <div class="p-6">
+        <div class="flex items-start gap-3">
+          <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0"></i>
+          <div>
+            <p class="text-sm text-slate-800">
+              This will remove <span id="removePromodizerName" class="font-semibold"></span> from <span id="removeStoreName" class="font-semibold"></span>.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="p-6 border-t border-slate-100 flex justify-end gap-3">
+        <button onclick="funCloseRemovePromodizerModal()" class="px-4 py-2 text-slate-600 hover:text-slate-800 font-medium transition-colors duration-200">
+          Cancel
+        </button>
+        <button onclick="funRemovePromodizer()" class="px-4 py-2 bg-red-600 text-white font-semibold rounded hover:bg-red-700 transition-colors duration-200">
+          Confirm Removal
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Store Modal -->
+<div id="deleteStoreModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,42rem)] max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-slate-100">
+        <h3 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Delete Store</h3>
+      </div>
+      <div class="p-6">
+        <div class="flex items-start gap-3 mb-4">
+          <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0"></i>
+          <div>
+            <p class="text-sm text-slate-800 mb-2">
+              Are you sure you want to delete <span id="deleteStoreName" class="font-semibold"></span>?
+            </p>
+            <div id="storeDependencies" class="text-sm text-slate-600">
+              <!-- Dependencies will be shown here -->
+            </div>
+          </div>
+        </div>
+        <div id="forceDeleteSection" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <label class="flex items-start gap-3">
+            <input type="checkbox" id="forceDeleteCheck" class="mt-1">
+            <span class="text-sm text-red-800">
+              I understand this will permanently delete all associated records and this action cannot be undone.
+            </span>
+          </label>
+        </div>
+      </div>
+      <div class="p-6 border-t border-slate-100 flex justify-end gap-3">
+        <button onclick="funCloseDeleteStoreModal()" class="px-4 py-2 text-slate-600 hover:text-slate-800 font-medium transition-colors duration-200">
+          Cancel
+        </button>
+        <button id="confirmDeleteBtn" onclick="funDeleteStore()" class="px-4 py-2 bg-red-600 text-white font-semibold rounded hover:bg-red-700 transition-colors duration-200">
+          Delete Store
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+    <!-- JAVASCRIPT INITIALIZATION -->
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils =
+          window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_mgmt_001");
+                    currentUserId = "usr_mgmt_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } =
+            state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail)
+            return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute(
+            "aria-expanded",
+            shouldOpen ? "true" : "false"
+          );
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active");
+            } else {
+              link.classList.remove("active");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () =>
+            closeMobileSidebar()
+          );
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+});
+</script>
+<script>
+let currentStore = null;
+let currentPromodizerToRemove = null;
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', () => {
+  funLoadStoreDetails();
+});
+
+function funLoadStoreDetails() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const storeId = urlParams.get('id');
+  
+  if (!storeId) {
+    alert('Store ID not provided');
+    window.location.href = 'store_list.html';
+    return;
+  }
+
+  try {
+    const stores = JSON.parse(localStorage.getItem('stores') || '[]');
+    currentStore = stores.find(store => store.id === storeId);
+    
+    if (!currentStore) {
+      alert('Store not found');
+      window.location.href = 'store_list.html';
+      return;
+    }
+
+    funPopulateStoreInfo();
+    funLoadSupervisorAssignment();
+    funLoadPromodizers();
+    funUpdateQuickStats();
+    
+  } catch (error) {
+    console.error('Error loading store details:', error);
+    alert('Error loading store details');
+  }
+}
+
+function funPopulateStoreInfo() {
+  // Update page title and breadcrumb
+  document.getElementById('pageTitle').textContent = currentStore.storeCode;
+  document.getElementById('breadcrumbStoreName').textContent = currentStore.storeName;
+  
+  // Status badge
+  const statusBadge = document.getElementById('storeStatusBadge');
+  statusBadge.textContent = currentStore.status.charAt(0).toUpperCase() + currentStore.status.slice(1);
+  statusBadge.className = `px-2 py-1 text-xs font-semibold rounded-full ${
+    currentStore.status === 'active' 
+      ? 'bg-green-100 text-green-800' 
+      : 'bg-red-100 text-red-800'
+  }`;
+  
+  // Store details
+  document.getElementById('storeName').textContent = currentStore.storeName;
+  document.getElementById('storeAddress').textContent = funFormatAddress(currentStore.address);
+  document.getElementById('contactPerson').textContent = currentStore.contactPerson;
+  document.getElementById('storePhone').textContent = currentStore.phone;
+  document.getElementById('storeEmail').textContent = currentStore.email;
+  document.getElementById('createdDate').textContent = funFormatDate(currentStore.createdAt);
+}
+
+function funLoadSupervisorAssignment() {
+  try {
+    const supervisorAllocations = JSON.parse(localStorage.getItem('supervisorAllocations') || '[]');
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    
+    const allocation = supervisorAllocations.find(alloc => alloc.storeId === currentStore.id);
+    const supervisorSection = document.getElementById('supervisorSection');
+    
+    if (allocation) {
+      const supervisor = users.find(user => user.id === allocation.supervisorId);
+      if (supervisor) {
+        supervisorSection.innerHTML = `
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-2">
+                <div class="w-10 h-10 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                  ${supervisor.firstName.charAt(0)}${supervisor.lastName.charAt(0)}
+                </div>
+                <div>
+                  <h3 class="text-base leading-6 font-semibold text-slate-800">
+                    <a href="supervisor_details.html?id=${supervisor.id}" class="text-teal-700 hover:text-teal-600">
+                      ${supervisor.firstName} ${supervisor.lastName}
+                    </a>
+                  </h3>
+                  <p class="text-sm text-slate-600">${supervisor.employeeId}</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 ml-13">
+                <div>
+                  <label class="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-1">Email</label>
+                  <p class="text-sm text-slate-800">${supervisor.email}</p>
+                </div>
+                <div>
+                  <label class="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-1">Phone</label>
+                  <p class="text-sm text-slate-800">${supervisor.phone}</p>
+                </div>
+                <div>
+                  <label class="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-1">Allocated Date</label>
+                  <p class="text-sm text-slate-800">${funFormatDate(allocation.allocatedAt)}</p>
+                </div>
+              </div>
+            </div>
+            <div class="flex gap-2 ml-4">
+              <button
+                onclick="funShowReassignSupervisorModal()"
+                class="px-3 py-1 text-sm text-teal-700 hover:text-teal-600 font-medium"
+              >
+                Reassign
+              </button>
+              <button
+                onclick="funShowDeallocateSupervisorModal()"
+                class="px-3 py-1 text-sm text-red-600 hover:text-red-700 font-medium"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    } else {
+      supervisorSection.innerHTML = `
+        <div class="text-center py-8">
+          <i data-lucide="user-x" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
+          <h3 class="text-base leading-6 font-semibold text-slate-800 mb-1">No Supervisor Assigned</h3>
+          <p class="text-sm text-slate-600 mb-4">This store needs a supervisor assignment.</p>
+          <button
+            onclick="funShowAllocateSupervisorModal()"
+            class="px-4 py-2 bg-teal-700 text-white text-sm font-semibold rounded hover:bg-teal-600 transition-colors duration-200"
+          >
+            Allocate Supervisor
+          </button>
+        </div>
+      `;
+    }
+    
+  } catch (error) {
+    console.error('Error loading supervisor assignment:', error);
+  }
+}
+
+function funLoadPromodizers() {
+  try {
+    const promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    
+    const storeAllocations = promodizerAllocations.filter(alloc => alloc.storeId === currentStore.id);
+    const promodizersGrid = document.getElementById('promodizersGrid');
+    const noMessage = document.getElementById('noPromodizersMessage');
+    
+    if (storeAllocations.length > 0) {
+      noMessage.classList.add('hidden');
+      promodizersGrid.classList.remove('hidden');
+      
+      promodizersGrid.innerHTML = storeAllocations.map(allocation => {
+        const promodizer = users.find(user => user.id === allocation.promodizerId);
+        if (!promodizer) return '';
+        
+        return `
+          <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                  ${promodizer.firstName.charAt(0)}${promodizer.lastName.charAt(0)}
+                </div>
+                <div>
+                  <h4 class="text-sm font-semibold text-slate-800">
+                    <a href="promodizer_details.html?id=${promodizer.id}" class="text-teal-700 hover:text-teal-600">
+                      ${promodizer.firstName} ${promodizer.lastName}
+                    </a>
+                  </h4>
+                  <p class="text-xs text-slate-600">${promodizer.employeeId}</p>
+                </div>
+              </div>
+              <button
+                onclick="funShowRemovePromodizerModal('${allocation.id}', '${promodizer.firstName} ${promodizer.lastName}')"
+                class="text-xs text-red-600 hover:text-red-700 font-medium"
+              >
+                Remove
+              </button>
+            </div>
+            <div>
+              <label class="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-1">Allocated Date</label>
+              <p class="text-xs text-slate-600">${funFormatDate(allocation.allocatedAt)}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+    } else {
+      noMessage.classList.remove('hidden');
+      promodizersGrid.classList.add('hidden');
+    }
+    
+  } catch (error) {
+    console.error('Error loading promodizers:', error);
+  }
+}
+
+function funUpdateQuickStats() {
+  try {
+    const promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+    const supervisorAllocations = JSON.parse(localStorage.getItem('supervisorAllocations') || '[]');
+    
+    const promodizerCount = promodizerAllocations.filter(alloc => alloc.storeId === currentStore.id).length;
+    const hasSupervisor = supervisorAllocations.some(alloc => alloc.storeId === currentStore.id);
+    
+    document.getElementById('promodizerCount').textContent = promodizerCount;
+    document.getElementById('supervisorStatus').textContent = hasSupervisor ? 'Assigned' : 'Not Assigned';
+    
+  } catch (error) {
+    console.error('Error updating quick stats:', error);
+  }
+}
+
+// Supervisor Modal Functions
+function funShowAllocateSupervisorModal() {
+  funLoadAvailableSupervisors('supervisorSelect', 'supervisorDetails');
+  document.getElementById('allocateSupervisorModal').classList.remove('hidden');
+}
+
+function funCloseAllocateSupervisorModal() {
+  document.getElementById('allocateSupervisorModal').classList.add('hidden');
+}
+
+function funShowReassignSupervisorModal() {
+  funLoadCurrentSupervisor();
+  funLoadAvailableSupervisors('newSupervisorSelect', 'newSupervisorDetails', true);
+  document.getElementById('reassignSupervisorModal').classList.remove('hidden');
+}
+
+function funCloseReassignSupervisorModal() {
+  document.getElementById('reassignSupervisorModal').classList.add('hidden');
+}
+
+function funShowDeallocateSupervisorModal() {
+  const supervisorAllocations = JSON.parse(localStorage.getItem('supervisorAllocations') || '[]');
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  
+  const allocation = supervisorAllocations.find(alloc => alloc.storeId === currentStore.id);
+  if (allocation) {
+    const supervisor = users.find(user => user.id === allocation.supervisorId);
+    if (supervisor) {
+      document.getElementById('deallocateSupervisorName').textContent = `${supervisor.firstName} ${supervisor.lastName}`;
+      document.getElementById('deallocateStoreName').textContent = currentStore.storeName;
+      document.getElementById('deallocateSupervisorModal').classList.remove('hidden');
+    }
+  }
+}
+
+function funCloseDeallocateSupervisorModal() {
+  document.getElementById('deallocateSupervisorModal').classList.add('hidden');
+}
+
+function funLoadAvailableSupervisors(selectId, detailsId, excludeCurrent = false) {
+  try {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const supervisorAllocations = JSON.parse(localStorage.getItem('supervisorAllocations') || '[]');
+    
+    const supervisors = users.filter(user => user.role === 'supervisor' && user.status === 'active');
+    const allocatedSupervisorIds = supervisorAllocations.map(alloc => alloc.supervisorId);
+    
+    let availableSupervisors = supervisors.filter(supervisor => !allocatedSupervisorIds.includes(supervisor.id));
+    
+    // If excluding current, also filter out the currently assigned supervisor
+    if (excludeCurrent) {
+      const currentAllocation = supervisorAllocations.find(alloc => alloc.storeId === currentStore.id);
+      if (currentAllocation) {
+        availableSupervisors = availableSupervisors.filter(sup => sup.id !== currentAllocation.supervisorId);
+      }
+    }
+    
+    const select = document.getElementById(selectId);
+    select.innerHTML = '<option value="">Choose a supervisor...</option>';
+    
+    availableSupervisors.forEach(supervisor => {
+      const option = document.createElement('option');
+      option.value = supervisor.id;
+      option.textContent = `${supervisor.firstName} ${supervisor.lastName} (${supervisor.employeeId})`;
+      select.appendChild(option);
+    });
+    
+    select.addEventListener('change', () => {
+      const selectedId = select.value;
+      const details = document.getElementById(detailsId);
+      
+      if (selectedId) {
+        const supervisor = supervisors.find(s => s.id === selectedId);
+        if (supervisor) {
+          details.innerHTML = `
+            <h4 class="text-sm font-semibold text-slate-800 mb-2">Supervisor Details</h4>
+            <div class="grid grid-cols-2 gap-3 text-sm">
+              <div>
+                <span class="text-slate-600">Name:</span>
+                <span class="font-medium">${supervisor.firstName} ${supervisor.lastName}</span>
+              </div>
+              <div>
+                <span class="text-slate-600">Employee ID:</span>
+                <span class="font-medium">${supervisor.employeeId}</span>
+              </div>
+              <div>
+                <span class="text-slate-600">Email:</span>
+                <span class="font-medium">${supervisor.email}</span>
+              </div>
+              <div>
+                <span class="text-slate-600">Phone:</span>
+                <span class="font-medium">${supervisor.phone}</span>
+              </div>
+            </div>
+          `;
+          details.classList.remove('hidden');
+        }
+      } else {
+        details.classList.add('hidden');
+      }
+    });
+    
+  } catch (error) {
+    console.error('Error loading available supervisors:', error);
+  }
+}
+
+function funLoadCurrentSupervisor() {
+  try {
+    const supervisorAllocations = JSON.parse(localStorage.getItem('supervisorAllocations') || '[]');
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    
+    const allocation = supervisorAllocations.find(alloc => alloc.storeId === currentStore.id);
+    if (allocation) {
+      const supervisor = users.find(user => user.id === allocation.supervisorId);
+      if (supervisor) {
+        document.getElementById('currentSupervisorInfo').innerHTML = `
+          <div class="grid grid-cols-2 gap-3 text-sm">
+            <div>
+              <span class="text-slate-600">Name:</span>
+              <span class="font-medium">${supervisor.firstName} ${supervisor.lastName}</span>
+            </div>
+            <div>
+              <span class="text-slate-600">Employee ID:</span>
+              <span class="font-medium">${supervisor.employeeId}</span>
+            </div>
+            <div>
+              <span class="text-slate-600">Email:</span>
+              <span class="font-medium">${supervisor.email}</span>
+            </div>
+            <div>
+              <span class="text-slate-600">Phone:</span>
+              <span class="font-medium">${supervisor.phone}</span>
+            </div>
+          </div>
+        `;
+      }
+    }
+  } catch (error) {
+    console.error('Error loading current supervisor:', error);
+  }
+}
+
+function funAllocateSupervisor() {
+  const supervisorId = document.getElementById('supervisorSelect').value;
+  
+  if (!supervisorId) {
+    alert('Please select a supervisor');
+    return;
+  }
+  
+  try {
+    const supervisorAllocations = JSON.parse(localStorage.getItem('supervisorAllocations') || '[]');
+    const newId = 'supalc_' + Date.now();
+    
+    const newAllocation = {
+      id: newId,
+      supervisorId: supervisorId,
+      storeId: currentStore.id,
+      allocatedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString()
+    };
+    
+    supervisorAllocations.push(newAllocation);
+    localStorage.setItem('supervisorAllocations', JSON.stringify(supervisorAllocations));
+    
+    funCloseAllocateSupervisorModal();
+    funLoadSupervisorAssignment();
+    funUpdateQuickStats();
+    
+    alert('Supervisor allocated successfully!');
+    
+  } catch (error) {
+    console.error('Error allocating supervisor:', error);
+    alert('Error allocating supervisor');
+  }
+}
+
+function funReassignSupervisor() {
+  const newSupervisorId = document.getElementById('newSupervisorSelect').value;
+  
+  if (!newSupervisorId) {
+    alert('Please select a new supervisor');
+    return;
+  }
+  
+  try {
+    const supervisorAllocations = JSON.parse(localStorage.getItem('supervisorAllocations') || '[]');
+    const allocationIndex = supervisorAllocations.findIndex(alloc => alloc.storeId === currentStore.id);
+    
+    if (allocationIndex !== -1) {
+      supervisorAllocations[allocationIndex].supervisorId = newSupervisorId;
+      supervisorAllocations[allocationIndex].allocatedAt = new Date().toISOString();
+      
+      localStorage.setItem('supervisorAllocations', JSON.stringify(supervisorAllocations));
+      
+      funCloseReassignSupervisorModal();
+      funLoadSupervisorAssignment();
+      funUpdateQuickStats();
+      
+      alert('Supervisor reassigned successfully!');
+    }
+    
+  } catch (error) {
+    console.error('Error reassigning supervisor:', error);
+    alert('Error reassigning supervisor');
+  }
+}
+
+function funDeallocateSupervisor() {
+  try {
+    const supervisorAllocations = JSON.parse(localStorage.getItem('supervisorAllocations') || '[]');
+    const updatedAllocations = supervisorAllocations.filter(alloc => alloc.storeId !== currentStore.id);
+    
+    localStorage.setItem('supervisorAllocations', JSON.stringify(updatedAllocations));
+    
+    funCloseDeallocateSupervisorModal();
+    funLoadSupervisorAssignment();
+    funUpdateQuickStats();
+    
+    alert('Supervisor deallocated successfully!');
+    
+  } catch (error) {
+    console.error('Error deallocating supervisor:', error);
+    alert('Error deallocating supervisor');
+  }
+}
+
+// Promodizer Modal Functions
+function funShowAddPromodizersModal() {
+  funLoadAvailablePromodizers();
+  document.getElementById('addPromodizersModal').classList.remove('hidden');
+}
+
+function funCloseAddPromodizersModal() {
+  document.getElementById('addPromodizersModal').classList.add('hidden');
+}
+
+function funShowRemovePromodizerModal(allocationId, promodizerName) {
+  currentPromodizerToRemove = allocationId;
+  document.getElementById('removePromodizerName').textContent = promodizerName;
+  document.getElementById('removeStoreName').textContent = currentStore.storeName;
+  document.getElementById('removePromodizerModal').classList.remove('hidden');
+}
+
+function funCloseRemovePromodizerModal() {
+  document.getElementById('removePromodizerModal').classList.add('hidden');
+  currentPromodizerToRemove = null;
+}
+
+function funLoadAvailablePromodizers() {
+  try {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+    
+    const promodizers = users.filter(user => user.role === 'promodizer' && user.status === 'active');
+    const currentStorePromodizers = promodizerAllocations
+      .filter(alloc => alloc.storeId === currentStore.id)
+      .map(alloc => alloc.promodizerId);
+    
+    const promodizersList = document.getElementById('promodizersList');
+    promodizersList.innerHTML = '';
+    
+    promodizers.forEach(promodizer => {
+      const isAlreadyAssigned = currentStorePromodizers.includes(promodizer.id);
+      const storeCount = promodizerAllocations.filter(alloc => alloc.promodizerId === promodizer.id).length;
+      
+      const checkbox = document.createElement('label');
+      checkbox.className = 'flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer';
+      checkbox.innerHTML = `
+        <input type="checkbox" value="${promodizer.id}" ${isAlreadyAssigned ? 'checked disabled' : ''} class="rounded">
+        <div class="flex-1">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-semibold text-slate-800">${promodizer.firstName} ${promodizer.lastName}</p>
+              <p class="text-xs text-slate-600">${promodizer.employeeId}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-xs text-slate-600">Current stores: ${storeCount}</p>
+              ${isAlreadyAssigned ? '<span class="text-xs text-green-600 font-medium">Already assigned</span>' : ''}
+            </div>
+          </div>
+        </div>
+      `;
+      
+      promodizersList.appendChild(checkbox);
+    });
+    
+  } catch (error) {
+    console.error('Error loading available promodizers:', error);
+  }
+}
+
+function funAddSelectedPromodizers() {
+  const checkboxes = document.querySelectorAll('#promodizersList input[type="checkbox"]:checked:not(:disabled)');
+  const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+  
+  if (selectedIds.length === 0) {
+    alert('Please select at least one promodizer');
+    return;
+  }
+  
+  try {
+    const promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+    const supervisorAllocations = JSON.parse(localStorage.getItem('supervisorAllocations') || '[]');
+    
+    // Find supervisor for this store (if any)
+    const supervisorAllocation = supervisorAllocations.find(alloc => alloc.storeId === currentStore.id);
+    const supervisorId = supervisorAllocation ? supervisorAllocation.supervisorId : null;
+    
+    selectedIds.forEach(promodizerId => {
+      const newId = 'proalc_' + Date.now() + '_' + promodizerId;
+      const newAllocation = {
+        id: newId,
+        promodizerId: promodizerId,
+        storeId: currentStore.id,
+        supervisorId: supervisorId,
+        allocatedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString()
+      };
+      
+      promodizerAllocations.push(newAllocation);
+    });
+    
+    localStorage.setItem('promodizerAllocations', JSON.stringify(promodizerAllocations));
+    
+    funCloseAddPromodizersModal();
+    funLoadPromodizers();
+    funUpdateQuickStats();
+    
+    alert(`${selectedIds.length} promodizer(s) added successfully!`);
+    
+  } catch (error) {
+    console.error('Error adding promodizers:', error);
+    alert('Error adding promodizers');
+  }
+}
+
+function funRemovePromodizer() {
+  if (!currentPromodizerToRemove) return;
+  
+  try {
+    const promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+    const updatedAllocations = promodizerAllocations.filter(alloc => alloc.id !== currentPromodizerToRemove);
+    
+    localStorage.setItem('promodizerAllocations', JSON.stringify(updatedAllocations));
+    
+    funCloseRemovePromodizerModal();
+    funLoadPromodizers();
+    funUpdateQuickStats();
+    
+    alert('Promodizer removed successfully!');
+    
+  } catch (error) {
+    console.error('Error removing promodizer:', error);
+    alert('Error removing promodizer');
+  }
+}
+
+// Delete Store Functions
+function funShowDeleteModal() {
+  funCheckStoreDependencies();
+  document.getElementById('deleteStoreModal').classList.remove('hidden');
+}
+
+function funCloseDeleteStoreModal() {
+  document.getElementById('deleteStoreModal').classList.add('hidden');
+}
+
+function funCheckStoreDependencies() {
+  try {
+    const supervisorAllocations = JSON.parse(localStorage.getItem('supervisorAllocations') || '[]');
+    const promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+    const salesRecords = JSON.parse(localStorage.getItem('salesRecords') || '[]');
+    const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+    
+    const hasSupervisor = supervisorAllocations.some(alloc => alloc.storeId === currentStore.id);
+    const promodizerCount = promodizerAllocations.filter(alloc => alloc.storeId === currentStore.id).length;
+    const salesCount = salesRecords.filter(record => record.storeId === currentStore.id).length;
+    const attendanceCount = attendanceRecords.filter(record => record.storeId === currentStore.id).length;
+    
+    document.getElementById('deleteStoreName').textContent = currentStore.storeName;
+    
+    const dependencies = [];
+    if (hasSupervisor) dependencies.push('1 supervisor assignment');
+    if (promodizerCount > 0) dependencies.push(`${promodizerCount} promodizer allocation(s)`);
+    if (salesCount > 0) dependencies.push(`${salesCount} sales record(s)`);
+    if (attendanceCount > 0) dependencies.push(`${attendanceCount} attendance record(s)`);
+    
+    const dependenciesDiv = document.getElementById('storeDependencies');
+    const forceSection = document.getElementById('forceDeleteSection');
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    
+    if (dependencies.length > 0) {
+      dependenciesDiv.innerHTML = `
+        <p class="mb-2">This store has the following associated records:</p>
+        <ul class="list-disc list-inside text-sm text-slate-600">
+          ${dependencies.map(dep => `<li>${dep}</li>`).join('')}
+        </ul>
+        <p class="mt-2 text-sm text-red-600">Deleting this store will permanently remove all associated records.</p>
+      `;
+      forceSection.classList.remove('hidden');
+      confirmBtn.disabled = true;
+      confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      
+      // Enable delete button when checkbox is checked
+      document.getElementById('forceDeleteCheck').addEventListener('change', function() {
+        if (this.checked) {
+          confirmBtn.disabled = false;
+          confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        } else {
+          confirmBtn.disabled = true;
+          confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+      });
+    } else {
+      dependenciesDiv.innerHTML = '<p class="text-sm text-slate-600">This store has no associated records.</p>';
+      forceSection.classList.add('hidden');
+      confirmBtn.disabled = false;
+      confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+    
+  } catch (error) {
+    console.error('Error checking store dependencies:', error);
+  }
+}
+
+function funDeleteStore() {
+  try {
+    const storeId = currentStore.id;
+    
+    // Remove store
+    const stores = JSON.parse(localStorage.getItem('stores') || '[]');
+    const updatedStores = stores.filter(store => store.id !== storeId);
+    localStorage.setItem('stores', JSON.stringify(updatedStores));
+    
+    // Remove supervisor allocations
+    const supervisorAllocations = JSON.parse(localStorage.getItem('supervisorAllocations') || '[]');
+    const updatedSupervisorAllocations = supervisorAllocations.filter(alloc => alloc.storeId !== storeId);
+    localStorage.setItem('supervisorAllocations', JSON.stringify(updatedSupervisorAllocations));
+    
+    // Remove promodizer allocations
+    const promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+    const updatedPromodizerAllocations = promodizerAllocations.filter(alloc => alloc.storeId !== storeId);
+    localStorage.setItem('promodizerAllocations', JSON.stringify(updatedPromodizerAllocations));
+    
+    // Remove sales records
+    const salesRecords = JSON.parse(localStorage.getItem('salesRecords') || '[]');
+    const updatedSalesRecords = salesRecords.filter(record => record.storeId !== storeId);
+    localStorage.setItem('salesRecords', JSON.stringify(updatedSalesRecords));
+    
+    // Remove attendance records
+    const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+    const updatedAttendanceRecords = attendanceRecords.filter(record => record.storeId !== storeId);
+    localStorage.setItem('attendanceRecords', JSON.stringify(updatedAttendanceRecords));
+    
+    alert('Store deleted successfully!');
+    window.location.href = 'store_list.html';
+    
+  } catch (error) {
+    console.error('Error deleting store:', error);
+    alert('Error deleting store');
+  }
+}
+
+// Navigation Functions
+function funEditStore() {
+  window.location.href = `store_edit.html?id=${currentStore.id}`;
+}
+
+// Utility Functions
+function funFormatAddress(address) {
+  return `${address.street}, ${address.city}, ${address.state} ${address.zipCode}, ${address.country}`;
+}
+
+function funFormatDate(dateString) {
+  return new Date(dateString).toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+}
+</script></body></html>

@@ -1,0 +1,1306 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>GTVL Management Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        /* GTVL Brand Colors */
+        --color-primary: #0F766E; /* Teal-700 - Primary CTAs, navigation highlights */
+        --color-primary-hover: #0D9488; /* Teal-600 - Hover states */
+        --color-secondary: #475569; /* Slate-600 - Secondary elements */
+        --color-accent: #D97706; /* Amber-600 - Call-to-action highlights */
+        --color-surface: #FFFFFF; /* White - Cards, modals, panels */
+        --color-background: #F8FAFC; /* Slate-50 - Page backgrounds */
+        --color-surface-variant: #F1F5F9; /* Slate-100 - Alternate backgrounds */
+        --color-on-background: #0F172A; /* Slate-900 - Primary headings */
+        --color-on-surface: #1E293B; /* Slate-800 - Body text */
+        --color-border: #E2E8F0; /* Slate-200 - Borders */
+        --color-success: #16A34A; /* Green-600 - Success states */
+        --color-warning: #F59E0B; /* Amber-500 - Warning alerts */
+        --color-error: #DC2626; /* Red-600 - Error messages */
+        --color-info: #2563EB; /* Blue-600 - Info messages */
+
+        /* Layout Constants */
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      /* Smooth scrolling */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      /* Layout with CSS variables */
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      /* Mobile sidebar slide states */
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      /* Active nav link styling */
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+        background-color: #f0fdfa;
+        color: var(--color-primary);
+      }
+
+      /* Popover animation states */
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      /* Sidebar backdrop states */
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Promodizer Details - GTVL Management Portal</title><script>
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+});
+</script></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <!-- HEADER SECTION -->
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <!-- Left: Logo & Title -->
+        <div class="flex items-center gap-3">
+          <!-- Mobile Menu Toggle -->
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <!-- Logo -->
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <rect x="68" y="68" width="264" height="264" rx="32" stroke="#0F766E" stroke-width="18"></rect>
+                  <rect x="109" y="143" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                  <rect x="206" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                </g>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">
+              GTVL Management Portal
+            </h1>
+          </div>
+        </div>
+
+        <!-- Right: User Profile -->
+        <div class="flex items-center gap-2 md:gap-3">
+          <!-- User Profile Button -->
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-500 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- User Profile Popover -->
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <!-- User Info Section -->
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-500 truncate"></div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <!-- Main Navigation Section -->
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Management
+          </div>
+          <div class="space-y-1">
+            <a href="management_dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="management_dashboard">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="sku_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sku_list">
+              <i data-lucide="package" class="w-5 h-5"></i>
+              <span>SKUs</span>
+            </a>
+            <a href="store_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="store_list">
+              <i data-lucide="store" class="w-5 h-5"></i>
+              <span>Stores</span>
+            </a>
+            <a href="supervisor_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="supervisor_list">
+              <i data-lucide="user-check" class="w-5 h-5"></i>
+              <span>Supervisors</span>
+            </a>
+            <a href="promodizer_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="promodizer_list">
+              <i data-lucide="users" class="w-5 h-5"></i>
+              <span>Promodizers</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="app-main p-6" id="pageContent" role="main"><nav class="flex mb-6" aria-label="Breadcrumb">
+  <ol class="flex items-center gap-2 text-sm">
+    <li>
+      <a href="management_dashboard.html" class="text-slate-600 hover:text-teal-700 no-underline">
+        Dashboard
+      </a>
+    </li>
+    <li class="text-slate-400">
+      <i data-lucide="chevron-right" class="w-4 h-4"></i>
+    </li>
+    <li>
+      <a href="promodizer_list.html" class="text-slate-600 hover:text-teal-700 no-underline">
+        Promodizers
+      </a>
+    </li>
+    <li class="text-slate-400">
+      <i data-lucide="chevron-right" class="w-4 h-4"></i>
+    </li>
+    <li class="text-teal-700 font-medium" id="breadcrumbPromodizerName">
+      Loading...
+    </li>
+  </ol>
+</nav>
+
+<!-- Main Content Container -->
+<div class="space-y-6">
+  <!-- Header Section -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900" id="promodizerName">
+        Loading...
+      </h1>
+      <div class="flex items-center gap-4 mt-2">
+        <span class="text-sm text-slate-600" id="promodizerEmployeeId">Loading...</span>
+        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium" id="promodizerStatus">
+          Loading...
+        </span>
+      </div>
+      <!-- Quick Stats -->
+      <div class="flex items-center gap-4 mt-3">
+        <div class="flex items-center gap-2">
+          <i data-lucide="store" class="w-4 h-4 text-slate-500"></i>
+          <span class="text-sm text-slate-600">
+            Total Stores: <span class="font-semibold text-slate-900" id="totalStoresCount">0</span>
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="flex items-center gap-2">
+      <button id="editPromodizerBtn" class="inline-flex items-center px-4 py-2 bg-teal-700 text-white text-sm font-medium rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-colors duration-200">
+        <i data-lucide="edit" class="w-4 h-4 mr-2"></i>
+        Edit Promodizer
+      </button>
+      <button id="deletePromodizerBtn" class="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200">
+        <i data-lucide="trash-2" class="w-4 h-4 mr-2"></i>
+        Delete Promodizer
+      </button>
+    </div>
+  </div>
+
+  <!-- Content Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Promodizer Information Card -->
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-lg shadow border border-slate-200 p-6">
+        <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900 mb-4">
+          Promodizer Information
+        </h2>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">
+              Full Name
+            </label>
+            <p class="text-sm text-slate-800" id="fullName">Loading...</p>
+          </div>
+          
+          <div>
+            <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">
+              Employee ID
+            </label>
+            <p class="text-sm text-slate-800" id="employeeId">Loading...</p>
+          </div>
+          
+          <div>
+            <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">
+              Phone
+            </label>
+            <p class="text-sm text-slate-800" id="phone">Loading...</p>
+          </div>
+          
+          <div>
+            <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">
+              Email
+            </label>
+            <p class="text-sm text-slate-800" id="email">Loading...</p>
+          </div>
+          
+          <div>
+            <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">
+              Status
+            </label>
+            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium" id="statusBadge">
+              Loading...
+            </span>
+          </div>
+          
+          <div>
+            <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">
+              Created Date
+            </label>
+            <p class="text-sm text-slate-800" id="createdDate">Loading...</p>
+          </div>
+          
+          <div>
+            <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">
+              Last Updated
+            </label>
+            <p class="text-sm text-slate-800" id="updatedDate">Loading...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Store Assignments Section -->
+    <div class="lg:col-span-2">
+      <div class="bg-white rounded-lg shadow border border-slate-200 p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">
+            Store Assignments
+          </h2>
+          <button id="addStoreAssignmentsBtn" class="inline-flex items-center px-4 py-2 bg-teal-700 text-white text-sm font-medium rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-colors duration-200">
+            <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+            Add Store Assignments
+          </button>
+        </div>
+
+        <!-- Note -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <div class="flex items-start gap-3">
+            <i data-lucide="info" class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0"></i>
+            <p class="text-sm text-blue-800">
+              <strong>Note:</strong> Promodizers can be assigned to multiple stores simultaneously.
+            </p>
+          </div>
+        </div>
+
+        <!-- Store Cards Container -->
+        <div id="storeAssignmentsContainer">
+          <!-- Loading state -->
+          <div class="text-center py-8">
+            <div class="inline-flex items-center gap-2 text-slate-500">
+              <div class="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin"></div>
+              <span class="text-sm">Loading store assignments...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Store Assignments Modal -->
+<div id="addStoreAssignmentsModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,42rem)] max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between p-6 border-b border-slate-200">
+        <h3 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">
+          Add Store Assignments
+        </h3>
+        <button id="closeAddStoreModalBtn" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      
+      <div class="p-6">
+        <div class="mb-4">
+          <p class="text-sm text-slate-600">
+            Select stores to assign to <span id="modalPromodizerName" class="font-medium text-slate-900"></span>:
+          </p>
+        </div>
+        
+        <div id="storeSelectionContainer" class="space-y-3 max-h-96 overflow-y-auto">
+          <!-- Store checkboxes will be populated here -->
+        </div>
+      </div>
+      
+      <div class="flex items-center justify-end gap-3 p-6 border-t border-slate-200 bg-slate-50">
+        <button id="cancelAddStoreBtn" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+          Cancel
+        </button>
+        <button id="confirmAddStoreBtn" class="px-4 py-2 bg-teal-700 text-white text-sm font-medium rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+          Add to Selected Stores
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Remove Assignment Confirmation Modal -->
+<div id="removeAssignmentModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,28rem)] max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between p-6 border-b border-slate-200">
+        <h3 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">
+          Remove Store Assignment
+        </h3>
+        <button id="closeRemoveModalBtn" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      
+      <div class="p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
+            <i data-lucide="alert-triangle" class="w-6 h-6 text-amber-600"></i>
+          </div>
+          <div>
+            <h4 class="text-base font-semibold text-slate-900">Confirm Removal</h4>
+            <p class="text-sm text-slate-600 mt-1" id="removeConfirmationText">
+              This will remove the assignment.
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex items-center justify-end gap-3 p-6 border-t border-slate-200 bg-slate-50">
+        <button id="cancelRemoveBtn" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+          Cancel
+        </button>
+        <button id="confirmRemoveBtn" class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+          Confirm Removal
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteConfirmationModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,32rem)] max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between p-6 border-b border-slate-200">
+        <h3 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">
+          Delete Promodizer
+        </h3>
+        <button id="closeDeleteModalBtn" class="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      
+      <div class="p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+            <i data-lucide="alert-triangle" class="w-6 h-6 text-red-600"></i>
+          </div>
+          <div>
+            <h4 class="text-base font-semibold text-slate-900">Confirm Deletion</h4>
+            <p class="text-sm text-slate-600 mt-1">
+              This action cannot be undone. This will permanently delete the promodizer and remove all associated data.
+            </p>
+          </div>
+        </div>
+        
+        <div class="bg-slate-50 rounded-lg p-4 mb-4">
+          <h5 class="text-sm font-medium text-slate-900 mb-2">Promodizer Details:</h5>
+          <div class="text-sm text-slate-600">
+            <p><strong>Name:</strong> <span id="deleteModalPromodizerName"></span></p>
+            <p><strong>Employee ID:</strong> <span id="deleteModalEmployeeId"></span></p>
+            <p><strong>Store Assignments:</strong> <span id="deleteModalStoreCount"></span></p>
+          </div>
+        </div>
+        
+        <div class="space-y-2">
+          <label class="flex items-center gap-2">
+            <input type="checkbox" id="deleteAssignmentsCheck" class="w-4 h-4 text-teal-600 border-slate-300 rounded focus:ring-teal-500 focus:ring-2">
+            <span class="text-sm text-slate-700">Remove all store assignments</span>
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="checkbox" id="deleteSalesCheck" class="w-4 h-4 text-teal-600 border-slate-300 rounded focus:ring-teal-500 focus:ring-2">
+            <span class="text-sm text-slate-700">Delete all sales records</span>
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="checkbox" id="deleteAttendanceCheck" class="w-4 h-4 text-teal-600 border-slate-300 rounded focus:ring-teal-500 focus:ring-2">
+            <span class="text-sm text-slate-700">Delete all attendance records</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="flex items-center justify-end gap-3 p-6 border-t border-slate-200 bg-slate-50">
+        <button id="cancelDeleteBtn" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+          Cancel
+        </button>
+        <button id="confirmDeleteBtn" class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+          Delete Promodizer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+    <!-- JAVASCRIPT INITIALIZATION -->
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils =
+          window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_mgmt_001");
+                    currentUserId = "usr_mgmt_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } =
+            state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail)
+            return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute(
+            "aria-expanded",
+            shouldOpen ? "true" : "false"
+          );
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active");
+            } else {
+              link.classList.remove("active");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () =>
+            closeMobileSidebar()
+          );
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Get promodizer ID from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const promodizerId = urlParams.get('id');
+  
+  if (!promodizerId) {
+    window.location.href = 'promodizer_list.html';
+    return;
+  }
+
+  let currentPromodizer = null;
+  let currentStoreToRemove = null;
+  let selectedStoresForAdd = [];
+
+  // Load promodizer data
+  function funLoadPromodizerData() {
+    try {
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const promodizer = users.find(user => user.id === promodizerId && user.role === 'promodizer');
+      
+      if (!promodizer) {
+        alert('Promodizer not found!');
+        window.location.href = 'promodizer_list.html';
+        return;
+      }
+
+      currentPromodizer = promodizer;
+      funPopulatePromodizerInfo(promodizer);
+      funLoadStoreAssignments();
+    } catch (error) {
+      console.error('Error loading promodizer data:', error);
+      alert('Error loading promodizer data. Please try again.');
+    }
+  }
+
+  // Populate promodizer information
+  function funPopulatePromodizerInfo(promodizer) {
+    const fullName = `${promodizer.firstName} ${promodizer.lastName}`;
+    
+    // Header elements
+    document.getElementById('promodizerName').textContent = fullName;
+    document.getElementById('breadcrumbPromodizerName').textContent = fullName;
+    document.getElementById('promodizerEmployeeId').textContent = promodizer.employeeId || 'N/A';
+    
+    // Status badge in header
+    const headerStatusEl = document.getElementById('promodizerStatus');
+    if (promodizer.status === 'active') {
+      headerStatusEl.textContent = 'Active';
+      headerStatusEl.className = 'inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800';
+    } else {
+      headerStatusEl.textContent = 'Inactive';
+      headerStatusEl.className = 'inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800';
+    }
+    
+    // Information card
+    document.getElementById('fullName').textContent = fullName;
+    document.getElementById('employeeId').textContent = promodizer.employeeId || 'N/A';
+    document.getElementById('phone').textContent = promodizer.phone || 'N/A';
+    document.getElementById('email').textContent = promodizer.email || 'N/A';
+    
+    // Status badge in info card
+    const statusBadgeEl = document.getElementById('statusBadge');
+    if (promodizer.status === 'active') {
+      statusBadgeEl.textContent = 'Active';
+      statusBadgeEl.className = 'inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800';
+    } else {
+      statusBadgeEl.textContent = 'Inactive';
+      statusBadgeEl.className = 'inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800';
+    }
+    
+    // Dates
+    document.getElementById('createdDate').textContent = funFormatDate(promodizer.createdAt);
+    document.getElementById('updatedDate').textContent = funFormatDate(promodizer.updatedAt);
+  }
+
+  // Load store assignments
+  function funLoadStoreAssignments() {
+    try {
+      const promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+      const stores = JSON.parse(localStorage.getItem('stores') || '[]');
+      
+      const assignments = promodizerAllocations.filter(allocation => 
+        allocation.promodizerId === promodizerId
+      );
+      
+      // Update total stores count
+      document.getElementById('totalStoresCount').textContent = assignments.length;
+      
+      const container = document.getElementById('storeAssignmentsContainer');
+      
+      if (assignments.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12">
+            <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i data-lucide="store" class="w-6 h-6 text-slate-400"></i>
+            </div>
+            <h3 class="text-base font-medium text-slate-900 mb-2">No Store Assignments</h3>
+            <p class="text-sm text-slate-500 mb-4">This promodizer is not currently assigned to any stores.</p>
+            <button 
+              onclick="funOpenAddStoreModal()"
+              class="inline-flex items-center px-4 py-2 bg-teal-700 text-white text-sm font-medium rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-colors duration-200"
+            >
+              <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+              Add Store Assignment
+            </button>
+          </div>
+        `;
+        if (typeof window.lucide?.createIcons === 'function') {
+          window.lucide.createIcons();
+        }
+        return;
+      }
+      
+      const storeCards = assignments.map(assignment => {
+        const store = stores.find(s => s.id === assignment.storeId);
+        if (!store) return '';
+        
+        return `
+          <div class="border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
+            <div class="flex items-start justify-between">
+              <div class="flex-1 min-w-0">
+                <h3 class="text-base font-semibold text-slate-900 mb-1">
+                  <a href="store_details.html?id=${store.id}" class="text-teal-700 hover:text-teal-800 no-underline">
+                    ${store.storeName}
+                  </a>
+                </h3>
+                <p class="text-sm text-slate-600 mb-2">${store.storeCode}</p>
+                <p class="text-sm text-slate-500">
+                  <i data-lucide="map-pin" class="w-4 h-4 inline mr-1"></i>
+                  ${store.address.city}, ${store.address.state}
+                </p>
+                <p class="text-xs text-slate-400 mt-2">
+                  Assigned: ${funFormatDate(assignment.allocatedAt)}
+                </p>
+              </div>
+              <button 
+                onclick="funOpenRemoveModal('${assignment.id}', '${store.storeName}')"
+                class="ml-4 px-3 py-1 text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200"
+              >
+                Remove Assignment
+              </button>
+            </div>
+          </div>
+        `;
+      }).filter(card => card !== '').join('');
+      
+      container.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          ${storeCards}
+        </div>
+      `;
+      
+      if (typeof window.lucide?.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+    } catch (error) {
+      console.error('Error loading store assignments:', error);
+      document.getElementById('storeAssignmentsContainer').innerHTML = `
+        <div class="text-center py-8 text-red-600">
+          <p class="text-sm">Error loading store assignments. Please refresh the page.</p>
+        </div>
+      `;
+    }
+  }
+
+  // Open add store modal
+  function funOpenAddStoreModal() {
+    try {
+      const stores = JSON.parse(localStorage.getItem('stores') || '[]');
+      const promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+      
+      // Get currently assigned stores
+      const assignedStoreIds = promodizerAllocations
+        .filter(allocation => allocation.promodizerId === promodizerId)
+        .map(allocation => allocation.storeId);
+      
+      // Get promodizer count per store
+      const storePromodizerCounts = {};
+      promodizerAllocations.forEach(allocation => {
+        if (storePromodizerCounts[allocation.storeId]) {
+          storePromodizerCounts[allocation.storeId]++;
+        } else {
+          storePromodizerCounts[allocation.storeId] = 1;
+        }
+      });
+      
+      const container = document.getElementById('storeSelectionContainer');
+      const checkboxes = stores.map(store => {
+        const isAssigned = assignedStoreIds.includes(store.id);
+        const promodizerCount = storePromodizerCounts[store.id] || 0;
+        
+        return `
+          <div class="flex items-center p-3 border border-slate-200 rounded-lg ${isAssigned ? 'bg-slate-50' : 'hover:bg-slate-50'}">
+            <input 
+              type="checkbox" 
+              id="store_${store.id}" 
+              value="${store.id}"
+              ${isAssigned ? 'checked disabled' : ''}
+              class="w-4 h-4 text-teal-600 border-slate-300 rounded focus:ring-teal-500 focus:ring-2 ${isAssigned ? 'opacity-50' : ''}"
+            >
+            <label for="store_${store.id}" class="ml-3 flex-1 ${isAssigned ? 'opacity-50' : ''}">
+              <div class="text-sm font-medium text-slate-900">
+                ${store.storeName} ${isAssigned ? '<span class="text-slate-500">(Currently Assigned)</span>' : ''}
+              </div>
+              <div class="text-xs text-slate-500">
+                ${store.storeCode} • ${store.address.city}, ${store.address.state} • ${promodizerCount} promodizer${promodizerCount !== 1 ? 's' : ''}
+              </div>
+            </label>
+          </div>
+        `;
+      }).join('');
+      
+      container.innerHTML = checkboxes;
+      document.getElementById('modalPromodizerName').textContent = `${currentPromodizer.firstName} ${currentPromodizer.lastName}`;
+      
+      selectedStoresForAdd = [];
+      document.getElementById('addStoreAssignmentsModal').classList.remove('hidden');
+      
+      // Add event listeners to checkboxes
+      container.querySelectorAll('input[type="checkbox"]:not(:disabled)').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          if (this.checked) {
+            selectedStoresForAdd.push(this.value);
+          } else {
+            selectedStoresForAdd = selectedStoresForAdd.filter(id => id !== this.value);
+          }
+        });
+      });
+      
+    } catch (error) {
+      console.error('Error opening add store modal:', error);
+      alert('Error loading store data. Please try again.');
+    }
+  }
+
+  // Open remove modal
+  function funOpenRemoveModal(allocationId, storeName) {
+    currentStoreToRemove = allocationId;
+    document.getElementById('removeConfirmationText').textContent = 
+      `This will remove ${currentPromodizer.firstName} ${currentPromodizer.lastName} from ${storeName}.`;
+    document.getElementById('removeAssignmentModal').classList.remove('hidden');
+  }
+
+  // Confirm add stores
+  function funConfirmAddStores() {
+    if (selectedStoresForAdd.length === 0) {
+      alert('Please select at least one store to assign.');
+      return;
+    }
+
+    try {
+      const promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+      
+      selectedStoresForAdd.forEach(storeId => {
+        const newAllocation = {
+          id: `proalc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          promodizerId: promodizerId,
+          storeId: storeId,
+          supervisorId: null,
+          allocatedAt: new Date().toISOString(),
+          createdAt: new Date().toISOString()
+        };
+        promodizerAllocations.push(newAllocation);
+      });
+      
+      localStorage.setItem('promodizerAllocations', JSON.stringify(promodizerAllocations));
+      
+      // Close modal and reload assignments
+      document.getElementById('addStoreAssignmentsModal').classList.add('hidden');
+      funLoadStoreAssignments();
+      
+      // Show success message
+      alert(`Successfully assigned to ${selectedStoresForAdd.length} store${selectedStoresForAdd.length !== 1 ? 's' : ''}!`);
+      
+    } catch (error) {
+      console.error('Error adding store assignments:', error);
+      alert('Error adding store assignments. Please try again.');
+    }
+  }
+
+  // Confirm remove assignment
+  function funConfirmRemoveAssignment() {
+    if (!currentStoreToRemove) return;
+
+    try {
+      let promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+      
+      promodizerAllocations = promodizerAllocations.filter(allocation => 
+        allocation.id !== currentStoreToRemove
+      );
+      
+      localStorage.setItem('promodizerAllocations', JSON.stringify(promodizerAllocations));
+      
+      // Close modal and reload assignments
+      document.getElementById('removeAssignmentModal').classList.add('hidden');
+      funLoadStoreAssignments();
+      
+      alert('Store assignment removed successfully!');
+      currentStoreToRemove = null;
+      
+    } catch (error) {
+      console.error('Error removing assignment:', error);
+      alert('Error removing assignment. Please try again.');
+    }
+  }
+
+  // Open delete confirmation modal
+  function funOpenDeleteModal() {
+    try {
+      const promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+      const stores = JSON.parse(localStorage.getItem('stores') || '[]');
+      
+      const assignments = promodizerAllocations.filter(allocation => 
+        allocation.promodizerId === promodizerId
+      );
+      
+      document.getElementById('deleteModalPromodizerName').textContent = 
+        `${currentPromodizer.firstName} ${currentPromodizer.lastName}`;
+      document.getElementById('deleteModalEmployeeId').textContent = currentPromodizer.employeeId || 'N/A';
+      document.getElementById('deleteModalStoreCount').textContent = 
+        `${assignments.length} store${assignments.length !== 1 ? 's' : ''}`;
+      
+      // Reset checkboxes
+      document.getElementById('deleteAssignmentsCheck').checked = true;
+      document.getElementById('deleteSalesCheck').checked = false;
+      document.getElementById('deleteAttendanceCheck').checked = false;
+      
+      document.getElementById('deleteConfirmationModal').classList.remove('hidden');
+    } catch (error) {
+      console.error('Error opening delete modal:', error);
+      alert('Error loading delete confirmation. Please try again.');
+    }
+  }
+
+  // Confirm delete promodizer
+  function funConfirmDeletePromodizer() {
+    try {
+      const deleteAssignments = document.getElementById('deleteAssignmentsCheck').checked;
+      const deleteSales = document.getElementById('deleteSalesCheck').checked;
+      const deleteAttendance = document.getElementById('deleteAttendanceCheck').checked;
+      
+      // Remove promodizer from users
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
+      users = users.filter(user => user.id !== promodizerId);
+      localStorage.setItem('users', JSON.stringify(users));
+      
+      if (deleteAssignments) {
+        let promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+        promodizerAllocations = promodizerAllocations.filter(allocation => 
+          allocation.promodizerId !== promodizerId
+        );
+        localStorage.setItem('promodizerAllocations', JSON.stringify(promodizerAllocations));
+      }
+      
+      if (deleteSales) {
+        let salesRecords = JSON.parse(localStorage.getItem('salesRecords') || '[]');
+        salesRecords = salesRecords.filter(record => 
+          record.recordedById !== promodizerId
+        );
+        localStorage.setItem('salesRecords', JSON.stringify(salesRecords));
+      }
+      
+      if (deleteAttendance) {
+        let attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+        attendanceRecords = attendanceRecords.filter(record => 
+          record.userId !== promodizerId
+        );
+        localStorage.setItem('attendanceRecords', JSON.stringify(attendanceRecords));
+      }
+      
+      alert('Promodizer deleted successfully!');
+      window.location.href = 'promodizer_list.html';
+      
+    } catch (error) {
+      console.error('Error deleting promodizer:', error);
+      alert('Error deleting promodizer. Please try again.');
+    }
+  }
+
+  // Format date helper
+  function funFormatDate(dateString) {
+    if (!dateString) return 'N/A';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    } catch (error) {
+      return 'Invalid Date';
+    }
+  }
+
+  // Event listeners
+  document.getElementById('editPromodizerBtn').addEventListener('click', () => {
+    window.location.href = `promodizer_edit.html?id=${promodizerId}`;
+  });
+
+  document.getElementById('deletePromodizerBtn').addEventListener('click', funOpenDeleteModal);
+  document.getElementById('addStoreAssignmentsBtn').addEventListener('click', funOpenAddStoreModal);
+
+  // Modal close buttons
+  document.getElementById('closeAddStoreModalBtn').addEventListener('click', () => {
+    document.getElementById('addStoreAssignmentsModal').classList.add('hidden');
+  });
+
+  document.getElementById('cancelAddStoreBtn').addEventListener('click', () => {
+    document.getElementById('addStoreAssignmentsModal').classList.add('hidden');
+  });
+
+  document.getElementById('confirmAddStoreBtn').addEventListener('click', funConfirmAddStores);
+
+  document.getElementById('closeRemoveModalBtn').addEventListener('click', () => {
+    document.getElementById('removeAssignmentModal').classList.add('hidden');
+  });
+
+  document.getElementById('cancelRemoveBtn').addEventListener('click', () => {
+    document.getElementById('removeAssignmentModal').classList.add('hidden');
+  });
+
+  document.getElementById('confirmRemoveBtn').addEventListener('click', funConfirmRemoveAssignment);
+
+  document.getElementById('closeDeleteModalBtn').addEventListener('click', () => {
+    document.getElementById('deleteConfirmationModal').classList.add('hidden');
+  });
+
+  document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
+    document.getElementById('deleteConfirmationModal').classList.add('hidden');
+  });
+
+  document.getElementById('confirmDeleteBtn').addEventListener('click', funConfirmDeletePromodizer);
+
+  // Make functions globally available
+  window.funOpenAddStoreModal = funOpenAddStoreModal;
+  window.funOpenRemoveModal = funOpenRemoveModal;
+
+  // Set active nav link
+  if (window.TemplateUtils && window.TemplateUtils.setActiveNavLink) {
+    window.TemplateUtils.setActiveNavLink('promodizer_list');
+  }
+
+  // Initialize page
+  funLoadPromodizerData();
+});
+</script></body></html>

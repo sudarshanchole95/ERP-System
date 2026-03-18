@@ -1,0 +1,1691 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>Sales Analytics Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-primary: #0F766E;
+        --color-primary-hover: #0D9488;
+        --color-secondary: #475569;
+        --color-accent: #D97706;
+        --color-background: #F8FAFC;
+        --color-surface: #FFFFFF;
+        --color-surface-variant: #F1F5F9;
+        --color-on-background: #0F172A;
+        --color-on-surface: #1E293B;
+        --color-border: #E2E8F0;
+        --color-success: #16A34A;
+        --color-warning: #F59E0B;
+        --color-error: #DC2626;
+        --color-info: #2563EB;
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+      }
+
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Store Performance Analysis</title></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="68" y="68" width="264" height="264" rx="32" stroke="#0F766E" stroke-width="18"></rect>
+                <rect x="109" y="143" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="109" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="109" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                <rect x="206" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="206" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">Sales Analytics Dashboard</h1>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 md:gap-3">
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-600 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-600 truncate"></div>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Analytics</div>
+          <div class="space-y-1">
+            <a href="dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="dashboard">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="sku_performance_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sku_performance">
+              <i data-lucide="package" class="w-5 h-5"></i>
+              <span>SKU Performance</span>
+            </a>
+            <a href="store_performance_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="store_performance">
+              <i data-lucide="store" class="w-5 h-5"></i>
+              <span>Store Performance</span>
+            </a>
+            <a href="staff_performance_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="staff_performance">
+              <i data-lucide="users" class="w-5 h-5"></i>
+              <span>Staff Performance</span>
+            </a>
+            <a href="transaction_history.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="transaction_history">
+              <i data-lucide="receipt" class="w-5 h-5"></i>
+              <span>Transaction History</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="py-6 border-b border-slate-100 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Tools</div>
+          <div class="space-y-1">
+            <a href="reports_configuration.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="reports">
+              <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+              <span>Reports</span>
+            </a>
+            <a href="settings.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="settings">
+              <i data-lucide="settings" class="w-5 h-5"></i>
+              <span>Settings</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="app-main p-6" id="pageContent" role="main"><nav class="mb-6" aria-label="Breadcrumb">
+  <ol class="flex items-center space-x-2 text-sm text-slate-600">
+    <li>
+      <a href="dashboard.html" class="hover:text-teal-700 transition-colors duration-200">Dashboard</a>
+    </li>
+    <li class="flex items-center">
+      <i data-lucide="chevron-right" class="w-4 h-4 mx-2 text-slate-400"></i>
+      <span class="text-slate-900 font-medium">Store Performance</span>
+    </li>
+  </ol>
+</nav>
+
+<!-- Page Header -->
+<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+  <div>
+    <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900">Store Performance Analysis</h1>
+    <p class="text-sm leading-[1.375rem] font-normal text-slate-600 mt-1">Analyze and compare store-level sales performance across locations</p>
+  </div>
+  
+  <!-- Header Controls -->
+  <div class="flex items-center gap-3">
+    <!-- Date Range Filter -->
+    <div class="flex items-center gap-2">
+      <label class="text-sm font-medium text-slate-700">Date Range:</label>
+      <select id="dateRangeFilter" class="px-3 py-2 border border-slate-200 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+        <option value="all">All Time</option>
+        <option value="7">Last 7 days</option>
+        <option value="30">Last 30 days</option>
+        <option value="90">Last 90 days</option>
+        <option value="custom">Custom Range</option>
+      </select>
+    </div>
+    
+    <!-- Search Bar -->
+    <div class="relative">
+      <input type="text" id="searchInput" placeholder="Search stores..." class="pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 w-64">
+      <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+    </div>
+    
+    <!-- Export Button -->
+    <button id="exportButton" class="flex items-center gap-2 px-4 py-2 bg-teal-700 text-white rounded-lg text-sm font-semibold hover:bg-teal-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+      <i data-lucide="download" class="w-4 h-4"></i>
+      Export
+    </button>
+  </div>
+</div>
+
+<!-- Custom Date Range Inputs (Initially Hidden) -->
+<div id="customDateRange" class="hidden mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
+  <div class="flex items-center gap-4">
+    <div class="flex items-center gap-2">
+      <label class="text-sm font-medium text-slate-700">From:</label>
+      <input type="date" id="startDate" class="px-3 py-2 border border-slate-200 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+    </div>
+    <div class="flex items-center gap-2">
+      <label class="text-sm font-medium text-slate-700">To:</label>
+      <input type="date" id="endDate" class="px-3 py-2 border border-slate-200 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+    </div>
+    <button id="applyCustomDateRange" class="px-4 py-2 bg-teal-700 text-white rounded text-sm font-semibold hover:bg-teal-600 transition-colors duration-200">
+      Apply
+    </button>
+  </div>
+</div>
+
+<!-- Main Content Area -->
+<div class="flex gap-6">
+  <!-- Filter Sidebar -->
+  <div class="w-64 flex-shrink-0">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 sticky top-6">
+      <h3 class="text-base leading-6 font-semibold text-slate-900 mb-4">Filters</h3>
+      
+      <!-- State Filter -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-slate-700 mb-2">State</label>
+        <select id="stateFilter" class="w-full px-3 py-2 border border-slate-200 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+          <option value="">All States</option>
+        </select>
+      </div>
+      
+      <!-- City Filter -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-slate-700 mb-2">City</label>
+        <select id="cityFilter" class="w-full px-3 py-2 border border-slate-200 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500" disabled="">
+          <option value="">Select state first</option>
+        </select>
+      </div>
+      
+      <!-- Sales Volume Range -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-slate-700 mb-2">Sales Volume</label>
+        <div class="space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-slate-600">Min:</span>
+            <input type="number" id="minSalesVolume" placeholder="0" class="flex-1 px-2 py-1 border border-slate-200 rounded text-xs bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500">
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-slate-600">Max:</span>
+            <input type="number" id="maxSalesVolume" placeholder="1000" class="flex-1 px-2 py-1 border border-slate-200 rounded text-xs bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500">
+          </div>
+        </div>
+      </div>
+      
+      <!-- Status Filter -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-slate-700 mb-2">Status</label>
+        <div class="space-y-2">
+          <label class="flex items-center">
+            <input type="checkbox" id="activeStatus" checked="" class="rounded border-slate-300 text-teal-600 focus:ring-teal-500">
+            <span class="ml-2 text-sm text-slate-700">Active</span>
+          </label>
+          <label class="flex items-center">
+            <input type="checkbox" id="inactiveStatus" class="rounded border-slate-300 text-teal-600 focus:ring-teal-500">
+            <span class="ml-2 text-sm text-slate-700">Inactive</span>
+          </label>
+        </div>
+      </div>
+      
+      <!-- Filter Actions -->
+      <div class="space-y-2">
+        <button id="applyFilters" class="w-full px-4 py-2 bg-teal-700 text-white rounded text-sm font-semibold hover:bg-teal-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+          Apply Filters
+        </button>
+        <button id="clearFilters" class="w-full px-4 py-2 border border-slate-200 text-slate-700 rounded text-sm font-semibold hover:bg-slate-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+          Clear All Filters
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Main Content -->
+  <div class="flex-1">
+    <!-- Active Filters Display -->
+    <div id="activeFiltersContainer" class="hidden mb-4">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-sm font-medium text-slate-700">Active Filters:</span>
+        <div id="activeFiltersDisplay" class="flex items-center gap-2 flex-wrap"></div>
+      </div>
+    </div>
+    
+    <!-- Table Container -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <!-- Table Header -->
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <h3 class="text-base leading-6 font-semibold text-slate-900">Store Performance Data</h3>
+          <span id="resultCount" class="text-sm text-slate-600"></span>
+        </div>
+        
+        <!-- View Toggle -->
+        <div class="flex items-center gap-2">
+          <button id="tableViewToggle" class="flex items-center gap-2 px-3 py-2 bg-teal-700 text-white rounded text-sm font-medium">
+            <i data-lucide="table" class="w-4 h-4"></i>
+            Table View
+          </button>
+          <button id="chartViewToggle" class="flex items-center gap-2 px-3 py-2 border border-slate-200 text-slate-700 rounded text-sm font-medium hover:bg-slate-50 transition-colors duration-200">
+            <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+            Chart View
+          </button>
+        </div>
+      </div>
+      
+      <!-- Loading Spinner -->
+      <div id="loadingSpinner" class="hidden flex items-center justify-center py-12">
+        <div class="flex items-center gap-3">
+          <div class="w-6 h-6 border-3 border-teal-200 border-t-teal-600 rounded-full animate-spin"></div>
+          <span class="text-sm text-slate-600">Loading store data...</span>
+        </div>
+      </div>
+      
+      <!-- Empty State -->
+      <div id="emptyState" class="hidden flex flex-col items-center justify-center py-12 px-6 text-center">
+        <i data-lucide="store" class="w-12 h-12 text-slate-400 mb-4"></i>
+        <h3 class="text-base font-semibold text-slate-900 mb-2">No Stores Found</h3>
+        <p class="text-sm text-slate-600 mb-4">No stores match your current filter criteria.</p>
+        <button id="clearFiltersFromEmpty" class="px-4 py-2 bg-teal-700 text-white rounded text-sm font-semibold hover:bg-teal-600 transition-colors duration-200">
+          Clear All Filters
+        </button>
+      </div>
+      
+      <!-- Data Table -->
+      <div id="tableContainer" class="overflow-x-auto">
+        <table class="min-w-full">
+          <thead class="bg-slate-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-900 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors" data-sort="storeCode">
+                <div class="flex items-center gap-1">
+                  Store Code
+                  <i data-lucide="arrow-up-down" class="w-3 h-3 text-slate-400"></i>
+                </div>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-900 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors" data-sort="storeName">
+                <div class="flex items-center gap-1">
+                  Store Name
+                  <i data-lucide="arrow-up-down" class="w-3 h-3 text-slate-400"></i>
+                </div>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-900 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors" data-sort="city">
+                <div class="flex items-center gap-1">
+                  City
+                  <i data-lucide="arrow-up-down" class="w-3 h-3 text-slate-400"></i>
+                </div>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-900 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors" data-sort="state">
+                <div class="flex items-center gap-1">
+                  State
+                  <i data-lucide="arrow-up-down" class="w-3 h-3 text-slate-400"></i>
+                </div>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-900 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors" data-sort="totalQuantity">
+                <div class="flex items-center gap-1">
+                  Total Quantity Sold
+                  <i data-lucide="arrow-up-down" class="w-3 h-3 text-slate-400"></i>
+                </div>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-900 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors" data-sort="totalTransactions">
+                <div class="flex items-center gap-1">
+                  Total Transactions
+                  <i data-lucide="arrow-up-down" class="w-3 h-3 text-slate-400"></i>
+                </div>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-900 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors" data-sort="uniqueSkus">
+                <div class="flex items-center gap-1">
+                  SKUs Sold
+                  <i data-lucide="arrow-up-down" class="w-3 h-3 text-slate-400"></i>
+                </div>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-900 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors" data-sort="activeStaff">
+                <div class="flex items-center gap-1">
+                  Active Staff
+                  <i data-lucide="arrow-up-down" class="w-3 h-3 text-slate-400"></i>
+                </div>
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-slate-900 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors" data-sort="lastSaleDate">
+                <div class="flex items-center gap-1">
+                  Last Sale Date
+                  <i data-lucide="arrow-up-down" class="w-3 h-3 text-slate-400"></i>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="storeTableBody" class="bg-white divide-y divide-slate-200">
+            <!-- Data will be populated by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Pagination -->
+      <div id="paginationContainer" class="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">Show</span>
+          <select id="itemsPerPage" class="px-2 py-1 border border-slate-200 rounded text-sm bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500">
+            <option value="25">25</option>
+            <option value="50" selected="">50</option>
+            <option value="100">100</option>
+          </select>
+          <span class="text-sm text-slate-600">items per page</span>
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <span id="paginationInfo" class="text-sm text-slate-600"></span>
+          <div class="flex items-center gap-1">
+            <button id="prevPage" class="px-3 py-2 border border-slate-200 rounded text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed" disabled="">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            </button>
+            <div id="pageNumbers" class="flex items-center gap-1"></div>
+            <button id="nextPage" class="px-3 py-2 border border-slate-200 rounded text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Export Options Modal -->
+<div id="exportModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,32rem)] max-h-[90vh] overflow-y-auto">
+      <div class="px-6 py-4 border-b border-slate-200">
+        <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Export Store Performance Data</h2>
+      </div>
+      
+      <div class="p-6 space-y-6">
+        <!-- Export Format Selection -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-3">Export Format</label>
+          <div class="space-y-3">
+            <label class="flex items-center p-4 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
+              <input type="radio" name="exportFormat" value="csv" checked="" class="text-teal-600 focus:ring-teal-500 border-slate-300">
+              <div class="ml-3">
+                <div class="text-sm font-medium text-slate-900">CSV Format</div>
+                <div class="text-xs text-slate-600">Comma-separated values, compatible with Excel</div>
+              </div>
+            </label>
+            <label class="flex items-center p-4 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
+              <input type="radio" name="exportFormat" value="json" class="text-teal-600 focus:ring-teal-500 border-slate-300">
+              <div class="ml-3">
+                <div class="text-sm font-medium text-slate-900">JSON Format</div>
+                <div class="text-xs text-slate-600">JavaScript Object Notation, for developers</div>
+              </div>
+            </label>
+          </div>
+        </div>
+        
+        <!-- Export Options -->
+        <div>
+          <label class="flex items-center">
+            <input type="checkbox" id="includeFilteredOnly" checked="" class="rounded border-slate-300 text-teal-600 focus:ring-teal-500">
+            <span class="ml-2 text-sm text-slate-700">Include only filtered results</span>
+          </label>
+        </div>
+        
+        <!-- File Name Preview -->
+        <div class="p-3 bg-slate-50 rounded border border-slate-200">
+          <div class="text-xs font-medium text-slate-700 mb-1">Export file name:</div>
+          <div id="exportFileName" class="text-sm text-slate-900 font-mono"></div>
+        </div>
+        
+        <!-- Export Summary -->
+        <div id="exportSummary" class="text-sm text-slate-600"></div>
+        
+        <!-- Error Display -->
+        <div id="exportError" class="hidden p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700"></div>
+      </div>
+      
+      <div class="px-6 py-4 border-t border-slate-200 flex items-center justify-end gap-3">
+        <button id="cancelExport" class="px-4 py-2 border border-slate-200 text-slate-700 rounded text-sm font-semibold hover:bg-slate-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+          Cancel
+        </button>
+        <button id="confirmExport" class="px-4 py-2 bg-teal-700 text-white rounded text-sm font-semibold hover:bg-teal-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+          Export
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils = window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_sales_001");
+                    currentUserId = "usr_sales_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent = TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent = TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } = state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail) return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent = TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent = TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active", "bg-teal-50", "text-teal-700");
+            } else {
+              link.classList.remove("active", "bg-teal-50", "text-teal-700");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () => closeMobileSidebar());
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+// Utility: portal a modal by id (idempotent)
+function funPortalModalToBody(id) {
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+
+  // Set active navigation
+  if (window.TemplateUtils && window.TemplateUtils.setActiveNavLink) {
+    window.TemplateUtils.setActiveNavLink('store_performance');
+  }
+
+  // State management
+  const state = {
+    stores: [],
+    salesRecords: [],
+    filteredStores: [],
+    currentPage: 1,
+    itemsPerPage: 50,
+    sortField: 'totalQuantity',
+    sortDirection: 'desc',
+    filters: {
+      search: '',
+      state: '',
+      city: '',
+      minSalesVolume: null,
+      maxSalesVolume: null,
+      activeStatus: true,
+      inactiveStatus: false,
+      dateRange: 'all',
+      startDate: null,
+      endDate: null
+    }
+  };
+
+  // DOM elements
+  const elements = {
+    // Filters
+    searchInput: document.getElementById('searchInput'),
+    stateFilter: document.getElementById('stateFilter'),
+    cityFilter: document.getElementById('cityFilter'),
+    minSalesVolume: document.getElementById('minSalesVolume'),
+    maxSalesVolume: document.getElementById('maxSalesVolume'),
+    activeStatus: document.getElementById('activeStatus'),
+    inactiveStatus: document.getElementById('inactiveStatus'),
+    dateRangeFilter: document.getElementById('dateRangeFilter'),
+    customDateRange: document.getElementById('customDateRange'),
+    startDate: document.getElementById('startDate'),
+    endDate: document.getElementById('endDate'),
+    applyCustomDateRange: document.getElementById('applyCustomDateRange'),
+    
+    // Filter actions
+    applyFilters: document.getElementById('applyFilters'),
+    clearFilters: document.getElementById('clearFilters'),
+    clearFiltersFromEmpty: document.getElementById('clearFiltersFromEmpty'),
+    
+    // Display
+    activeFiltersContainer: document.getElementById('activeFiltersContainer'),
+    activeFiltersDisplay: document.getElementById('activeFiltersDisplay'),
+    loadingSpinner: document.getElementById('loadingSpinner'),
+    emptyState: document.getElementById('emptyState'),
+    tableContainer: document.getElementById('tableContainer'),
+    storeTableBody: document.getElementById('storeTableBody'),
+    resultCount: document.getElementById('resultCount'),
+    
+    // Pagination
+    paginationContainer: document.getElementById('paginationContainer'),
+    paginationInfo: document.getElementById('paginationInfo'),
+    itemsPerPage: document.getElementById('itemsPerPage'),
+    prevPage: document.getElementById('prevPage'),
+    nextPage: document.getElementById('nextPage'),
+    pageNumbers: document.getElementById('pageNumbers'),
+    
+    // Export
+    exportButton: document.getElementById('exportButton'),
+    exportModal: document.getElementById('exportModal'),
+    cancelExport: document.getElementById('cancelExport'),
+    confirmExport: document.getElementById('confirmExport'),
+    exportFileName: document.getElementById('exportFileName'),
+    exportSummary: document.getElementById('exportSummary'),
+    exportError: document.getElementById('exportError'),
+    includeFilteredOnly: document.getElementById('includeFilteredOnly'),
+    
+    // View toggle
+    tableViewToggle: document.getElementById('tableViewToggle'),
+    chartViewToggle: document.getElementById('chartViewToggle')
+  };
+
+  // Utility functions
+  function funFormatDate(dateString) {
+    if (!dateString) return 'Never';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-IN', { 
+      day: '2-digit', 
+      month: '2-digit', 
+      year: 'numeric' 
+    });
+  }
+
+  function funFormatNumber(num) {
+    return new Intl.NumberFormat('en-IN').format(num);
+  }
+
+  function funDebounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
+  function funShowLoading(show = true) {
+    elements.loadingSpinner.classList.toggle('hidden', !show);
+    elements.tableContainer.classList.toggle('hidden', show);
+    elements.paginationContainer.classList.toggle('hidden', show);
+  }
+
+  function funShowEmptyState(show = true) {
+    elements.emptyState.classList.toggle('hidden', !show);
+    elements.tableContainer.classList.toggle('hidden', show);
+    elements.paginationContainer.classList.toggle('hidden', show);
+  }
+
+  // Data loading functions
+  function funLoadData() {
+    try {
+      state.stores = JSON.parse(localStorage.getItem('stores') || '[]');
+      state.salesRecords = JSON.parse(localStorage.getItem('salesRecords') || '[]');
+      
+      // Process store performance data
+      state.stores = state.stores.map(store => {
+        const storeRecords = state.salesRecords.filter(record => record.storeId === store.id);
+        
+        const totalQuantity = storeRecords.reduce((sum, record) => {
+          return sum + record.scannedSkus.reduce((skuSum, sku) => skuSum + sku.quantity, 0);
+        }, 0);
+        
+        const totalTransactions = storeRecords.length;
+        
+        const uniqueSkus = new Set();
+        storeRecords.forEach(record => {
+          record.scannedSkus.forEach(sku => {
+            uniqueSkus.add(sku.skuId);
+          });
+        });
+        
+        const activeStaff = new Set();
+        storeRecords.forEach(record => {
+          activeStaff.add(record.recordedById);
+        });
+        
+        const lastSaleDate = storeRecords.length > 0 
+          ? storeRecords.reduce((latest, record) => {
+              return new Date(record.recordedAt) > new Date(latest) ? record.recordedAt : latest;
+            }, storeRecords[0].recordedAt)
+          : null;
+
+        return {
+          ...store,
+          totalQuantity,
+          totalTransactions,
+          uniqueSkus: uniqueSkus.size,
+          activeStaff: activeStaff.size,
+          lastSaleDate
+        };
+      });
+      
+      funPopulateStateFilter();
+      funApplyFilters();
+      
+    } catch (error) {
+      console.error('Error loading data:', error);
+    }
+  }
+
+  function funPopulateStateFilter() {
+    const states = [...new Set(state.stores.map(store => store.address.state))].sort();
+    elements.stateFilter.innerHTML = '<option value="">All States</option>';
+    states.forEach(state => {
+      const option = document.createElement('option');
+      option.value = state;
+      option.textContent = state;
+      elements.stateFilter.appendChild(option);
+    });
+  }
+
+  function funUpdateCityFilter() {
+    const selectedState = elements.stateFilter.value;
+    elements.cityFilter.innerHTML = '<option value="">All Cities</option>';
+    
+    if (!selectedState) {
+      elements.cityFilter.disabled = true;
+      elements.cityFilter.innerHTML = '<option value="">Select state first</option>';
+      return;
+    }
+    
+    elements.cityFilter.disabled = false;
+    const cities = [...new Set(
+      state.stores
+        .filter(store => store.address.state === selectedState)
+        .map(store => store.address.city)
+    )].sort();
+    
+    cities.forEach(city => {
+      const option = document.createElement('option');
+      option.value = city;
+      option.textContent = city;
+      elements.cityFilter.appendChild(option);
+    });
+  }
+
+  // Filter functions
+  function funApplyFilters() {
+    funShowLoading(true);
+    
+    setTimeout(() => {
+      let filtered = [...state.stores];
+      
+      // Search filter
+      if (state.filters.search) {
+        const searchTerm = state.filters.search.toLowerCase();
+        filtered = filtered.filter(store => 
+          store.storeCode.toLowerCase().includes(searchTerm) ||
+          store.storeName.toLowerCase().includes(searchTerm) ||
+          store.address.city.toLowerCase().includes(searchTerm) ||
+          store.address.state.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      // State filter
+      if (state.filters.state) {
+        filtered = filtered.filter(store => store.address.state === state.filters.state);
+      }
+      
+      // City filter
+      if (state.filters.city) {
+        filtered = filtered.filter(store => store.address.city === state.filters.city);
+      }
+      
+      // Sales volume filter
+      if (state.filters.minSalesVolume !== null) {
+        filtered = filtered.filter(store => store.totalQuantity >= state.filters.minSalesVolume);
+      }
+      
+      if (state.filters.maxSalesVolume !== null) {
+        filtered = filtered.filter(store => store.totalQuantity <= state.filters.maxSalesVolume);
+      }
+      
+      // Status filter
+      const activeChecked = state.filters.activeStatus;
+      const inactiveChecked = state.filters.inactiveStatus;
+      
+      if (activeChecked && !inactiveChecked) {
+        filtered = filtered.filter(store => store.status === 'active');
+      } else if (!activeChecked && inactiveChecked) {
+        filtered = filtered.filter(store => store.status === 'inactive');
+      } else if (!activeChecked && !inactiveChecked) {
+        filtered = [];
+      }
+      
+      // Date range filter
+      if (state.filters.dateRange !== 'all') {
+        const now = new Date();
+        let cutoffDate;
+        
+        if (state.filters.dateRange === 'custom' && state.filters.startDate && state.filters.endDate) {
+          const startDate = new Date(state.filters.startDate);
+          const endDate = new Date(state.filters.endDate);
+          endDate.setHours(23, 59, 59, 999); // End of day
+          
+          filtered = filtered.filter(store => {
+            if (!store.lastSaleDate) return false;
+            const saleDate = new Date(store.lastSaleDate);
+            return saleDate >= startDate && saleDate <= endDate;
+          });
+        } else if (state.filters.dateRange !== 'custom') {
+          const days = parseInt(state.filters.dateRange);
+          cutoffDate = new Date(now.getTime() - (days * 24 * 60 * 60 * 1000));
+          
+          filtered = filtered.filter(store => {
+            if (!store.lastSaleDate) return false;
+            return new Date(store.lastSaleDate) >= cutoffDate;
+          });
+        }
+      }
+      
+      state.filteredStores = filtered;
+      state.currentPage = 1;
+      
+      funSortStores();
+      funUpdateActiveFiltersDisplay();
+      funRenderTable();
+      funShowLoading(false);
+    }, 300);
+  }
+
+  function funSortStores() {
+    state.filteredStores.sort((a, b) => {
+      let aValue = a[state.sortField];
+      let bValue = b[state.sortField];
+      
+      // Handle different data types
+      if (state.sortField === 'lastSaleDate') {
+        aValue = aValue ? new Date(aValue) : new Date(0);
+        bValue = bValue ? new Date(bValue) : new Date(0);
+      } else if (typeof aValue === 'string') {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+      }
+      
+      if (aValue < bValue) return state.sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return state.sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
+  function funUpdateActiveFiltersDisplay() {
+    const activeFilters = [];
+    
+    if (state.filters.search) {
+      activeFilters.push({ 
+        label: `Search: "${state.filters.search}"`, 
+        key: 'search' 
+      });
+    }
+    
+    if (state.filters.state) {
+      activeFilters.push({ 
+        label: `State: ${state.filters.state}`, 
+        key: 'state' 
+      });
+    }
+    
+    if (state.filters.city) {
+      activeFilters.push({ 
+        label: `City: ${state.filters.city}`, 
+        key: 'city' 
+      });
+    }
+    
+    if (state.filters.minSalesVolume !== null || state.filters.maxSalesVolume !== null) {
+      const min = state.filters.minSalesVolume || 0;
+      const max = state.filters.maxSalesVolume || '∞';
+      activeFilters.push({ 
+        label: `Sales: ${min} - ${max}`, 
+        key: 'salesVolume' 
+      });
+    }
+    
+    if (!state.filters.activeStatus || !state.filters.inactiveStatus) {
+      const statusLabel = state.filters.activeStatus ? 'Active Only' : 'Inactive Only';
+      activeFilters.push({ 
+        label: `Status: ${statusLabel}`, 
+        key: 'status' 
+      });
+    }
+    
+    if (state.filters.dateRange !== 'all') {
+      let dateLabel = '';
+      if (state.filters.dateRange === 'custom') {
+        dateLabel = `Custom: ${state.filters.startDate} to ${state.filters.endDate}`;
+      } else {
+        dateLabel = `Last ${state.filters.dateRange} days`;
+      }
+      activeFilters.push({ 
+        label: `Date: ${dateLabel}`, 
+        key: 'dateRange' 
+      });
+    }
+    
+    if (activeFilters.length > 0) {
+      elements.activeFiltersContainer.classList.remove('hidden');
+      elements.activeFiltersDisplay.innerHTML = activeFilters.map(filter => 
+        `<span class="inline-flex items-center gap-1 px-2 py-1 bg-teal-100 text-teal-800 text-xs rounded-full">
+          ${filter.label}
+          <button class="hover:bg-teal-200 rounded-full p-0.5 transition-colors" onclick="funRemoveFilter('${filter.key}')">
+            <i data-lucide="x" class="w-3 h-3"></i>
+          </button>
+        </span>`
+      ).join('');
+    } else {
+      elements.activeFiltersContainer.classList.add('hidden');
+    }
+    
+    // Re-create icons for the filter tags
+    if (typeof window.lucide?.createIcons === 'function') {
+      window.lucide.createIcons();
+    }
+  }
+
+  function funRemoveFilter(filterKey) {
+    switch (filterKey) {
+      case 'search':
+        state.filters.search = '';
+        elements.searchInput.value = '';
+        break;
+      case 'state':
+        state.filters.state = '';
+        state.filters.city = '';
+        elements.stateFilter.value = '';
+        elements.cityFilter.value = '';
+        funUpdateCityFilter();
+        break;
+      case 'city':
+        state.filters.city = '';
+        elements.cityFilter.value = '';
+        break;
+      case 'salesVolume':
+        state.filters.minSalesVolume = null;
+        state.filters.maxSalesVolume = null;
+        elements.minSalesVolume.value = '';
+        elements.maxSalesVolume.value = '';
+        break;
+      case 'status':
+        state.filters.activeStatus = true;
+        state.filters.inactiveStatus = false;
+        elements.activeStatus.checked = true;
+        elements.inactiveStatus.checked = false;
+        break;
+      case 'dateRange':
+        state.filters.dateRange = 'all';
+        state.filters.startDate = null;
+        state.filters.endDate = null;
+        elements.dateRangeFilter.value = 'all';
+        elements.customDateRange.classList.add('hidden');
+        break;
+    }
+    funApplyFilters();
+  }
+  
+  window.funRemoveFilter = funRemoveFilter; // Make it globally accessible
+
+  function funClearAllFilters() {
+    state.filters = {
+      search: '',
+      state: '',
+      city: '',
+      minSalesVolume: null,
+      maxSalesVolume: null,
+      activeStatus: true,
+      inactiveStatus: false,
+      dateRange: 'all',
+      startDate: null,
+      endDate: null
+    };
+    
+    // Reset form elements
+    elements.searchInput.value = '';
+    elements.stateFilter.value = '';
+    elements.cityFilter.value = '';
+    elements.minSalesVolume.value = '';
+    elements.maxSalesVolume.value = '';
+    elements.activeStatus.checked = true;
+    elements.inactiveStatus.checked = false;
+    elements.dateRangeFilter.value = 'all';
+    elements.startDate.value = '';
+    elements.endDate.value = '';
+    elements.customDateRange.classList.add('hidden');
+    
+    funUpdateCityFilter();
+    funApplyFilters();
+  }
+
+  // Table rendering functions
+  function funRenderTable() {
+    if (state.filteredStores.length === 0) {
+      funShowEmptyState(true);
+      elements.resultCount.textContent = '';
+      return;
+    }
+    
+    funShowEmptyState(false);
+    
+    // Calculate pagination
+    const totalItems = state.filteredStores.length;
+    const totalPages = Math.ceil(totalItems / state.itemsPerPage);
+    const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+    const endIndex = Math.min(startIndex + state.itemsPerPage, totalItems);
+    const currentPageItems = state.filteredStores.slice(startIndex, endIndex);
+    
+    // Update result count
+    elements.resultCount.textContent = `${funFormatNumber(totalItems)} stores found`;
+    
+    // Render table rows
+    elements.storeTableBody.innerHTML = currentPageItems.map(store => `
+      <tr class="hover:bg-slate-50 transition-colors duration-200 cursor-pointer" onclick="funNavigateToStoreDetail('${store.id}')">
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">${store.storeCode}</td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="text-sm font-medium text-slate-900">${store.storeName}</div>
+          <div class="text-xs text-slate-500">${store.address.street}</div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">${store.address.city}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">${store.address.state}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">${funFormatNumber(store.totalQuantity)}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">${funFormatNumber(store.totalTransactions)}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">${funFormatNumber(store.uniqueSkus)}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">${funFormatNumber(store.activeStaff)}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${funFormatDate(store.lastSaleDate)}</td>
+      </tr>
+    `).join('');
+    
+    funRenderPagination(totalItems, totalPages);
+  }
+
+  function funRenderPagination(totalItems, totalPages) {
+    const startItem = (state.currentPage - 1) * state.itemsPerPage + 1;
+    const endItem = Math.min(state.currentPage * state.itemsPerPage, totalItems);
+    
+    elements.paginationInfo.textContent = `${startItem}-${endItem} of ${funFormatNumber(totalItems)} stores`;
+    
+    // Update prev/next buttons
+    elements.prevPage.disabled = state.currentPage <= 1;
+    elements.nextPage.disabled = state.currentPage >= totalPages;
+    
+    // Render page numbers
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, state.currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    let pagesHtml = '';
+    
+    if (startPage > 1) {
+      pagesHtml += `<button class="px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors" onclick="funGoToPage(1)">1</button>`;
+      if (startPage > 2) {
+        pagesHtml += `<span class="px-2 text-slate-400">...</span>`;
+      }
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      const isActive = i === state.currentPage;
+      pagesHtml += `
+        <button class="px-3 py-2 text-sm font-medium transition-colors ${
+          isActive 
+            ? 'bg-teal-700 text-white' 
+            : 'text-slate-700 hover:bg-slate-50'
+        }" onclick="funGoToPage(${i})">${i}</button>
+      `;
+    }
+    
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pagesHtml += `<span class="px-2 text-slate-400">...</span>`;
+      }
+      pagesHtml += `<button class="px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors" onclick="funGoToPage(${totalPages})">${totalPages}</button>`;
+    }
+    
+    elements.pageNumbers.innerHTML = pagesHtml;
+  }
+
+  function funGoToPage(page) {
+    state.currentPage = page;
+    funRenderTable();
+  }
+  
+  window.funGoToPage = funGoToPage; // Make it globally accessible
+
+  function funNavigateToStoreDetail(storeId) {
+    window.location.href = `store_detail.html?id=${storeId}`;
+  }
+  
+  window.funNavigateToStoreDetail = funNavigateToStoreDetail; // Make it globally accessible
+
+  // Sort functionality
+  function funHandleSort(field) {
+    if (state.sortField === field) {
+      state.sortDirection = state.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      state.sortField = field;
+      state.sortDirection = field === 'totalQuantity' ? 'desc' : 'asc';
+    }
+    
+    funUpdateSortIcons();
+    funSortStores();
+    funRenderTable();
+  }
+
+  function funUpdateSortIcons() {
+    document.querySelectorAll('th[data-sort] i').forEach(icon => {
+      icon.setAttribute('data-lucide', 'arrow-up-down');
+      icon.className = 'w-3 h-3 text-slate-400';
+    });
+    
+    const currentSortHeader = document.querySelector(`th[data-sort="${state.sortField}"] i`);
+    if (currentSortHeader) {
+      const iconName = state.sortDirection === 'asc' ? 'arrow-up' : 'arrow-down';
+      currentSortHeader.setAttribute('data-lucide', iconName);
+      currentSortHeader.className = 'w-3 h-3 text-teal-600';
+    }
+    
+    if (typeof window.lucide?.createIcons === 'function') {
+      window.lucide.createIcons();
+    }
+  }
+
+  // Export functionality
+  function funShowExportModal() {
+    const format = document.querySelector('input[name="exportFormat"]:checked')?.value || 'csv';
+    const today = new Date().toISOString().split('T')[0];
+    const extension = format === 'csv' ? 'csv' : 'json';
+    
+    elements.exportFileName.textContent = `store_performance_${today}.${extension}`;
+    
+    const totalStores = elements.includeFilteredOnly.checked ? state.filteredStores.length : state.stores.length;
+    elements.exportSummary.textContent = `${funFormatNumber(totalStores)} stores will be exported in ${format.toUpperCase()} format.`;
+    
+    elements.exportError.classList.add('hidden');
+    elements.exportModal.classList.remove('hidden');
+  }
+
+  function funHideExportModal() {
+    elements.exportModal.classList.add('hidden');
+  }
+
+  function funPerformExport() {
+    try {
+      const format = document.querySelector('input[name="exportFormat"]:checked')?.value || 'csv';
+      const dataToExport = elements.includeFilteredOnly.checked ? state.filteredStores : state.stores;
+      
+      if (dataToExport.length === 0) {
+        elements.exportError.textContent = 'No data available to export.';
+        elements.exportError.classList.remove('hidden');
+        return;
+      }
+      
+      const today = new Date().toISOString().split('T')[0];
+      const filename = `store_performance_${today}`;
+      
+      if (format === 'csv') {
+        funExportAsCSV(dataToExport, filename);
+      } else {
+        funExportAsJSON(dataToExport, filename);
+      }
+      
+      funHideExportModal();
+      
+    } catch (error) {
+      console.error('Export failed:', error);
+      elements.exportError.textContent = 'Export failed. Please try again.';
+      elements.exportError.classList.remove('hidden');
+    }
+  }
+
+  function funExportAsCSV(data, filename) {
+    const headers = [
+      'Store Code', 'Store Name', 'City', 'State', 'Street', 'Contact Person', 'Phone', 'Email',
+      'Total Quantity Sold', 'Total Transactions', 'SKUs Sold', 'Active Staff', 'Last Sale Date', 'Status'
+    ];
+    
+    const csvContent = [
+      headers.join(','),
+      ...data.map(store => [
+        `"${store.storeCode}"`,
+        `"${store.storeName}"`,
+        `"${store.address.city}"`,
+        `"${store.address.state}"`,
+        `"${store.address.street}"`,
+        `"${store.contactPerson}"`,
+        `"${store.phone}"`,
+        `"${store.email}"`,
+        store.totalQuantity,
+        store.totalTransactions,
+        store.uniqueSkus,
+        store.activeStaff,
+        `"${funFormatDate(store.lastSaleDate)}"`,
+        `"${store.status}"`
+      ].join(','))
+    ].join('\n');
+    
+    funDownloadFile(csvContent, `${filename}.csv`, 'text/csv');
+  }
+
+  function funExportAsJSON(data, filename) {
+    const exportData = {
+      exportDate: new Date().toISOString(),
+      totalStores: data.length,
+      stores: data.map(store => ({
+        storeCode: store.storeCode,
+        storeName: store.storeName,
+        address: store.address,
+        contactPerson: store.contactPerson,
+        phone: store.phone,
+        email: store.email,
+        totalQuantitySold: store.totalQuantity,
+        totalTransactions: store.totalTransactions,
+        skusSold: store.uniqueSkus,
+        activeStaff: store.activeStaff,
+        lastSaleDate: store.lastSaleDate,
+        status: store.status
+      }))
+    };
+    
+    const jsonContent = JSON.stringify(exportData, null, 2);
+    funDownloadFile(jsonContent, `${filename}.json`, 'application/json');
+  }
+
+  function funDownloadFile(content, filename, mimeType) {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  // Event listeners
+  elements.searchInput.addEventListener('input', funDebounce((e) => {
+    state.filters.search = e.target.value;
+    funApplyFilters();
+  }, 300));
+
+  elements.stateFilter.addEventListener('change', (e) => {
+    state.filters.state = e.target.value;
+    state.filters.city = ''; // Reset city when state changes
+    elements.cityFilter.value = '';
+    funUpdateCityFilter();
+  });
+
+  elements.cityFilter.addEventListener('change', (e) => {
+    state.filters.city = e.target.value;
+  });
+
+  elements.dateRangeFilter.addEventListener('change', (e) => {
+    state.filters.dateRange = e.target.value;
+    if (e.target.value === 'custom') {
+      elements.customDateRange.classList.remove('hidden');
+    } else {
+      elements.customDateRange.classList.add('hidden');
+      state.filters.startDate = null;
+      state.filters.endDate = null;
+      elements.startDate.value = '';
+      elements.endDate.value = '';
+    }
+  });
+
+  elements.applyCustomDateRange.addEventListener('click', () => {
+    state.filters.startDate = elements.startDate.value;
+    state.filters.endDate = elements.endDate.value;
+    funApplyFilters();
+  });
+
+  elements.applyFilters.addEventListener('click', () => {
+    // Update filter state from form inputs
+    state.filters.minSalesVolume = elements.minSalesVolume.value ? parseInt(elements.minSalesVolume.value) : null;
+    state.filters.maxSalesVolume = elements.maxSalesVolume.value ? parseInt(elements.maxSalesVolume.value) : null;
+    state.filters.activeStatus = elements.activeStatus.checked;
+    state.filters.inactiveStatus = elements.inactiveStatus.checked;
+    
+    funApplyFilters();
+  });
+
+  elements.clearFilters.addEventListener('click', funClearAllFilters);
+  elements.clearFiltersFromEmpty.addEventListener('click', funClearAllFilters);
+
+  // Pagination event listeners
+  elements.itemsPerPage.addEventListener('change', (e) => {
+    state.itemsPerPage = parseInt(e.target.value);
+    state.currentPage = 1;
+    funRenderTable();
+  });
+
+  elements.prevPage.addEventListener('click', () => {
+    if (state.currentPage > 1) {
+      state.currentPage--;
+      funRenderTable();
+    }
+  });
+
+  elements.nextPage.addEventListener('click', () => {
+    const totalPages = Math.ceil(state.filteredStores.length / state.itemsPerPage);
+    if (state.currentPage < totalPages) {
+      state.currentPage++;
+      funRenderTable();
+    }
+  });
+
+  // Sort event listeners
+  document.querySelectorAll('th[data-sort]').forEach(header => {
+    header.addEventListener('click', () => {
+      funHandleSort(header.dataset.sort);
+    });
+  });
+
+  // Export event listeners
+  elements.exportButton.addEventListener('click', funShowExportModal);
+  elements.cancelExport.addEventListener('click', funHideExportModal);
+  elements.confirmExport.addEventListener('click', funPerformExport);
+
+  // Export format change listener
+  document.querySelectorAll('input[name="exportFormat"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      const format = radio.value;
+      const today = new Date().toISOString().split('T')[0];
+      const extension = format === 'csv' ? 'csv' : 'json';
+      elements.exportFileName.textContent = `store_performance_${today}.${extension}`;
+      
+      const totalStores = elements.includeFilteredOnly.checked ? state.filteredStores.length : state.stores.length;
+      elements.exportSummary.textContent = `${funFormatNumber(totalStores)} stores will be exported in ${format.toUpperCase()} format.`;
+    });
+  });
+
+  elements.includeFilteredOnly.addEventListener('change', () => {
+    const format = document.querySelector('input[name="exportFormat"]:checked')?.value || 'csv';
+    const totalStores = elements.includeFilteredOnly.checked ? state.filteredStores.length : state.stores.length;
+    elements.exportSummary.textContent = `${funFormatNumber(totalStores)} stores will be exported in ${format.toUpperCase()} format.`;
+  });
+
+  // Close modal on backdrop click
+  elements.exportModal.addEventListener('click', (e) => {
+    if (e.target === elements.exportModal) {
+      funHideExportModal();
+    }
+  });
+
+  // View toggle functionality (placeholder)
+  elements.tableViewToggle.addEventListener('click', () => {
+    elements.tableViewToggle.classList.add('bg-teal-700', 'text-white');
+    elements.tableViewToggle.classList.remove('border', 'border-slate-200', 'text-slate-700');
+    elements.chartViewToggle.classList.remove('bg-teal-700', 'text-white');
+    elements.chartViewToggle.classList.add('border', 'border-slate-200', 'text-slate-700');
+  });
+
+  elements.chartViewToggle.addEventListener('click', () => {
+    elements.chartViewToggle.classList.add('bg-teal-700', 'text-white');
+    elements.chartViewToggle.classList.remove('border', 'border-slate-200', 'text-slate-700');
+    elements.tableViewToggle.classList.remove('bg-teal-700', 'text-white');
+    elements.tableViewToggle.classList.add('border', 'border-slate-200', 'text-slate-700');
+    // Note: Chart view functionality would be implemented here
+  });
+
+  // Initialize data loading
+  funLoadData();
+});
+</script></body></html>

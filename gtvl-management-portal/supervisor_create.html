@@ -1,0 +1,930 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>GTVL Management Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        /* GTVL Brand Colors */
+        --color-primary: #0F766E; /* Teal-700 - Primary CTAs, navigation highlights */
+        --color-primary-hover: #0D9488; /* Teal-600 - Hover states */
+        --color-secondary: #475569; /* Slate-600 - Secondary elements */
+        --color-accent: #D97706; /* Amber-600 - Call-to-action highlights */
+        --color-surface: #FFFFFF; /* White - Cards, modals, panels */
+        --color-background: #F8FAFC; /* Slate-50 - Page backgrounds */
+        --color-surface-variant: #F1F5F9; /* Slate-100 - Alternate backgrounds */
+        --color-on-background: #0F172A; /* Slate-900 - Primary headings */
+        --color-on-surface: #1E293B; /* Slate-800 - Body text */
+        --color-border: #E2E8F0; /* Slate-200 - Borders */
+        --color-success: #16A34A; /* Green-600 - Success states */
+        --color-warning: #F59E0B; /* Amber-500 - Warning alerts */
+        --color-error: #DC2626; /* Red-600 - Error messages */
+        --color-info: #2563EB; /* Blue-600 - Info messages */
+
+        /* Layout Constants */
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      /* Smooth scrolling */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      /* Layout with CSS variables */
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      /* Mobile sidebar slide states */
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      /* Active nav link styling */
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+        background-color: #f0fdfa;
+        color: var(--color-primary);
+      }
+
+      /* Popover animation states */
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      /* Sidebar backdrop states */
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Create New Supervisor - GTVL Management Portal</title></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <!-- HEADER SECTION -->
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <!-- Left: Logo & Title -->
+        <div class="flex items-center gap-3">
+          <!-- Mobile Menu Toggle -->
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <!-- Logo -->
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <rect x="68" y="68" width="264" height="264" rx="32" stroke="#0F766E" stroke-width="18"></rect>
+                  <rect x="109" y="143" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                  <rect x="206" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                </g>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">
+              GTVL Management Portal
+            </h1>
+          </div>
+        </div>
+
+        <!-- Right: User Profile -->
+        <div class="flex items-center gap-2 md:gap-3">
+          <!-- User Profile Button -->
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-500 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- User Profile Popover -->
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <!-- User Info Section -->
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-500 truncate"></div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <!-- Main Navigation Section -->
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Management
+          </div>
+          <div class="space-y-1">
+            <a href="management_dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="management_dashboard">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="sku_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sku_list">
+              <i data-lucide="package" class="w-5 h-5"></i>
+              <span>SKUs</span>
+            </a>
+            <a href="store_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="store_list">
+              <i data-lucide="store" class="w-5 h-5"></i>
+              <span>Stores</span>
+            </a>
+            <a href="supervisor_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="supervisor_list">
+              <i data-lucide="user-check" class="w-5 h-5"></i>
+              <span>Supervisors</span>
+            </a>
+            <a href="promodizer_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="promodizer_list">
+              <i data-lucide="users" class="w-5 h-5"></i>
+              <span>Promodizers</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="app-main p-6" id="pageContent" role="main"><div class="flex items-center gap-2 mb-6">
+  <a href="management_dashboard.html" class="text-sm font-medium text-slate-600 hover:text-teal-700 transition-colors">Dashboard</a>
+  <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+  <a href="supervisor_list.html" class="text-sm font-medium text-slate-600 hover:text-teal-700 transition-colors">Supervisors</a>
+  <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+  <span class="text-sm font-medium text-slate-900">Create New</span>
+</div>
+
+<!-- Page Header -->
+<div class="mb-8">
+  <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900 mb-2">Create New Supervisor</h1>
+  <p class="text-sm leading-[1.375rem] font-normal text-slate-600">Add a new supervisor account to the GTVL system</p>
+</div>
+
+<!-- Info Message -->
+<div class="bg-blue-50 border-l-4 border-blue-600 p-4 mb-6">
+  <div class="flex items-center">
+    <i data-lucide="info" class="w-5 h-5 text-blue-600 mr-3"></i>
+    <p class="text-sm font-medium text-blue-800">New supervisors can be assigned to stores after account creation.</p>
+  </div>
+</div>
+
+<!-- Create Supervisor Form -->
+<div class="bg-white rounded-lg shadow-sm border border-slate-200">
+  <form id="createSupervisorForm">
+    <div class="p-6 space-y-8">
+      
+      <!-- Personal Information Section -->
+      <div>
+        <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900 mb-4">Personal Information</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- First Name -->
+          <div>
+            <label for="firstName" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+              First Name <span class="text-red-600">*</span>
+            </label>
+            <input type="text" id="firstName" name="firstName" required="" class="w-full px-4 py-3 border border-slate-200 rounded text-sm leading-[1.375rem] font-normal text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:border-teal-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" placeholder="Enter first name">
+            <div id="firstNameError" class="text-xs text-red-600 mt-1 hidden"></div>
+          </div>
+
+          <!-- Last Name -->
+          <div>
+            <label for="lastName" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+              Last Name <span class="text-red-600">*</span>
+            </label>
+            <input type="text" id="lastName" name="lastName" required="" class="w-full px-4 py-3 border border-slate-200 rounded text-sm leading-[1.375rem] font-normal text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:border-teal-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" placeholder="Enter last name">
+            <div id="lastNameError" class="text-xs text-red-600 mt-1 hidden"></div>
+          </div>
+
+          <!-- Employee ID -->
+          <div class="md:col-span-2">
+            <label for="employeeId" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+              Employee ID <span class="text-red-600">*</span>
+            </label>
+            <input type="text" id="employeeId" name="employeeId" required="" class="w-full px-4 py-3 border border-slate-200 rounded text-sm leading-[1.375rem] font-normal text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:border-teal-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" placeholder="Enter employee ID (e.g., SUP-2024-004)">
+            <div id="employeeIdError" class="text-xs text-red-600 mt-1 hidden"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Information Section -->
+      <div>
+        <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900 mb-4">Contact Information</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Phone Number -->
+          <div>
+            <label for="phone" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+              Phone Number <span class="text-red-600">*</span>
+            </label>
+            <input type="tel" id="phone" name="phone" required="" class="w-full px-4 py-3 border border-slate-200 rounded text-sm leading-[1.375rem] font-normal text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:border-teal-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" placeholder="(XXX) XXX-XXXX">
+            <div id="phoneError" class="text-xs text-red-600 mt-1 hidden"></div>
+          </div>
+
+          <!-- Email Address -->
+          <div>
+            <label for="email" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+              Email Address <span class="text-red-600">*</span>
+            </label>
+            <input type="email" id="email" name="email" required="" class="w-full px-4 py-3 border border-slate-200 rounded text-sm leading-[1.375rem] font-normal text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:border-teal-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" placeholder="Enter email address">
+            <div id="emailError" class="text-xs text-red-600 mt-1 hidden"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Status Section -->
+      <div>
+        <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900 mb-4">Account Status</h2>
+        <div class="space-y-3">
+          <div class="flex items-center">
+            <input type="radio" id="statusActive" name="status" value="active" checked="" class="w-4 h-4 text-teal-700 border-slate-300 focus:ring-teal-500 focus:ring-2">
+            <label for="statusActive" class="ml-3 text-sm leading-[1.375rem] font-normal text-slate-800">
+              Active
+            </label>
+          </div>
+          <div class="flex items-center">
+            <input type="radio" id="statusInactive" name="status" value="inactive" class="w-4 h-4 text-teal-700 border-slate-300 focus:ring-teal-500 focus:ring-2">
+            <label for="statusInactive" class="ml-3 text-sm leading-[1.375rem] font-normal text-slate-800">
+              Inactive
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3">
+      <button type="button" id="cancelButton" class="px-4 py-2 text-sm leading-[1.375rem] font-semibold text-slate-600 bg-white border border-slate-300 rounded hover:bg-slate-50 hover:border-slate-400 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all duration-200 min-h-[2.75rem]">
+        Cancel
+      </button>
+      <button type="submit" id="createButton" disabled="" class="px-6 py-2 text-sm leading-[1.375rem] font-semibold text-white bg-teal-700 rounded hover:bg-teal-600 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 disabled:bg-slate-300 disabled:cursor-not-allowed transition-all duration-200 min-h-[2.75rem]">
+        Create Supervisor
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Success Toast (initially hidden) -->
+<div id="successToast" class="fixed top-20 right-4 bg-green-600 text-white p-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+  <div class="flex items-center gap-3">
+    <i data-lucide="check-circle" class="w-5 h-5"></i>
+    <span class="text-sm font-medium">Supervisor created successfully!</span>
+  </div>
+</div>
+
+</main>
+
+    <!-- JAVASCRIPT INITIALIZATION -->
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils =
+          window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_mgmt_001");
+                    currentUserId = "usr_mgmt_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } =
+            state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail)
+            return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute(
+            "aria-expanded",
+            shouldOpen ? "true" : "false"
+          );
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active");
+            } else {
+              link.classList.remove("active");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () =>
+            closeMobileSidebar()
+          );
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+// Utility: portal a modal by id (idempotent)
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+
+  // Set active nav link
+  if (typeof TemplateUtils !== 'undefined' && TemplateUtils.setActiveNavLink) {
+    TemplateUtils.setActiveNavLink('supervisor_list');
+  }
+
+  // Form elements
+  const form = document.getElementById('createSupervisorForm');
+  const firstName = document.getElementById('firstName');
+  const lastName = document.getElementById('lastName');
+  const employeeId = document.getElementById('employeeId');
+  const phone = document.getElementById('phone');
+  const email = document.getElementById('email');
+  const createButton = document.getElementById('createButton');
+  const cancelButton = document.getElementById('cancelButton');
+  const successToast = document.getElementById('successToast');
+
+  // Error elements
+  const firstNameError = document.getElementById('firstNameError');
+  const lastNameError = document.getElementById('lastNameError');
+  const employeeIdError = document.getElementById('employeeIdError');
+  const phoneError = document.getElementById('phoneError');
+  const emailError = document.getElementById('emailError');
+
+  // Validation state
+  let validationState = {
+    firstName: false,
+    lastName: false,
+    employeeId: false,
+    phone: false,
+    email: false
+  };
+
+  // Utility functions
+  function funShowError(element, message) {
+    element.textContent = message;
+    element.classList.remove('hidden');
+  }
+
+  function funHideError(element) {
+    element.classList.add('hidden');
+  }
+
+  function funValidateRequired(value, errorElement, fieldName) {
+    if (!value.trim()) {
+      funShowError(errorElement, `${fieldName} is required.`);
+      return false;
+    }
+    funHideError(errorElement);
+    return true;
+  }
+
+  function funValidateEmployeeId(value) {
+    if (!value.trim()) {
+      funShowError(employeeIdError, 'Employee ID is required.');
+      return false;
+    }
+
+    // Check uniqueness
+    try {
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const exists = users.some(user => user.employeeId === value.trim());
+      if (exists) {
+        funShowError(employeeIdError, 'This Employee ID already exists. Please use a different one.');
+        return false;
+      }
+    } catch (error) {
+      console.error('Error checking employee ID uniqueness:', error);
+      funShowError(employeeIdError, 'Error validating Employee ID.');
+      return false;
+    }
+
+    funHideError(employeeIdError);
+    return true;
+  }
+
+  function funValidatePhone(value) {
+    if (!value.trim()) {
+      funShowError(phoneError, 'Phone number is required.');
+      return false;
+    }
+
+    // Phone format validation: (XXX) XXX-XXXX or XXX-XXX-XXXX
+    const phoneRegex = /^(\(\d{3}\)\s?\d{3}-\d{4}|\d{3}-\d{3}-\d{4})$/;
+    if (!phoneRegex.test(value.trim())) {
+      funShowError(phoneError, 'Please enter a valid phone number in format (XXX) XXX-XXXX or XXX-XXX-XXXX.');
+      return false;
+    }
+
+    funHideError(phoneError);
+    return true;
+  }
+
+  function funValidateEmail(value) {
+    if (!value.trim()) {
+      funShowError(emailError, 'Email address is required.');
+      return false;
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(value.trim())) {
+      funShowError(emailError, 'Please enter a valid email address.');
+      return false;
+    }
+
+    funHideError(emailError);
+    return true;
+  }
+
+  function funUpdateCreateButton() {
+    const allValid = Object.values(validationState).every(valid => valid);
+    createButton.disabled = !allValid;
+  }
+
+  function funGenerateId() {
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substr(2, 5);
+    return `usr_sup_${timestamp}_${random}`;
+  }
+
+  function funGenerateUid() {
+    const random = Math.random().toString(36).substr(2, 10);
+    return `local-${random}`;
+  }
+
+  function funShowSuccessToast() {
+    successToast.classList.remove('translate-x-full');
+    setTimeout(() => {
+      successToast.classList.add('translate-x-full');
+    }, 3000);
+  }
+
+  // Event listeners for real-time validation
+  firstName.addEventListener('input', () => {
+    validationState.firstName = funValidateRequired(firstName.value, firstNameError, 'First name');
+    funUpdateCreateButton();
+  });
+
+  firstName.addEventListener('blur', () => {
+    validationState.firstName = funValidateRequired(firstName.value, firstNameError, 'First name');
+    funUpdateCreateButton();
+  });
+
+  lastName.addEventListener('input', () => {
+    validationState.lastName = funValidateRequired(lastName.value, lastNameError, 'Last name');
+    funUpdateCreateButton();
+  });
+
+  lastName.addEventListener('blur', () => {
+    validationState.lastName = funValidateRequired(lastName.value, lastNameError, 'Last name');
+    funUpdateCreateButton();
+  });
+
+  employeeId.addEventListener('input', () => {
+    validationState.employeeId = funValidateEmployeeId(employeeId.value);
+    funUpdateCreateButton();
+  });
+
+  employeeId.addEventListener('blur', () => {
+    validationState.employeeId = funValidateEmployeeId(employeeId.value);
+    funUpdateCreateButton();
+  });
+
+  phone.addEventListener('input', () => {
+    validationState.phone = funValidatePhone(phone.value);
+    funUpdateCreateButton();
+  });
+
+  phone.addEventListener('blur', () => {
+    validationState.phone = funValidatePhone(phone.value);
+    funUpdateCreateButton();
+  });
+
+  email.addEventListener('input', () => {
+    validationState.email = funValidateEmail(email.value);
+    funUpdateCreateButton();
+  });
+
+  email.addEventListener('blur', () => {
+    validationState.email = funValidateEmail(email.value);
+    funUpdateCreateButton();
+  });
+
+  // Cancel button click
+  cancelButton.addEventListener('click', () => {
+    window.location.href = 'supervisor_list.html';
+  });
+
+  // Form submission
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    // Final validation
+    validationState.firstName = funValidateRequired(firstName.value, firstNameError, 'First name');
+    validationState.lastName = funValidateRequired(lastName.value, lastNameError, 'Last name');
+    validationState.employeeId = funValidateEmployeeId(employeeId.value);
+    validationState.phone = funValidatePhone(phone.value);
+    validationState.email = funValidateEmail(email.value);
+
+    funUpdateCreateButton();
+
+    if (!Object.values(validationState).every(valid => valid)) {
+      return;
+    }
+
+    // Get form data
+    const formData = new FormData(form);
+    const now = new Date().toISOString();
+
+    // Create supervisor object
+    const supervisor = {
+      id: funGenerateId(),
+      uid: funGenerateUid(),
+      firstName: formData.get('firstName').trim(),
+      lastName: formData.get('lastName').trim(),
+      email: formData.get('email').trim(),
+      phone: formData.get('phone').trim(),
+      role: 'supervisor',
+      employeeId: formData.get('employeeId').trim(),
+      status: formData.get('status') || 'active',
+      createdAt: now,
+      updatedAt: now
+    };
+
+    try {
+      // Get existing users
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      
+      // Add new supervisor
+      users.push(supervisor);
+      
+      // Save back to localStorage
+      localStorage.setItem('users', JSON.stringify(users));
+
+      // Show success toast
+      funShowSuccessToast();
+
+      // Redirect after a short delay
+      setTimeout(() => {
+        window.location.href = 'supervisor_list.html';
+      }, 1500);
+
+    } catch (error) {
+      console.error('Error creating supervisor:', error);
+      alert('An error occurred while creating the supervisor. Please try again.');
+    }
+  });
+
+  // Phone number formatting on input
+  phone.addEventListener('input', (e) => {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length >= 6) {
+      value = value.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+    } else if (value.length >= 3) {
+      value = value.replace(/(\d{3})(\d{0,3})/, '($1) $2');
+    }
+    e.target.value = value;
+  });
+});
+</script></body></html>

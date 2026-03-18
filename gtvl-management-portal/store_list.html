@@ -1,0 +1,1248 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>GTVL Management Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        /* GTVL Brand Colors */
+        --color-primary: #0F766E; /* Teal-700 - Primary CTAs, navigation highlights */
+        --color-primary-hover: #0D9488; /* Teal-600 - Hover states */
+        --color-secondary: #475569; /* Slate-600 - Secondary elements */
+        --color-accent: #D97706; /* Amber-600 - Call-to-action highlights */
+        --color-surface: #FFFFFF; /* White - Cards, modals, panels */
+        --color-background: #F8FAFC; /* Slate-50 - Page backgrounds */
+        --color-surface-variant: #F1F5F9; /* Slate-100 - Alternate backgrounds */
+        --color-on-background: #0F172A; /* Slate-900 - Primary headings */
+        --color-on-surface: #1E293B; /* Slate-800 - Body text */
+        --color-border: #E2E8F0; /* Slate-200 - Borders */
+        --color-success: #16A34A; /* Green-600 - Success states */
+        --color-warning: #F59E0B; /* Amber-500 - Warning alerts */
+        --color-error: #DC2626; /* Red-600 - Error messages */
+        --color-info: #2563EB; /* Blue-600 - Info messages */
+
+        /* Layout Constants */
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      /* Smooth scrolling */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      /* Layout with CSS variables */
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      /* Mobile sidebar slide states */
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      /* Active nav link styling */
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+        background-color: #f0fdfa;
+        color: var(--color-primary);
+      }
+
+      /* Popover animation states */
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      /* Sidebar backdrop states */
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Store List - GTVL Management Portal</title></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <!-- HEADER SECTION -->
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <!-- Left: Logo & Title -->
+        <div class="flex items-center gap-3">
+          <!-- Mobile Menu Toggle -->
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <!-- Logo -->
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <rect x="68" y="68" width="264" height="264" rx="32" stroke="#0F766E" stroke-width="18"></rect>
+                  <rect x="109" y="143" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                  <rect x="206" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                </g>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">
+              GTVL Management Portal
+            </h1>
+          </div>
+        </div>
+
+        <!-- Right: User Profile -->
+        <div class="flex items-center gap-2 md:gap-3">
+          <!-- User Profile Button -->
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-500 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- User Profile Popover -->
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <!-- User Info Section -->
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-500 truncate"></div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <!-- Main Navigation Section -->
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Management
+          </div>
+          <div class="space-y-1">
+            <a href="management_dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="management_dashboard">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="sku_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sku_list">
+              <i data-lucide="package" class="w-5 h-5"></i>
+              <span>SKUs</span>
+            </a>
+            <a href="store_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="store_list">
+              <i data-lucide="store" class="w-5 h-5"></i>
+              <span>Stores</span>
+            </a>
+            <a href="supervisor_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="supervisor_list">
+              <i data-lucide="user-check" class="w-5 h-5"></i>
+              <span>Supervisors</span>
+            </a>
+            <a href="promodizer_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="promodizer_list">
+              <i data-lucide="users" class="w-5 h-5"></i>
+              <span>Promodizers</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="app-main p-6" id="pageContent" role="main"><nav class="flex items-center gap-2 text-sm mb-6" aria-label="Breadcrumb">
+  <a href="management_dashboard.html" class="text-slate-600 hover:text-teal-700 transition-colors duration-200 no-underline">
+    Dashboard
+  </a>
+  <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+  <span class="text-slate-900 font-medium">Stores</span>
+</nav>
+
+<!-- Page Header -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+  <div>
+    <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900 mb-2">Stores</h1>
+    <p class="text-sm leading-[1.375rem] font-normal text-slate-600">
+      Manage customer locations and personnel assignments
+    </p>
+  </div>
+  
+  <button onclick="window.location.href='store_create.html'" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-teal-700 hover:bg-teal-600 text-white font-semibold rounded text-sm transition-all duration-200 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 min-h-[44px]">
+    <i data-lucide="plus" class="w-4 h-4"></i>
+    Add New Store
+  </button>
+</div>
+
+<!-- Filters and Search -->
+<div class="bg-white rounded-lg border border-slate-200 p-6 mb-6">
+  <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <!-- Search -->
+    <div class="lg:col-span-2">
+      <label for="searchInput" class="block text-sm font-medium text-slate-700 mb-2">
+        Search Stores
+      </label>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <i data-lucide="search" class="h-4 w-4 text-slate-400"></i>
+        </div>
+        <input type="text" id="searchInput" placeholder="Search by store code, name, or location..." class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+      </div>
+    </div>
+
+    <!-- Status Filter -->
+    <div>
+      <label for="statusFilter" class="block text-sm font-medium text-slate-700 mb-2">
+        Status
+      </label>
+      <select id="statusFilter" class="block w-full px-3 py-2 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+        <option value="">All Statuses</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+    </div>
+
+    <!-- Assignment Filter -->
+    <div>
+      <label for="assignmentFilter" class="block text-sm font-medium text-slate-700 mb-2">
+        Assignment
+      </label>
+      <select id="assignmentFilter" class="block w-full px-3 py-2 border border-slate-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+        <option value="">All Stores</option>
+        <option value="assigned">Assigned Supervisor</option>
+        <option value="unassigned">No Supervisor</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- Stores Table -->
+<div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+  <!-- Table Header -->
+  <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <h2 class="text-base leading-6 font-semibold text-slate-900">Store Directory</h2>
+        <span id="storeCount" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+          0 stores
+        </span>
+      </div>
+      
+      <!-- Export/Actions -->
+      <div class="flex items-center gap-2">
+        <button class="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded transition-colors duration-200">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          Export
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Content -->
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-slate-200">
+      <thead class="bg-slate-50">
+        <tr>
+          <th scope="col" class="px-6 py-3 text-left">
+            <button class="group flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-700" onclick="funSortTable('storeCode')">
+              Store Code
+              <i data-lucide="arrow-up-down" class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </button>
+          </th>
+          <th scope="col" class="px-6 py-3 text-left">
+            <button class="group flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-700" onclick="funSortTable('storeName')">
+              Store Name
+              <i data-lucide="arrow-up-down" class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </button>
+          </th>
+          <th scope="col" class="px-6 py-3 text-left">
+            <button class="group flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-700" onclick="funSortTable('location')">
+              Location
+              <i data-lucide="arrow-up-down" class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </button>
+          </th>
+          <th scope="col" class="px-6 py-3 text-left">
+            <button class="group flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-700" onclick="funSortTable('supervisor')">
+              Assigned Supervisor
+              <i data-lucide="arrow-up-down" class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </button>
+          </th>
+          <th scope="col" class="px-6 py-3 text-left">
+            <button class="group flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-700" onclick="funSortTable('promodizers')">
+              Promodizers
+              <i data-lucide="arrow-up-down" class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </button>
+          </th>
+          <th scope="col" class="px-6 py-3 text-left">
+            <button class="group flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-700" onclick="funSortTable('status')">
+              Status
+              <i data-lucide="arrow-up-down" class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </button>
+          </th>
+          <th scope="col" class="px-6 py-3 text-right">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Actions</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody id="storesTableBody" class="bg-white divide-y divide-slate-200">
+        <!-- Table rows will be populated by JavaScript -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State -->
+  <div id="emptyState" class="hidden text-center py-16">
+    <div class="flex justify-center mb-4">
+      <div class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center">
+        <i data-lucide="store" class="w-6 h-6 text-slate-400"></i>
+      </div>
+    </div>
+    <h3 class="text-base font-semibold text-slate-900 mb-2">No stores found</h3>
+    <p class="text-sm text-slate-600 mb-6">Get started by adding your first store location.</p>
+    <button onclick="window.location.href='store_create.html'" class="inline-flex items-center gap-2 px-4 py-2 bg-teal-700 hover:bg-teal-600 text-white font-semibold rounded text-sm transition-all duration-200">
+      <i data-lucide="plus" class="w-4 h-4"></i>
+      Add New Store
+    </button>
+  </div>
+</div>
+
+<!-- Pagination -->
+<div id="pagination" class="hidden flex items-center justify-between mt-6">
+  <div class="text-sm text-slate-600">
+    Showing <span id="paginationStart">1</span> to <span id="paginationEnd">50</span> of <span id="paginationTotal">0</span> stores
+  </div>
+  <div class="flex items-center gap-1">
+    <button id="prevPage" class="px-3 py-2 text-sm text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+      Previous
+    </button>
+    <div id="pageNumbers" class="flex items-center gap-1">
+      <!-- Page numbers will be generated by JavaScript -->
+    </div>
+    <button id="nextPage" class="px-3 py-2 text-sm text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+      Next
+    </button>
+  </div>
+</div>
+
+<!-- Promodizers Popover -->
+<div id="promodizersPopover" class="absolute bg-white border border-slate-200 rounded-lg shadow-xl z-50 w-64 hidden" data-portal="body">
+  <div class="p-4">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-sm font-semibold text-slate-900">Assigned Promodizers</h3>
+      <button onclick="funHidePromodizersPopover()" class="text-slate-400 hover:text-slate-600">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+    <div id="promodizersPopoverContent" class="space-y-2">
+      <!-- Content will be populated by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,28rem)] max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+              <i data-lucide="alert-triangle" class="w-5 h-5 text-red-600"></i>
+            </div>
+            <h2 class="text-lg font-semibold text-slate-900">Delete Store</h2>
+          </div>
+          <button onclick="funCloseDeleteModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Content -->
+        <div class="mb-6">
+          <div class="bg-slate-50 rounded-lg p-4 mb-4">
+            <h3 class="font-medium text-slate-900 mb-2" id="deleteStoreInfo">Store Details</h3>
+            <div class="space-y-1 text-sm text-slate-600">
+              <div><span class="font-medium">Code:</span> <span id="deleteStoreCode">-</span></div>
+              <div><span class="font-medium">Name:</span> <span id="deleteStoreName">-</span></div>
+              <div><span class="font-medium">Location:</span> <span id="deleteStoreLocation">-</span></div>
+            </div>
+          </div>
+
+          <div id="deleteWarnings" class="space-y-3 mb-4">
+            <!-- Warnings will be populated by JavaScript -->
+          </div>
+
+          <p class="text-sm text-slate-700">
+            This action cannot be undone. All related data including personnel allocations will be permanently removed.
+          </p>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-3">
+          <button onclick="funCloseDeleteModal()" class="flex-1 px-4 py-2 border border-slate-200 text-slate-700 rounded font-medium hover:bg-slate-50 transition-colors duration-200">
+            Cancel
+          </button>
+          <button id="confirmDeleteBtn" onclick="funConfirmDelete()" class="flex-1 px-4 py-2 bg-red-600 text-white rounded font-medium hover:bg-red-700 transition-colors duration-200">
+            Force Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success Toast -->
+<div id="successToast" class="fixed top-4 right-4 z-50 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300" data-portal="body">
+  <div class="flex items-center gap-2">
+    <i data-lucide="check-circle" class="w-4 h-4"></i>
+    <span id="successToastMessage">Action completed successfully</span>
+  </div>
+</div>
+
+</main>
+
+    <!-- JAVASCRIPT INITIALIZATION -->
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils =
+          window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_mgmt_001");
+                    currentUserId = "usr_mgmt_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } =
+            state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail)
+            return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute(
+            "aria-expanded",
+            shouldOpen ? "true" : "false"
+          );
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active");
+            } else {
+              link.classList.remove("active");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () =>
+            closeMobileSidebar()
+          );
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+// Utility: portal a modal by id (idempotent)
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+
+  // Set active navigation
+  if (typeof TemplateUtils !== 'undefined' && TemplateUtils.setActiveNavLink) {
+    TemplateUtils.setActiveNavLink('store_list');
+  }
+
+  // Initialize the stores list
+  funInitializeStoresList();
+  funLoadAndDisplayStores();
+
+  // Bind filter events
+  document.getElementById('searchInput').addEventListener('input', funApplyFilters);
+  document.getElementById('statusFilter').addEventListener('change', funApplyFilters);
+  document.getElementById('assignmentFilter').addEventListener('change', funApplyFilters);
+});
+
+let storesData = [];
+let filteredStores = [];
+let currentSort = { column: null, direction: 'asc' };
+let currentPage = 1;
+const itemsPerPage = 50;
+let currentDeleteStoreId = null;
+
+function funInitializeStoresList() {
+  // Get all required data from localStorage
+  const stores = JSON.parse(localStorage.getItem('stores') || '[]');
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  const supervisorAllocations = JSON.parse(localStorage.getItem('supervisorAllocations') || '[]');
+  const promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+  const salesRecords = JSON.parse(localStorage.getItem('salesRecords') || '[]');
+
+  // Process stores data with relationships
+  storesData = stores.map(store => {
+    // Find assigned supervisor
+    const supervisorAllocation = supervisorAllocations.find(sa => sa.storeId === store.id);
+    const supervisor = supervisorAllocation ? users.find(u => u.id === supervisorAllocation.supervisorId) : null;
+
+    // Find promodizers
+    const storePromoAllocations = promodizerAllocations.filter(pa => pa.storeId === store.id);
+    const promodizers = storePromoAllocations.map(pa => {
+      const promodizer = users.find(u => u.id === pa.promodizerId);
+      return {
+        id: pa.promodizerId,
+        name: promodizer ? `${promodizer.firstName} ${promodizer.lastName}` : 'Unknown',
+        employeeId: promodizer?.employeeId || ''
+      };
+    });
+
+    // Check for sales records
+    const hasSalesRecords = salesRecords.some(sr => sr.storeId === store.id);
+
+    return {
+      ...store,
+      supervisor: supervisor ? {
+        id: supervisor.id,
+        name: `${supervisor.firstName} ${supervisor.lastName}`,
+        employeeId: supervisor.employeeId
+      } : null,
+      promodizers,
+      promodizersCount: promodizers.length,
+      hasSalesRecords,
+      location: `${store.address.city}, ${store.address.state}`,
+      isAssigned: !!supervisor
+    };
+  });
+
+  filteredStores = [...storesData];
+}
+
+function funLoadAndDisplayStores() {
+  funUpdateStoreCount();
+  funRenderStoreTable();
+  funUpdatePagination();
+}
+
+function funApplyFilters() {
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  const statusFilter = document.getElementById('statusFilter').value;
+  const assignmentFilter = document.getElementById('assignmentFilter').value;
+
+  filteredStores = storesData.filter(store => {
+    // Search filter
+    const matchesSearch = !searchTerm || 
+      store.storeCode.toLowerCase().includes(searchTerm) ||
+      store.storeName.toLowerCase().includes(searchTerm) ||
+      store.location.toLowerCase().includes(searchTerm);
+
+    // Status filter
+    const matchesStatus = !statusFilter || store.status === statusFilter;
+
+    // Assignment filter
+    let matchesAssignment = true;
+    if (assignmentFilter === 'assigned') {
+      matchesAssignment = store.isAssigned;
+    } else if (assignmentFilter === 'unassigned') {
+      matchesAssignment = !store.isAssigned;
+    }
+
+    return matchesSearch && matchesStatus && matchesAssignment;
+  });
+
+  currentPage = 1;
+  funLoadAndDisplayStores();
+}
+
+function funSortTable(column) {
+  if (currentSort.column === column) {
+    currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+  } else {
+    currentSort.column = column;
+    currentSort.direction = 'asc';
+  }
+
+  filteredStores.sort((a, b) => {
+    let valueA, valueB;
+
+    switch (column) {
+      case 'storeCode':
+        valueA = a.storeCode;
+        valueB = b.storeCode;
+        break;
+      case 'storeName':
+        valueA = a.storeName;
+        valueB = b.storeName;
+        break;
+      case 'location':
+        valueA = a.location;
+        valueB = b.location;
+        break;
+      case 'supervisor':
+        valueA = a.supervisor ? a.supervisor.name : '';
+        valueB = b.supervisor ? b.supervisor.name : '';
+        break;
+      case 'promodizers':
+        valueA = a.promodizersCount;
+        valueB = b.promodizersCount;
+        break;
+      case 'status':
+        valueA = a.status;
+        valueB = b.status;
+        break;
+      default:
+        return 0;
+    }
+
+    if (typeof valueA === 'string') {
+      valueA = valueA.toLowerCase();
+      valueB = valueB.toLowerCase();
+    }
+
+    let result = 0;
+    if (valueA < valueB) result = -1;
+    if (valueA > valueB) result = 1;
+
+    return currentSort.direction === 'asc' ? result : -result;
+  });
+
+  funRenderStoreTable();
+}
+
+function funUpdateStoreCount() {
+  const storeCount = document.getElementById('storeCount');
+  const count = filteredStores.length;
+  storeCount.textContent = `${count} store${count !== 1 ? 's' : ''}`;
+}
+
+function funRenderStoreTable() {
+  const tableBody = document.getElementById('storesTableBody');
+  const emptyState = document.getElementById('emptyState');
+
+  if (filteredStores.length === 0) {
+    tableBody.innerHTML = '';
+    emptyState.classList.remove('hidden');
+    return;
+  }
+
+  emptyState.classList.add('hidden');
+
+  // Calculate pagination
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, filteredStores.length);
+  const paginatedStores = filteredStores.slice(startIndex, endIndex);
+
+  tableBody.innerHTML = paginatedStores.map(store => `
+    <tr class="hover:bg-slate-50 transition-colors duration-200">
+      <td class="px-6 py-4 whitespace-nowrap">
+        <div class="text-sm font-medium text-slate-900">${store.storeCode}</div>
+      </td>
+      <td class="px-6 py-4">
+        <div class="text-sm font-medium text-slate-900">${store.storeName}</div>
+        <div class="text-xs text-slate-500">${store.contactPerson}</div>
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap">
+        <div class="text-sm text-slate-900">${store.location}</div>
+        <div class="text-xs text-slate-500">${store.address.zipCode}</div>
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap">
+        ${store.supervisor ? `
+          <button 
+            onclick="window.location.href='supervisor_details.html?id=${store.supervisor.id}'"
+            class="text-sm text-teal-700 hover:text-teal-900 font-medium underline"
+          >
+            ${store.supervisor.name}
+          </button>
+          <div class="text-xs text-slate-500">${store.supervisor.employeeId}</div>
+        ` : `
+          <div class="flex items-center gap-1">
+            <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500"></i>
+            <span class="text-sm text-slate-500">Unassigned</span>
+          </div>
+        `}
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap">
+        ${store.promodizersCount > 0 ? `
+          <button 
+            onclick="funShowPromodizersPopover(event, '${store.id}')"
+            class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800 hover:bg-teal-200 transition-colors duration-200"
+          >
+            <i data-lucide="users" class="w-3 h-3"></i>
+            ${store.promodizersCount}
+          </button>
+        ` : `
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500">
+            0
+          </span>
+        `}
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap">
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+          store.status === 'active' 
+            ? 'bg-green-100 text-green-800' 
+            : 'bg-red-100 text-red-800'
+        }">
+          ${store.status === 'active' ? 'Active' : 'Inactive'}
+        </span>
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <div class="flex items-center justify-end gap-2">
+          <button 
+            onclick="window.location.href='store_details.html?id=${store.id}'"
+            class="text-slate-600 hover:text-teal-700 transition-colors duration-200"
+            title="View Details"
+          >
+            <i data-lucide="eye" class="w-4 h-4"></i>
+          </button>
+          <button 
+            onclick="window.location.href='store_edit.html?id=${store.id}'"
+            class="text-slate-600 hover:text-amber-600 transition-colors duration-200"
+            title="Edit Store"
+          >
+            <i data-lucide="pencil" class="w-4 h-4"></i>
+          </button>
+          <button 
+            onclick="funShowDeleteModal('${store.id}')"
+            class="text-slate-600 hover:text-red-600 transition-colors duration-200"
+            title="Delete Store"
+          >
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function funUpdatePagination() {
+  const pagination = document.getElementById('pagination');
+  const totalItems = filteredStores.length;
+
+  if (totalItems <= itemsPerPage) {
+    pagination.classList.add('hidden');
+    return;
+  }
+
+  pagination.classList.remove('hidden');
+
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startItem = ((currentPage - 1) * itemsPerPage) + 1;
+  const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+
+  document.getElementById('paginationStart').textContent = startItem;
+  document.getElementById('paginationEnd').textContent = endItem;
+  document.getElementById('paginationTotal').textContent = totalItems;
+
+  // Update pagination buttons
+  const prevBtn = document.getElementById('prevPage');
+  const nextBtn = document.getElementById('nextPage');
+
+  prevBtn.disabled = currentPage === 1;
+  nextBtn.disabled = currentPage === totalPages;
+
+  prevBtn.onclick = () => {
+    if (currentPage > 1) {
+      currentPage--;
+      funRenderStoreTable();
+      funUpdatePagination();
+    }
+  };
+
+  nextBtn.onclick = () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      funRenderStoreTable();
+      funUpdatePagination();
+    }
+  };
+}
+
+function funShowPromodizersPopover(event, storeId) {
+  event.stopPropagation();
+  
+  const popover = document.getElementById('promodizersPopover');
+  const content = document.getElementById('promodizersPopoverContent');
+  
+  const store = storesData.find(s => s.id === storeId);
+  if (!store || store.promodizers.length === 0) return;
+
+  content.innerHTML = store.promodizers.map(promodizer => `
+    <div class="flex items-center justify-between py-2">
+      <div>
+        <button 
+          onclick="window.location.href='promodizer_details.html?id=${promodizer.id}'"
+          class="text-sm font-medium text-teal-700 hover:text-teal-900 underline"
+        >
+          ${promodizer.name}
+        </button>
+        <div class="text-xs text-slate-500">${promodizer.employeeId}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Position popover
+  const rect = event.target.getBoundingClientRect();
+  popover.style.top = `${rect.bottom + window.scrollY + 5}px`;
+  popover.style.left = `${rect.left + window.scrollX}px`;
+  
+  popover.classList.remove('hidden');
+
+  // Close on outside click
+  setTimeout(() => {
+    document.addEventListener('click', funHidePromodizersPopover, { once: true });
+  }, 100);
+}
+
+function funHidePromodizersPopover() {
+  const popover = document.getElementById('promodizersPopover');
+  popover.classList.add('hidden');
+}
+
+function funShowDeleteModal(storeId) {
+  currentDeleteStoreId = storeId;
+  
+  const store = storesData.find(s => s.id === storeId);
+  if (!store) return;
+
+  // Populate store details
+  document.getElementById('deleteStoreCode').textContent = store.storeCode;
+  document.getElementById('deleteStoreName').textContent = store.storeName;
+  document.getElementById('deleteStoreLocation').textContent = store.location;
+
+  // Generate warnings
+  const warnings = [];
+  
+  if (store.supervisor || store.promodizersCount > 0) {
+    const personnelList = [];
+    if (store.supervisor) personnelList.push(store.supervisor.name);
+    if (store.promodizersCount > 0) personnelList.push(`${store.promodizersCount} promodizer${store.promodizersCount !== 1 ? 's' : ''}`);
+    
+    warnings.push({
+      type: 'warning',
+      text: `This store has active personnel assignments: ${personnelList.join(', ')}. Deleting will remove all allocations.`
+    });
+  }
+
+  if (store.hasSalesRecords) {
+    warnings.push({
+      type: 'error',
+      text: 'This store has historical sales data that will be permanently lost.'
+    });
+  }
+
+  const warningsContainer = document.getElementById('deleteWarnings');
+  warningsContainer.innerHTML = warnings.map(warning => `
+    <div class="flex items-start gap-3 p-3 rounded-lg ${
+      warning.type === 'error' ? 'bg-red-50 border border-red-200' : 'bg-amber-50 border border-amber-200'
+    }">
+      <i data-lucide="${warning.type === 'error' ? 'alert-circle' : 'alert-triangle'}" class="w-4 h-4 mt-0.5 ${
+        warning.type === 'error' ? 'text-red-600' : 'text-amber-600'
+      }"></i>
+      <p class="text-sm ${warning.type === 'error' ? 'text-red-800' : 'text-amber-800'}">${warning.text}</p>
+    </div>
+  `).join('');
+
+  document.getElementById('deleteModal').classList.remove('hidden');
+}
+
+function funCloseDeleteModal() {
+  document.getElementById('deleteModal').classList.add('hidden');
+  currentDeleteStoreId = null;
+}
+
+function funConfirmDelete() {
+  if (!currentDeleteStoreId) return;
+
+  try {
+    // Remove store from stores collection
+    let stores = JSON.parse(localStorage.getItem('stores') || '[]');
+    stores = stores.filter(s => s.id !== currentDeleteStoreId);
+    localStorage.setItem('stores', JSON.stringify(stores));
+
+    // Remove supervisor allocations
+    let supervisorAllocations = JSON.parse(localStorage.getItem('supervisorAllocations') || '[]');
+    supervisorAllocations = supervisorAllocations.filter(sa => sa.storeId !== currentDeleteStoreId);
+    localStorage.setItem('supervisorAllocations', JSON.stringify(supervisorAllocations));
+
+    // Remove promodizer allocations
+    let promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+    promodizerAllocations = promodizerAllocations.filter(pa => pa.storeId !== currentDeleteStoreId);
+    localStorage.setItem('promodizerAllocations', JSON.stringify(promodizerAllocations));
+
+    // Close modal
+    funCloseDeleteModal();
+
+    // Show success message
+    funShowSuccessToast('Store deleted successfully');
+
+    // Refresh data and display
+    funInitializeStoresList();
+    funLoadAndDisplayStores();
+
+  } catch (error) {
+    console.error('Error deleting store:', error);
+    funShowSuccessToast('Error deleting store', 'error');
+  }
+}
+
+function funShowSuccessToast(message, type = 'success') {
+  const toast = document.getElementById('successToast');
+  const messageEl = document.getElementById('successToastMessage');
+  
+  messageEl.textContent = message;
+  
+  if (type === 'error') {
+    toast.className = toast.className.replace('bg-green-600', 'bg-red-600');
+  } else {
+    toast.className = toast.className.replace('bg-red-600', 'bg-green-600');
+  }
+  
+  toast.style.transform = 'translateX(0)';
+  
+  setTimeout(() => {
+    toast.style.transform = 'translateX(100%)';
+  }, 3000);
+}
+</script></body></html>

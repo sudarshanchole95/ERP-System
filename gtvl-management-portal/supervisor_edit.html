@@ -1,0 +1,1054 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>GTVL Management Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        /* GTVL Brand Colors */
+        --color-primary: #0F766E; /* Teal-700 - Primary CTAs, navigation highlights */
+        --color-primary-hover: #0D9488; /* Teal-600 - Hover states */
+        --color-secondary: #475569; /* Slate-600 - Secondary elements */
+        --color-accent: #D97706; /* Amber-600 - Call-to-action highlights */
+        --color-surface: #FFFFFF; /* White - Cards, modals, panels */
+        --color-background: #F8FAFC; /* Slate-50 - Page backgrounds */
+        --color-surface-variant: #F1F5F9; /* Slate-100 - Alternate backgrounds */
+        --color-on-background: #0F172A; /* Slate-900 - Primary headings */
+        --color-on-surface: #1E293B; /* Slate-800 - Body text */
+        --color-border: #E2E8F0; /* Slate-200 - Borders */
+        --color-success: #16A34A; /* Green-600 - Success states */
+        --color-warning: #F59E0B; /* Amber-500 - Warning alerts */
+        --color-error: #DC2626; /* Red-600 - Error messages */
+        --color-info: #2563EB; /* Blue-600 - Info messages */
+
+        /* Layout Constants */
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      /* Smooth scrolling */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      /* Layout with CSS variables */
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      /* Mobile sidebar slide states */
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      /* Active nav link styling */
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+        background-color: #f0fdfa;
+        color: var(--color-primary);
+      }
+
+      /* Popover animation states */
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      /* Sidebar backdrop states */
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Edit Supervisor - GTVL Management Portal</title></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <!-- HEADER SECTION -->
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <!-- Left: Logo & Title -->
+        <div class="flex items-center gap-3">
+          <!-- Mobile Menu Toggle -->
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <!-- Logo -->
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <rect x="68" y="68" width="264" height="264" rx="32" stroke="#0F766E" stroke-width="18"></rect>
+                  <rect x="109" y="143" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                  <rect x="206" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                </g>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">
+              GTVL Management Portal
+            </h1>
+          </div>
+        </div>
+
+        <!-- Right: User Profile -->
+        <div class="flex items-center gap-2 md:gap-3">
+          <!-- User Profile Button -->
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-500 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- User Profile Popover -->
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <!-- User Info Section -->
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-500 truncate"></div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <!-- Main Navigation Section -->
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Management
+          </div>
+          <div class="space-y-1">
+            <a href="management_dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="management_dashboard">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="sku_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sku_list">
+              <i data-lucide="package" class="w-5 h-5"></i>
+              <span>SKUs</span>
+            </a>
+            <a href="store_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="store_list">
+              <i data-lucide="store" class="w-5 h-5"></i>
+              <span>Stores</span>
+            </a>
+            <a href="supervisor_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="supervisor_list">
+              <i data-lucide="user-check" class="w-5 h-5"></i>
+              <span>Supervisors</span>
+            </a>
+            <a href="promodizer_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="promodizer_list">
+              <i data-lucide="users" class="w-5 h-5"></i>
+              <span>Promodizers</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="app-main p-6" id="pageContent" role="main"><div class="space-y-6">
+  <!-- Breadcrumb Navigation -->
+  <nav class="flex" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a href="management_dashboard.html" class="inline-flex items-center text-sm font-medium text-slate-700 hover:text-teal-700 transition-colors duration-200">
+          <i data-lucide="layout-dashboard" class="w-4 h-4 mr-2"></i>
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 mx-1"></i>
+          <a href="supervisor_list.html" class="text-sm font-medium text-slate-700 hover:text-teal-700 transition-colors duration-200">Supervisors</a>
+        </div>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 mx-1"></i>
+          <span id="breadcrumbSupervisorName" class="text-sm font-medium text-slate-700"></span>
+        </div>
+      </li>
+      <li aria-current="page">
+        <div class="flex items-center">
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 mx-1"></i>
+          <span class="text-sm font-medium text-slate-500">Edit</span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+
+  <!-- Page Header -->
+  <div>
+    <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900 mb-2">Edit Supervisor</h1>
+    <p class="text-sm leading-[1.375rem] font-normal text-slate-600">Update supervisor account information and settings</p>
+  </div>
+
+  <!-- Store Assignment Warning (Hidden by default) -->
+  <div id="storeAssignmentWarning" class="hidden p-4 bg-amber-50 border-l-4 border-amber-500 rounded-lg">
+    <div class="flex items-start">
+      <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-500 mt-0.5 mr-3 shrink-0"></i>
+      <div>
+        <h3 class="text-sm font-semibold text-amber-800 mb-1">Store Assignment Notice</h3>
+        <p id="storeAssignmentMessage" class="text-sm text-amber-700"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Supervisor Form -->
+  <div class="bg-white border border-slate-200 rounded-lg shadow-sm">
+    <div class="px-6 py-4 border-b border-slate-200">
+      <h2 class="text-base leading-6 font-semibold text-slate-900">Supervisor Information</h2>
+    </div>
+
+    <form id="editSupervisorForm" class="p-6 space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- First Name -->
+        <div>
+          <label for="firstName" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+            First Name <span class="text-red-600">*</span>
+          </label>
+          <input type="text" id="firstName" name="firstName" required="" class="w-full px-4 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors duration-200" placeholder="Enter first name">
+          <div id="firstNameError" class="hidden mt-1 text-xs text-red-600"></div>
+        </div>
+
+        <!-- Last Name -->
+        <div>
+          <label for="lastName" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+            Last Name <span class="text-red-600">*</span>
+          </label>
+          <input type="text" id="lastName" name="lastName" required="" class="w-full px-4 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors duration-200" placeholder="Enter last name">
+          <div id="lastNameError" class="hidden mt-1 text-xs text-red-600"></div>
+        </div>
+
+        <!-- Employee ID -->
+        <div>
+          <label for="employeeId" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+            Employee ID <span class="text-red-600">*</span>
+          </label>
+          <input type="text" id="employeeId" name="employeeId" required="" class="w-full px-4 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors duration-200" placeholder="Enter employee ID">
+          <div id="employeeIdError" class="hidden mt-1 text-xs text-red-600"></div>
+          <p class="mt-1 text-xs text-slate-500">Must be unique across all supervisors and promodizers</p>
+        </div>
+
+        <!-- Phone Number -->
+        <div>
+          <label for="phone" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+            Phone Number <span class="text-red-600">*</span>
+          </label>
+          <input type="tel" id="phone" name="phone" required="" class="w-full px-4 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors duration-200" placeholder="+1-555-0123">
+          <div id="phoneError" class="hidden mt-1 text-xs text-red-600"></div>
+        </div>
+
+        <!-- Email Address -->
+        <div class="md:col-span-2">
+          <label for="email" class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-2">
+            Email Address <span class="text-red-600">*</span>
+          </label>
+          <input type="email" id="email" name="email" required="" class="w-full px-4 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors duration-200" placeholder="supervisor@company.com">
+          <div id="emailError" class="hidden mt-1 text-xs text-red-600"></div>
+        </div>
+
+        <!-- Status -->
+        <div class="md:col-span-2">
+          <label class="block text-sm leading-[1.375rem] font-semibold text-slate-800 mb-3">
+            Account Status <span class="text-red-600">*</span>
+          </label>
+          <div class="flex gap-6">
+            <label class="flex items-center">
+              <input type="radio" name="status" value="active" id="statusActive" class="w-4 h-4 text-teal-700 border-slate-300 focus:ring-teal-500 focus:ring-2" checked="">
+              <span class="ml-2 text-sm text-slate-800">Active</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="status" value="inactive" id="statusInactive" class="w-4 h-4 text-teal-700 border-slate-300 focus:ring-teal-500 focus:ring-2">
+              <span class="ml-2 text-sm text-slate-800">Inactive</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-slate-200">
+        <button type="button" id="cancelButton" class="px-6 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-colors duration-200">
+          Cancel
+        </button>
+        <button type="button" id="viewDetailsButton" class="px-6 py-2 text-sm font-medium text-slate-700 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-colors duration-200">
+          View Details
+        </button>
+        <button type="submit" id="updateSupervisorButton" class="px-6 py-2 text-sm font-medium text-white bg-teal-700 border border-teal-700 rounded-lg hover:bg-teal-600 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-colors duration-200">
+          Update Supervisor
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Success Toast -->
+<div id="successToast" class="fixed top-4 right-4 z-50 hidden">
+  <div class="bg-white border border-green-200 rounded-lg shadow-lg p-4 max-w-sm">
+    <div class="flex items-center">
+      <div class="flex-shrink-0">
+        <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm font-medium text-green-800">Supervisor Updated Successfully</p>
+        <p class="text-sm text-green-600 mt-1">Changes have been saved to the system.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Error Toast -->
+<div id="errorToast" class="fixed top-4 right-4 z-50 hidden">
+  <div class="bg-white border border-red-200 rounded-lg shadow-lg p-4 max-w-sm">
+    <div class="flex items-center">
+      <div class="flex-shrink-0">
+        <i data-lucide="alert-circle" class="w-5 h-5 text-red-600"></i>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm font-medium text-red-800">Error Updating Supervisor</p>
+        <p id="errorToastMessage" class="text-sm text-red-600 mt-1"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+    <!-- JAVASCRIPT INITIALIZATION -->
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils =
+          window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_mgmt_001");
+                    currentUserId = "usr_mgmt_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } =
+            state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail)
+            return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute(
+            "aria-expanded",
+            shouldOpen ? "true" : "false"
+          );
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active");
+            } else {
+              link.classList.remove("active");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () =>
+            closeMobileSidebar()
+          );
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+// Utility: portal a modal by id (idempotent)
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+
+  // Set active navigation link
+  if (typeof TemplateUtils !== 'undefined' && TemplateUtils.setActiveNavLink) {
+    TemplateUtils.setActiveNavLink('supervisor_list');
+  }
+
+  let currentSupervisorId = null;
+  let originalSupervisor = null;
+
+  // Extract supervisor ID from URL parameters
+  function funGetSupervisorIdFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('id');
+  }
+
+  // Load supervisor data by ID
+  function funLoadSupervisorData(supervisorId) {
+    try {
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const supervisor = users.find(user => user.id === supervisorId && user.role === 'supervisor');
+      
+      if (!supervisor) {
+        funShowErrorToast('Supervisor not found');
+        window.location.href = 'supervisor_list.html';
+        return null;
+      }
+      
+      return supervisor;
+    } catch (error) {
+      console.error('Error loading supervisor data:', error);
+      funShowErrorToast('Error loading supervisor data');
+      return null;
+    }
+  }
+
+  // Check if supervisor is assigned to a store
+  function funCheckStoreAssignment(supervisorId) {
+    try {
+      const supervisorAllocations = JSON.parse(localStorage.getItem('supervisorAllocations') || '[]');
+      const stores = JSON.parse(localStorage.getItem('stores') || '[]');
+      
+      const allocation = supervisorAllocations.find(alloc => alloc.supervisorId === supervisorId);
+      if (allocation) {
+        const store = stores.find(s => s.id === allocation.storeId);
+        return store ? store.storeName : 'Unknown Store';
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error checking store assignment:', error);
+      return null;
+    }
+  }
+
+  // Populate form with supervisor data
+  function funPopulateForm(supervisor) {
+    document.getElementById('firstName').value = supervisor.firstName || '';
+    document.getElementById('lastName').value = supervisor.lastName || '';
+    document.getElementById('employeeId').value = supervisor.employeeId || '';
+    document.getElementById('phone').value = supervisor.phone || '';
+    document.getElementById('email').value = supervisor.email || '';
+    
+    // Set status radio buttons
+    if (supervisor.status === 'inactive') {
+      document.getElementById('statusInactive').checked = true;
+    } else {
+      document.getElementById('statusActive').checked = true;
+    }
+    
+    // Update breadcrumb
+    const supervisorName = `${supervisor.firstName} ${supervisor.lastName}`.trim() || 'Unknown Supervisor';
+    document.getElementById('breadcrumbSupervisorName').textContent = supervisorName;
+  }
+
+  // Show store assignment warning if applicable
+  function funShowStoreAssignmentWarning(storeName) {
+    if (storeName) {
+      const warningDiv = document.getElementById('storeAssignmentWarning');
+      const messageElement = document.getElementById('storeAssignmentMessage');
+      
+      messageElement.textContent = `This supervisor is assigned to ${storeName}. Changing the Employee ID may affect reporting and audit trails.`;
+      warningDiv.classList.remove('hidden');
+    }
+  }
+
+  // Validate form fields
+  function funValidateForm() {
+    let isValid = true;
+
+    // Clear previous errors
+    document.querySelectorAll('[id$="Error"]').forEach(el => el.classList.add('hidden'));
+
+    // First Name validation
+    const firstName = document.getElementById('firstName').value.trim();
+    if (!firstName) {
+      funShowFieldError('firstName', 'First name is required');
+      isValid = false;
+    } else if (firstName.length < 2) {
+      funShowFieldError('firstName', 'First name must be at least 2 characters');
+      isValid = false;
+    }
+
+    // Last Name validation
+    const lastName = document.getElementById('lastName').value.trim();
+    if (!lastName) {
+      funShowFieldError('lastName', 'Last name is required');
+      isValid = false;
+    } else if (lastName.length < 2) {
+      funShowFieldError('lastName', 'Last name must be at least 2 characters');
+      isValid = false;
+    }
+
+    // Employee ID validation
+    const employeeId = document.getElementById('employeeId').value.trim();
+    if (!employeeId) {
+      funShowFieldError('employeeId', 'Employee ID is required');
+      isValid = false;
+    } else if (!funValidateEmployeeIdUniqueness(employeeId)) {
+      funShowFieldError('employeeId', 'Employee ID already exists');
+      isValid = false;
+    }
+
+    // Phone validation
+    const phone = document.getElementById('phone').value.trim();
+    if (!phone) {
+      funShowFieldError('phone', 'Phone number is required');
+      isValid = false;
+    } else if (!funValidatePhoneFormat(phone)) {
+      funShowFieldError('phone', 'Please enter a valid phone number format (+1-555-0123)');
+      isValid = false;
+    }
+
+    // Email validation
+    const email = document.getElementById('email').value.trim();
+    if (!email) {
+      funShowFieldError('email', 'Email address is required');
+      isValid = false;
+    } else if (!funValidateEmailFormat(email)) {
+      funShowFieldError('email', 'Please enter a valid email address');
+      isValid = false;
+    } else if (!funValidateEmailUniqueness(email)) {
+      funShowFieldError('email', 'Email address already exists');
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  // Validate Employee ID uniqueness (excluding current supervisor)
+  function funValidateEmployeeIdUniqueness(employeeId) {
+    try {
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      return !users.some(user => 
+        user.employeeId === employeeId && 
+        user.id !== currentSupervisorId &&
+        (user.role === 'supervisor' || user.role === 'promodizer')
+      );
+    } catch (error) {
+      console.error('Error validating employee ID uniqueness:', error);
+      return false;
+    }
+  }
+
+  // Validate email uniqueness (excluding current supervisor)
+  function funValidateEmailUniqueness(email) {
+    try {
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      return !users.some(user => 
+        user.email === email && 
+        user.id !== currentSupervisorId
+      );
+    } catch (error) {
+      console.error('Error validating email uniqueness:', error);
+      return false;
+    }
+  }
+
+  // Validate phone format
+  function funValidatePhoneFormat(phone) {
+    const phoneRegex = /^\+\d{1,3}-\d{3}-\d{4}$/;
+    return phoneRegex.test(phone);
+  }
+
+  // Validate email format
+  function funValidateEmailFormat(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  // Show field error
+  function funShowFieldError(fieldId, message) {
+    const errorElement = document.getElementById(`${fieldId}Error`);
+    if (errorElement) {
+      errorElement.textContent = message;
+      errorElement.classList.remove('hidden');
+    }
+  }
+
+  // Update supervisor
+  function funUpdateSupervisor(formData) {
+    try {
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const userIndex = users.findIndex(user => user.id === currentSupervisorId);
+      
+      if (userIndex === -1) {
+        funShowErrorToast('Supervisor not found');
+        return false;
+      }
+
+      // Update supervisor data
+      const updatedSupervisor = {
+        ...users[userIndex],
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        employeeId: formData.employeeId,
+        phone: formData.phone,
+        email: formData.email,
+        status: formData.status,
+        updatedAt: new Date().toISOString()
+      };
+
+      users[userIndex] = updatedSupervisor;
+      localStorage.setItem('users', JSON.stringify(users));
+
+      return true;
+    } catch (error) {
+      console.error('Error updating supervisor:', error);
+      funShowErrorToast('Error updating supervisor data');
+      return false;
+    }
+  }
+
+  // Show success toast
+  function funShowSuccessToast() {
+    const toast = document.getElementById('successToast');
+    toast.classList.remove('hidden');
+    setTimeout(() => {
+      toast.classList.add('hidden');
+    }, 3000);
+  }
+
+  // Show error toast
+  function funShowErrorToast(message) {
+    const toast = document.getElementById('errorToast');
+    const messageElement = document.getElementById('errorToastMessage');
+    messageElement.textContent = message;
+    toast.classList.remove('hidden');
+    setTimeout(() => {
+      toast.classList.add('hidden');
+    }, 5000);
+  }
+
+  // Navigate to supervisor details page
+  function funNavigateToDetails() {
+    window.location.href = `supervisor_details.html?id=${currentSupervisorId}`;
+  }
+
+  // Initialize page
+  function funInitializePage() {
+    currentSupervisorId = funGetSupervisorIdFromUrl();
+    
+    if (!currentSupervisorId) {
+      funShowErrorToast('No supervisor ID provided');
+      window.location.href = 'supervisor_list.html';
+      return;
+    }
+
+    originalSupervisor = funLoadSupervisorData(currentSupervisorId);
+    if (!originalSupervisor) {
+      return; // Error already handled in funLoadSupervisorData
+    }
+
+    funPopulateForm(originalSupervisor);
+    
+    // Check for store assignment and show warning if applicable
+    const assignedStoreName = funCheckStoreAssignment(currentSupervisorId);
+    if (assignedStoreName) {
+      funShowStoreAssignmentWarning(assignedStoreName);
+    }
+  }
+
+  // Event listeners
+  document.getElementById('cancelButton').addEventListener('click', () => {
+    funNavigateToDetails();
+  });
+
+  document.getElementById('viewDetailsButton').addEventListener('click', () => {
+    funNavigateToDetails();
+  });
+
+  document.getElementById('editSupervisorForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    if (!funValidateForm()) {
+      return;
+    }
+
+    const formData = {
+      firstName: document.getElementById('firstName').value.trim(),
+      lastName: document.getElementById('lastName').value.trim(),
+      employeeId: document.getElementById('employeeId').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      status: document.querySelector('input[name="status"]:checked').value
+    };
+
+    if (funUpdateSupervisor(formData)) {
+      funShowSuccessToast();
+      setTimeout(() => {
+        funNavigateToDetails();
+      }, 1500);
+    }
+  });
+
+  // Real-time validation
+  ['firstName', 'lastName', 'employeeId', 'phone', 'email'].forEach(fieldId => {
+    const field = document.getElementById(fieldId);
+    if (field) {
+      field.addEventListener('blur', () => {
+        // Clear error on blur if field has valid content
+        const errorElement = document.getElementById(`${fieldId}Error`);
+        if (field.value.trim() && errorElement && !errorElement.classList.contains('hidden')) {
+          setTimeout(() => {
+            if (fieldId === 'employeeId' && !funValidateEmployeeIdUniqueness(field.value.trim())) {
+              return;
+            }
+            if (fieldId === 'email' && (!funValidateEmailFormat(field.value.trim()) || !funValidateEmailUniqueness(field.value.trim()))) {
+              return;
+            }
+            if (fieldId === 'phone' && !funValidatePhoneFormat(field.value.trim())) {
+              return;
+            }
+            errorElement.classList.add('hidden');
+          }, 100);
+        }
+      });
+    }
+  });
+
+  // Initialize page
+  funInitializePage();
+});
+</script></body></html>

@@ -1,0 +1,882 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>GTVL Management Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        /* GTVL Brand Colors */
+        --color-primary: #0F766E; /* Teal-700 - Primary CTAs, navigation highlights */
+        --color-primary-hover: #0D9488; /* Teal-600 - Hover states */
+        --color-secondary: #475569; /* Slate-600 - Secondary elements */
+        --color-accent: #D97706; /* Amber-600 - Call-to-action highlights */
+        --color-surface: #FFFFFF; /* White - Cards, modals, panels */
+        --color-background: #F8FAFC; /* Slate-50 - Page backgrounds */
+        --color-surface-variant: #F1F5F9; /* Slate-100 - Alternate backgrounds */
+        --color-on-background: #0F172A; /* Slate-900 - Primary headings */
+        --color-on-surface: #1E293B; /* Slate-800 - Body text */
+        --color-border: #E2E8F0; /* Slate-200 - Borders */
+        --color-success: #16A34A; /* Green-600 - Success states */
+        --color-warning: #F59E0B; /* Amber-500 - Warning alerts */
+        --color-error: #DC2626; /* Red-600 - Error messages */
+        --color-info: #2563EB; /* Blue-600 - Info messages */
+
+        /* Layout Constants */
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      /* Smooth scrolling */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      /* Layout with CSS variables */
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      /* Mobile sidebar slide states */
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      /* Active nav link styling */
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+        background-color: #f0fdfa;
+        color: var(--color-primary);
+      }
+
+      /* Popover animation states */
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      /* Sidebar backdrop states */
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Management Dashboard - GTVL Management Portal</title></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <!-- HEADER SECTION -->
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <!-- Left: Logo & Title -->
+        <div class="flex items-center gap-3">
+          <!-- Mobile Menu Toggle -->
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <!-- Logo -->
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <rect x="68" y="68" width="264" height="264" rx="32" stroke="#0F766E" stroke-width="18"></rect>
+                  <rect x="109" y="143" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                  <rect x="206" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                </g>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">
+              GTVL Management Portal
+            </h1>
+          </div>
+        </div>
+
+        <!-- Right: User Profile -->
+        <div class="flex items-center gap-2 md:gap-3">
+          <!-- User Profile Button -->
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-500 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- User Profile Popover -->
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <!-- User Info Section -->
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-500 truncate"></div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <!-- Main Navigation Section -->
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Management
+          </div>
+          <div class="space-y-1">
+            <a href="management_dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="management_dashboard">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="sku_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sku_list">
+              <i data-lucide="package" class="w-5 h-5"></i>
+              <span>SKUs</span>
+            </a>
+            <a href="store_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="store_list">
+              <i data-lucide="store" class="w-5 h-5"></i>
+              <span>Stores</span>
+            </a>
+            <a href="supervisor_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="supervisor_list">
+              <i data-lucide="user-check" class="w-5 h-5"></i>
+              <span>Supervisors</span>
+            </a>
+            <a href="promodizer_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="promodizer_list">
+              <i data-lucide="users" class="w-5 h-5"></i>
+              <span>Promodizers</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="app-main p-6" id="pageContent" role="main"><div class="space-y-6">
+  <!-- Header Section -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900">Management Dashboard</h1>
+      <p class="text-sm leading-[1.375rem] font-normal text-slate-600 mt-1">
+        Central command center for GTVL operations oversight
+      </p>
+    </div>
+    <div class="flex items-center gap-2 text-sm text-slate-600">
+      <i data-lucide="calendar" class="w-4 h-4"></i>
+      <span id="currentDateTime"></span>
+    </div>
+  </div>
+
+  <!-- Key Metrics Cards Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+    <!-- SKU Management Card -->
+    <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-6 hover:shadow-md transition-all duration-200 cursor-pointer group" onclick="funNavigateToPage('sku_list.html')">
+      <div class="flex items-start justify-between">
+        <div class="flex-1">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 bg-teal-50 rounded-lg flex items-center justify-center group-hover:bg-teal-100 transition-colors duration-200">
+              <i data-lucide="package" class="w-5 h-5 text-teal-700"></i>
+            </div>
+            <h3 class="text-base leading-6 font-semibold text-slate-800">SKU Management</h3>
+          </div>
+          <div class="space-y-2">
+            <div class="text-[1.75rem] leading-[2.25rem] font-bold text-teal-700" id="totalSkus">-</div>
+            <p class="text-xs leading-[1.125rem] font-normal text-slate-500">Active Products</p>
+          </div>
+        </div>
+        <i data-lucide="arrow-right" class="w-4 h-4 text-slate-400 group-hover:text-teal-700 transition-colors duration-200"></i>
+      </div>
+    </div>
+
+    <!-- Store Management Card -->
+    <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-6 hover:shadow-md transition-all duration-200 cursor-pointer group" onclick="funNavigateToPage('store_list.html')">
+      <div class="flex items-start justify-between">
+        <div class="flex-1">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center group-hover:bg-amber-100 transition-colors duration-200">
+              <i data-lucide="store" class="w-5 h-5 text-amber-600"></i>
+            </div>
+            <h3 class="text-base leading-6 font-semibold text-slate-800">Store Management</h3>
+          </div>
+          <div class="space-y-2">
+            <div class="text-[1.75rem] leading-[2.25rem] font-bold text-amber-600" id="totalStores">-</div>
+            <p class="text-xs leading-[1.125rem] font-normal text-slate-500">Active Stores</p>
+          </div>
+        </div>
+        <i data-lucide="arrow-right" class="w-4 h-4 text-slate-400 group-hover:text-amber-600 transition-colors duration-200"></i>
+      </div>
+    </div>
+
+    <!-- Supervisor Management Card -->
+    <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-6 hover:shadow-md transition-all duration-200 cursor-pointer group" onclick="funNavigateToPage('supervisor_list.html')">
+      <div class="flex items-start justify-between">
+        <div class="flex-1">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors duration-200">
+              <i data-lucide="user-check" class="w-5 h-5 text-blue-600"></i>
+            </div>
+            <h3 class="text-base leading-6 font-semibold text-slate-800">Supervisors</h3>
+          </div>
+          <div class="space-y-2">
+            <div class="flex items-center gap-2">
+              <div class="text-[1.75rem] leading-[2.25rem] font-bold text-blue-600" id="totalSupervisors">-</div>
+              <div class="text-sm text-slate-500">
+                (<span id="assignedSupervisors">-</span> assigned)
+              </div>
+            </div>
+            <p class="text-xs leading-[1.125rem] font-normal text-slate-500">
+              <span id="unassignedSupervisors">-</span> available for assignment
+            </p>
+          </div>
+        </div>
+        <i data-lucide="arrow-right" class="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors duration-200"></i>
+      </div>
+    </div>
+
+    <!-- Promodizer Management Card -->
+    <div class="bg-white border border-slate-200 rounded-lg shadow-sm p-6 hover:shadow-md transition-all duration-200 cursor-pointer group" onclick="funNavigateToPage('promodizer_list.html')">
+      <div class="flex items-start justify-between">
+        <div class="flex-1">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center group-hover:bg-green-100 transition-colors duration-200">
+              <i data-lucide="users" class="w-5 h-5 text-green-600"></i>
+            </div>
+            <h3 class="text-base leading-6 font-semibold text-slate-800">Promodizers</h3>
+          </div>
+          <div class="space-y-2">
+            <div class="text-[1.75rem] leading-[2.25rem] font-bold text-green-600" id="totalPromodizers">-</div>
+            <p class="text-xs leading-[1.125rem] font-normal text-slate-500">
+              <span id="totalAllocations">-</span> store allocations
+            </p>
+          </div>
+        </div>
+        <i data-lucide="arrow-right" class="w-4 h-4 text-slate-400 group-hover:text-green-600 transition-colors duration-200"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions Section -->
+  <div class="bg-white border border-slate-200 rounded-lg shadow-sm">
+    <div class="border-b border-slate-100 px-6 py-4">
+      <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-800">Quick Actions</h2>
+      <p class="text-sm leading-[1.375rem] font-normal text-slate-600 mt-1">
+        Direct access to key management functions
+      </p>
+    </div>
+    <div class="p-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <button onclick="funNavigateToPage('sku_list.html')" class="flex flex-col items-center gap-3 p-4 rounded-lg border border-slate-200 hover:border-teal-300 hover:bg-teal-50 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+          <div class="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center">
+            <i data-lucide="package" class="w-4 h-4 text-teal-700"></i>
+          </div>
+          <span class="text-sm leading-[1.375rem] font-semibold text-slate-800">Manage SKUs</span>
+        </button>
+        
+        <button onclick="funNavigateToPage('store_list.html')" class="flex flex-col items-center gap-3 p-4 rounded-lg border border-slate-200 hover:border-amber-300 hover:bg-amber-50 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+          <div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+            <i data-lucide="store" class="w-4 h-4 text-amber-600"></i>
+          </div>
+          <span class="text-sm leading-[1.375rem] font-semibold text-slate-800">Manage Stores</span>
+        </button>
+        
+        <button onclick="funNavigateToPage('supervisor_list.html')" class="flex flex-col items-center gap-3 p-4 rounded-lg border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+          <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+            <i data-lucide="user-check" class="w-4 h-4 text-blue-600"></i>
+          </div>
+          <span class="text-sm leading-[1.375rem] font-semibold text-slate-800">Manage Supervisors</span>
+        </button>
+        
+        <button onclick="funNavigateToPage('promodizer_list.html')" class="flex flex-col items-center gap-3 p-4 rounded-lg border border-slate-200 hover:border-green-300 hover:bg-green-50 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+          <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+            <i data-lucide="users" class="w-4 h-4 text-green-600"></i>
+          </div>
+          <span class="text-sm leading-[1.375rem] font-semibold text-slate-800">Manage Promodizers</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Overview Section -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Recent Activity Summary -->
+    <div class="bg-white border border-slate-200 rounded-lg shadow-sm">
+      <div class="border-b border-slate-100 px-6 py-4">
+        <h3 class="text-base leading-6 font-semibold text-slate-800">System Status</h3>
+      </div>
+      <div class="p-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm leading-[1.375rem] font-normal text-slate-600">Total Active Users</span>
+          <span class="text-sm leading-[1.375rem] font-semibold text-slate-800" id="totalActiveUsers">-</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm leading-[1.375rem] font-normal text-slate-600">Management Personnel</span>
+          <span class="text-sm leading-[1.375rem] font-semibold text-slate-800" id="totalManagement">-</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm leading-[1.375rem] font-normal text-slate-600">Sales Operations</span>
+          <span class="text-sm leading-[1.375rem] font-semibold text-slate-800" id="totalSalesOps">-</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm leading-[1.375rem] font-normal text-slate-600">Total Sales Records</span>
+          <span class="text-sm leading-[1.375rem] font-semibold text-slate-800" id="totalSalesRecords">-</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm leading-[1.375rem] font-normal text-slate-600">Attendance Records</span>
+          <span class="text-sm leading-[1.375rem] font-semibold text-slate-800" id="totalAttendanceRecords">-</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coverage Overview -->
+    <div class="bg-white border border-slate-200 rounded-lg shadow-sm">
+      <div class="border-b border-slate-100 px-6 py-4">
+        <h3 class="text-base leading-6 font-semibold text-slate-800">Coverage Overview</h3>
+      </div>
+      <div class="p-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm leading-[1.375rem] font-normal text-slate-600">Stores with Supervisors</span>
+          <div class="flex items-center gap-2">
+            <span class="text-sm leading-[1.375rem] font-semibold text-slate-800" id="storesWithSupervisors">-</span>
+            <span class="text-xs leading-[1.125rem] font-normal text-slate-500">/ <span id="totalStoresForCoverage">-</span></span>
+          </div>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm leading-[1.375rem] font-normal text-slate-600">Avg. Promodizers per Store</span>
+          <span class="text-sm leading-[1.375rem] font-semibold text-slate-800" id="avgPromosPerStore">-</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm leading-[1.375rem] font-normal text-slate-600">Coverage Percentage</span>
+          <span class="text-sm leading-[1.375rem] font-semibold text-green-600" id="coveragePercentage">-</span>
+        </div>
+        
+        <!-- Coverage Progress Bar -->
+        <div class="mt-4">
+          <div class="flex justify-between items-center mb-1">
+            <span class="text-xs leading-[1.125rem] font-normal text-slate-500">Store Coverage</span>
+          </div>
+          <div class="w-full bg-slate-200 rounded-full h-2">
+            <div id="coverageProgressBar" class="bg-green-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+    <!-- JAVASCRIPT INITIALIZATION -->
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils =
+          window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_mgmt_001");
+                    currentUserId = "usr_mgmt_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } =
+            state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail)
+            return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute(
+            "aria-expanded",
+            shouldOpen ? "true" : "false"
+          );
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active");
+            } else {
+              link.classList.remove("active");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () =>
+            closeMobileSidebar()
+          );
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+// Utility: portal a modal by id (idempotent)
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+// Navigation function
+function funNavigateToPage(pageUrl) {
+  window.location.href = pageUrl;
+}
+
+// Format current date and time
+function funFormatDateTime() {
+  const now = new Date();
+  const options = {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  };
+  return new Intl.DateTimeFormat('en-IN', options).format(now);
+}
+
+// Load and display dashboard metrics
+function funLoadDashboardMetrics() {
+  try {
+    // Get data from localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const skus = JSON.parse(localStorage.getItem('skus') || '[]');
+    const stores = JSON.parse(localStorage.getItem('stores') || '[]');
+    const supervisorAllocations = JSON.parse(localStorage.getItem('supervisorAllocations') || '[]');
+    const promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+    const salesRecords = JSON.parse(localStorage.getItem('salesRecords') || '[]');
+    const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+
+    // Calculate metrics
+    const totalSkus = skus.filter(sku => sku.status === 'active').length;
+    const totalStores = stores.filter(store => store.status === 'active').length;
+    const totalSupervisors = users.filter(user => user.role === 'supervisor' && user.status === 'active').length;
+    const assignedSupervisors = supervisorAllocations.length;
+    const unassignedSupervisors = totalSupervisors - assignedSupervisors;
+    const totalPromodizers = users.filter(user => user.role === 'promodizer' && user.status === 'active').length;
+    const totalAllocations = promodizerAllocations.length;
+    
+    // System status metrics
+    const totalActiveUsers = users.filter(user => user.status === 'active').length;
+    const totalManagement = users.filter(user => user.role === 'management' && user.status === 'active').length;
+    const totalSalesOps = users.filter(user => user.role === 'salesOperations' && user.status === 'active').length;
+    const totalSalesRecords = salesRecords.length;
+    const totalAttendanceRecords = attendanceRecords.length;
+    
+    // Coverage metrics
+    const storesWithSupervisors = supervisorAllocations.length;
+    const avgPromosPerStore = totalStores > 0 ? (totalAllocations / totalStores).toFixed(1) : '0.0';
+    const coveragePercentage = totalStores > 0 ? Math.round((storesWithSupervisors / totalStores) * 100) : 0;
+
+    // Update DOM elements
+    document.getElementById('totalSkus').textContent = totalSkus.toString();
+    document.getElementById('totalStores').textContent = totalStores.toString();
+    document.getElementById('totalSupervisors').textContent = totalSupervisors.toString();
+    document.getElementById('assignedSupervisors').textContent = assignedSupervisors.toString();
+    document.getElementById('unassignedSupervisors').textContent = unassignedSupervisors.toString();
+    document.getElementById('totalPromodizers').textContent = totalPromodizers.toString();
+    document.getElementById('totalAllocations').textContent = totalAllocations.toString();
+    
+    // System status
+    document.getElementById('totalActiveUsers').textContent = totalActiveUsers.toString();
+    document.getElementById('totalManagement').textContent = totalManagement.toString();
+    document.getElementById('totalSalesOps').textContent = totalSalesOps.toString();
+    document.getElementById('totalSalesRecords').textContent = totalSalesRecords.toString();
+    document.getElementById('totalAttendanceRecords').textContent = totalAttendanceRecords.toString();
+    
+    // Coverage overview
+    document.getElementById('storesWithSupervisors').textContent = storesWithSupervisors.toString();
+    document.getElementById('totalStoresForCoverage').textContent = totalStores.toString();
+    document.getElementById('avgPromosPerStore').textContent = avgPromosPerStore;
+    document.getElementById('coveragePercentage').textContent = `${coveragePercentage}%`;
+    
+    // Update progress bar
+    const progressBar = document.getElementById('coverageProgressBar');
+    if (progressBar) {
+      progressBar.style.width = `${coveragePercentage}%`;
+    }
+
+  } catch (error) {
+    console.error('Error loading dashboard metrics:', error);
+    
+    // Set error state for all metrics
+    const errorElements = [
+      'totalSkus', 'totalStores', 'totalSupervisors', 'assignedSupervisors', 
+      'unassignedSupervisors', 'totalPromodizers', 'totalAllocations',
+      'totalActiveUsers', 'totalManagement', 'totalSalesOps', 
+      'totalSalesRecords', 'totalAttendanceRecords', 'storesWithSupervisors',
+      'totalStoresForCoverage', 'avgPromosPerStore', 'coveragePercentage'
+    ];
+    
+    errorElements.forEach(id => {
+      const element = document.getElementById(id);
+      if (element) element.textContent = 'Error';
+    });
+  }
+}
+
+// Update current date/time
+function funUpdateDateTime() {
+  const dateTimeElement = document.getElementById('currentDateTime');
+  if (dateTimeElement) {
+    dateTimeElement.textContent = funFormatDateTime();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+
+  // Set active navigation link
+  if (typeof window.TemplateUtils?.setActiveNavLink === 'function') {
+    window.TemplateUtils.setActiveNavLink('management_dashboard');
+  }
+
+  // Load dashboard data
+  funLoadDashboardMetrics();
+  
+  // Update date/time and refresh every minute
+  funUpdateDateTime();
+  setInterval(funUpdateDateTime, 60000);
+
+  // Initialize lucide icons if available
+  if (typeof window.lucide?.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+});
+</script></body></html>

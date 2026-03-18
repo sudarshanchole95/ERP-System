@@ -1,0 +1,1054 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>GTVL Promodizer Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-primary: #0f766e;
+        --color-primary-hover: #0d9488;
+        --color-secondary: #475569;
+        --color-accent: #d97706;
+        --color-surface: #ffffff;
+        --color-background: #f8fafc;
+        --color-surface-variant: #f1f5f9;
+        --color-on-background: #0f172a;
+        --color-on-surface: #1e293b;
+        --color-border: #e2e8f0;
+        --color-success: #16a34a;
+        --color-warning: #f59e0b;
+        --color-error: #dc2626;
+        --color-info: #2563eb;
+
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+      }
+
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Attendance History - GTVL Promodizer Portal</title><script>
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+});
+</script></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-teal-700 rounded-lg flex items-center justify-center">
+              <svg width="20" height="20" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <rect x="68" y="68" width="264" height="264" rx="32" stroke="#FFFFFF" stroke-width="18"></rect>
+                  <rect x="109" y="143" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="109" y="194" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="109" y="245" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                  <rect x="206" y="194" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="206" y="245" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                </g>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">
+              GTVL Promodizer Portal
+            </h1>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 md:gap-3">
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-600 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-600 truncate"></div>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-600">
+            Main
+          </div>
+          <div class="space-y-1">
+            <a href="dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="dashboard">
+              <i data-lucide="home" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="record_sales.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="record_sales">
+              <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+              <span>Record Sales</span>
+            </a>
+            <a href="sales_history.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sales_history">
+              <i data-lucide="history" class="w-5 h-5"></i>
+              <span>Sales History</span>
+            </a>
+            <a href="attendance.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="attendance">
+              <i data-lucide="clock" class="w-5 h-5"></i>
+              <span>Attendance</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="py-6 border-b border-slate-100 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-600">
+            Records
+          </div>
+          <div class="space-y-1">
+            <a href="attendance_history.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="attendance_history">
+              <i data-lucide="calendar" class="w-5 h-5"></i>
+              <span>Attendance History</span>
+            </a>
+            <a href="my_stores.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="my_stores">
+              <i data-lucide="map-pin" class="w-5 h-5"></i>
+              <span>My Stores</span>
+            </a>
+            <a href="my_profile.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="my_profile">
+              <i data-lucide="user" class="w-5 h-5"></i>
+              <span>My Profile</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="app-main p-6" id="pageContent" role="main"><div class="max-w-4xl mx-auto">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center gap-3">
+      <button onclick="window.location.href='dashboard.html'" class="flex items-center justify-center w-10 h-10 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Go back to dashboard">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      </button>
+      <div>
+        <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900">Attendance History</h1>
+        <p class="text-sm leading-[1.375rem] font-normal text-slate-600 mt-1">View your past attendance records</p>
+      </div>
+    </div>
+    <button onclick="window.location.href='dashboard.html'" class="flex items-center justify-center w-10 h-10 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Go to home">
+      <i data-lucide="home" class="w-5 h-5"></i>
+    </button>
+  </div>
+
+  <!-- View Toggle -->
+  <div class="flex items-center gap-2 mb-6">
+    <div class="flex bg-slate-100 rounded-lg p-1">
+      <button id="listViewBtn" class="px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 bg-white text-teal-700 shadow-sm">
+        List View
+      </button>
+      <button id="calendarViewBtn" class="px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 text-slate-600 hover:text-slate-800">
+        Calendar View
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div id="loadingState" class="flex items-center justify-center py-12">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-700"></div>
+  </div>
+
+  <!-- Empty State -->
+  <div id="emptyState" class="hidden text-center py-12">
+    <div class="w-16 h-16 mx-auto mb-4 text-slate-400">
+      <i data-lucide="calendar-x" class="w-16 h-16"></i>
+    </div>
+    <h3 class="text-base leading-6 font-semibold text-slate-900 mb-2">No attendance records yet</h3>
+    <p class="text-sm leading-[1.375rem] font-normal text-slate-600 mb-6">Start tracking your work hours today</p>
+    <button onclick="window.location.href='attendance.html'" class="inline-flex items-center px-4 py-2 bg-teal-700 text-white text-sm font-semibold rounded-lg hover:bg-teal-600 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+      Record your attendance today
+    </button>
+  </div>
+
+  <!-- List View Content -->
+  <div id="listViewContent" class="hidden">
+    <div id="attendanceGroupsContainer" class="space-y-6">
+      <!-- Dynamic content will be inserted here -->
+    </div>
+  </div>
+
+  <!-- Calendar View Content -->
+  <div id="calendarViewContent" class="hidden">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 id="calendarMonthYear" class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900"></h2>
+          <div class="flex items-center gap-2">
+            <button id="prevMonthBtn" class="flex items-center justify-center w-10 h-10 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+              <i data-lucide="chevron-left" class="w-5 h-5"></i>
+            </button>
+            <button id="nextMonthBtn" class="flex items-center justify-center w-10 h-10 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+              <i data-lucide="chevron-right" class="w-5 h-5"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-7 gap-px bg-slate-200 rounded-lg overflow-hidden">
+          <!-- Calendar header -->
+          <div class="bg-slate-50 p-2 text-center">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-600">Sun</span>
+          </div>
+          <div class="bg-slate-50 p-2 text-center">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-600">Mon</span>
+          </div>
+          <div class="bg-slate-50 p-2 text-center">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-600">Tue</span>
+          </div>
+          <div class="bg-slate-50 p-2 text-center">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-600">Wed</span>
+          </div>
+          <div class="bg-slate-50 p-2 text-center">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-600">Thu</span>
+          </div>
+          <div class="bg-slate-50 p-2 text-center">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-600">Fri</span>
+          </div>
+          <div class="bg-slate-50 p-2 text-center">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-600">Sat</span>
+          </div>
+          
+          <!-- Calendar days will be inserted here -->
+          <div id="calendarDaysContainer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Calendar Day Detail Modal -->
+<div id="dayDetailModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,28rem)] max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 id="modalDateTitle" class="text-base leading-6 font-semibold text-slate-900"></h3>
+          <button onclick="funCloseModal('dayDetailModal')" class="flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+        
+        <div id="modalAttendanceDetails" class="space-y-4">
+          <!-- Dynamic content will be inserted here -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils =
+          window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_promo_001");
+                    currentUserId = "usr_promo_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } =
+            state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail)
+            return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute(
+            "aria-expanded",
+            shouldOpen ? "true" : "false"
+          );
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active");
+            } else {
+              link.classList.remove("active");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () =>
+            closeMobileSidebar()
+          );
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+});
+</script>
+<script>
+// Global state
+let currentView = 'list';
+let currentCalendarDate = new Date();
+let attendanceData = [];
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+  funInitializeAttendanceHistory();
+});
+
+function funInitializeAttendanceHistory() {
+  funLoadAttendanceData();
+  funSetupEventListeners();
+  funShowView('list');
+}
+
+function funLoadAttendanceData() {
+  try {
+    const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+    if (!currentUser) {
+      funShowEmptyState();
+      return;
+    }
+
+    const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+    const stores = JSON.parse(localStorage.getItem('stores') || '[]');
+    
+    // Filter records for current user and join with store data
+    attendanceData = attendanceRecords
+      .filter(record => record.userId === currentUser.id)
+      .map(record => {
+        const store = stores.find(s => s.id === record.storeId);
+        return {
+          ...record,
+          storeName: store ? store.storeName : 'Unknown Store',
+          formattedDate: funFormatDate(record.date),
+          formattedClockIn: funFormatTime(record.clockInTime),
+          formattedClockOut: record.clockOutTime ? funFormatTime(record.clockOutTime) : null,
+          totalHours: funCalculateTotalHours(record.clockInTime, record.clockOutTime),
+          isComplete: !!record.clockOutTime,
+          dayName: funGetDayName(record.date)
+        };
+      })
+      .sort((a, b) => new Date(b.date) - new Date(a.date)); // Most recent first
+
+    if (attendanceData.length === 0) {
+      funShowEmptyState();
+    } else {
+      funHideLoadingState();
+      funRenderListView();
+      funRenderCalendarView();
+    }
+  } catch (error) {
+    console.error('Error loading attendance data:', error);
+    funShowEmptyState();
+  }
+}
+
+function funSetupEventListeners() {
+  document.getElementById('listViewBtn').addEventListener('click', () => funShowView('list'));
+  document.getElementById('calendarViewBtn').addEventListener('click', () => funShowView('calendar'));
+  document.getElementById('prevMonthBtn').addEventListener('click', () => funChangeCalendarMonth(-1));
+  document.getElementById('nextMonthBtn').addEventListener('click', () => funChangeCalendarMonth(1));
+}
+
+function funShowView(view) {
+  currentView = view;
+  
+  // Update button states
+  const listBtn = document.getElementById('listViewBtn');
+  const calendarBtn = document.getElementById('calendarViewBtn');
+  
+  if (view === 'list') {
+    listBtn.classList.add('bg-white', 'text-teal-700', 'shadow-sm');
+    listBtn.classList.remove('text-slate-600', 'hover:text-slate-800');
+    calendarBtn.classList.remove('bg-white', 'text-teal-700', 'shadow-sm');
+    calendarBtn.classList.add('text-slate-600', 'hover:text-slate-800');
+    
+    document.getElementById('listViewContent').classList.remove('hidden');
+    document.getElementById('calendarViewContent').classList.add('hidden');
+  } else {
+    calendarBtn.classList.add('bg-white', 'text-teal-700', 'shadow-sm');
+    calendarBtn.classList.remove('text-slate-600', 'hover:text-slate-800');
+    listBtn.classList.remove('bg-white', 'text-teal-700', 'shadow-sm');
+    listBtn.classList.add('text-slate-600', 'hover:text-slate-800');
+    
+    document.getElementById('calendarViewContent').classList.remove('hidden');
+    document.getElementById('listViewContent').classList.add('hidden');
+  }
+}
+
+function funRenderListView() {
+  const container = document.getElementById('attendanceGroupsContainer');
+  if (!container) return;
+
+  // Group by month
+  const groupedData = funGroupByMonth(attendanceData);
+  
+  let html = '';
+  for (const [monthKey, records] of Object.entries(groupedData)) {
+    html += `
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200">
+        <div class="px-6 py-4 border-b border-slate-100">
+          <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">${monthKey}</h2>
+        </div>
+        <div class="divide-y divide-slate-100">
+    `;
+    
+    records.forEach(record => {
+      const borderClass = !record.isComplete ? 'border-l-4 border-amber-500' : '';
+      const bgClass = !record.isComplete ? 'bg-amber-50/50' : '';
+      
+      html += `
+        <div class="p-6 ${borderClass} ${bgClass}">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-2">
+                <h3 class="text-base leading-6 font-semibold text-slate-900">
+                  ${record.dayName}, ${record.formattedDate}
+                </h3>
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-[0.625rem] leading-4 font-normal ${record.isComplete ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}">
+                  ${record.isComplete ? 'Complete' : 'Incomplete'}
+                </span>
+              </div>
+              <p class="text-sm leading-[1.375rem] font-normal text-slate-600 mb-3">${record.storeName}</p>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <span class="text-xs leading-[1.125rem] font-normal text-slate-500">Clock In</span>
+                  <p class="text-sm leading-[1.375rem] font-semibold text-slate-900">${record.formattedClockIn}</p>
+                </div>
+                <div>
+                  <span class="text-xs leading-[1.125rem] font-normal text-slate-500">Clock Out</span>
+                  <p class="text-sm leading-[1.375rem] font-semibold ${record.isComplete ? 'text-slate-900' : 'text-amber-600'}">
+                    ${record.formattedClockOut || 'Not clocked out'}
+                  </p>
+                </div>
+                <div>
+                  <span class="text-xs leading-[1.125rem] font-normal text-slate-500">Total Hours</span>
+                  <p class="text-sm leading-[1.375rem] font-semibold text-slate-900">${record.totalHours}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    
+    html += `
+        </div>
+      </div>
+    `;
+  }
+  
+  container.innerHTML = html;
+}
+
+function funRenderCalendarView() {
+  funUpdateCalendarHeader();
+  funRenderCalendarDays();
+}
+
+function funUpdateCalendarHeader() {
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'];
+  
+  const header = document.getElementById('calendarMonthYear');
+  if (header) {
+    header.textContent = `${monthNames[currentCalendarDate.getMonth()]} ${currentCalendarDate.getFullYear()}`;
+  }
+}
+
+function funRenderCalendarDays() {
+  const container = document.getElementById('calendarDaysContainer');
+  if (!container) return;
+
+  const year = currentCalendarDate.getFullYear();
+  const month = currentCalendarDate.getMonth();
+  
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const startDate = new Date(firstDay);
+  startDate.setDate(startDate.getDate() - firstDay.getDay());
+  
+  let html = '';
+  const today = new Date();
+  
+  for (let i = 0; i < 42; i++) {
+    const currentDate = new Date(startDate);
+    currentDate.setDate(startDate.getDate() + i);
+    
+    const isCurrentMonth = currentDate.getMonth() === month;
+    const isToday = currentDate.toDateString() === today.toDateString();
+    const dateKey = currentDate.toISOString().split('T')[0];
+    
+    const dayAttendance = attendanceData.filter(record => 
+      record.date.split('T')[0] === dateKey
+    );
+    
+    let indicators = '';
+    if (dayAttendance.length > 0) {
+      const hasIncomplete = dayAttendance.some(record => !record.isComplete);
+      const dotColor = hasIncomplete ? 'bg-amber-500' : 'bg-green-500';
+      indicators = `<div class="absolute top-1 right-1 w-2 h-2 ${dotColor} rounded-full"></div>`;
+    }
+    
+    const cellClass = isCurrentMonth ? 'bg-white hover:bg-slate-50' : 'bg-slate-50 text-slate-400';
+    const dateClass = isToday ? 'font-bold text-teal-700' : 'text-slate-900';
+    const cursorClass = dayAttendance.length > 0 ? 'cursor-pointer' : '';
+    
+    html += `
+      <div class="relative ${cellClass} p-3 min-h-[3rem] border-r border-b border-slate-100 ${cursorClass} transition-colors duration-200" 
+           ${dayAttendance.length > 0 ? `onclick="funShowDayDetail('${dateKey}')"` : ''}>
+        <span class="text-sm ${isCurrentMonth ? dateClass : 'text-slate-400'}">${currentDate.getDate()}</span>
+        ${indicators}
+      </div>
+    `;
+  }
+  
+  container.innerHTML = html;
+}
+
+function funChangeCalendarMonth(direction) {
+  currentCalendarDate.setMonth(currentCalendarDate.getMonth() + direction);
+  funRenderCalendarView();
+}
+
+function funShowDayDetail(dateKey) {
+  const dayAttendance = attendanceData.filter(record => 
+    record.date.split('T')[0] === dateKey
+  );
+  
+  if (dayAttendance.length === 0) return;
+  
+  const date = new Date(dateKey);
+  const modalTitle = document.getElementById('modalDateTitle');
+  const modalDetails = document.getElementById('modalAttendanceDetails');
+  
+  if (modalTitle) {
+    modalTitle.textContent = `${funGetDayName(dateKey)}, ${funFormatDate(dateKey)}`;
+  }
+  
+  if (modalDetails) {
+    let html = '';
+    dayAttendance.forEach(record => {
+      const statusClass = record.isComplete ? 'text-green-600 bg-green-50' : 'text-amber-600 bg-amber-50';
+      
+      html += `
+        <div class="p-4 border border-slate-200 rounded-lg">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="text-sm font-semibold text-slate-900">${record.storeName}</h4>
+            <span class="inline-flex items-center px-2 py-1 rounded-full text-[0.625rem] leading-4 font-normal ${statusClass}">
+              ${record.isComplete ? 'Complete' : 'Incomplete'}
+            </span>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <span class="text-xs leading-[1.125rem] font-normal text-slate-500">Clock In</span>
+              <p class="text-sm leading-[1.375rem] font-semibold text-slate-900">${record.formattedClockIn}</p>
+            </div>
+            <div>
+              <span class="text-xs leading-[1.125rem] font-normal text-slate-500">Clock Out</span>
+              <p class="text-sm leading-[1.375rem] font-semibold ${record.isComplete ? 'text-slate-900' : 'text-amber-600'}">
+                ${record.formattedClockOut || 'Not clocked out'}
+              </p>
+            </div>
+          </div>
+          
+          <div class="mt-3 pt-3 border-t border-slate-100">
+            <span class="text-xs leading-[1.125rem] font-normal text-slate-500">Total Hours</span>
+            <p class="text-sm leading-[1.375rem] font-semibold text-slate-900">${record.totalHours}</p>
+          </div>
+        </div>
+      `;
+    });
+    
+    modalDetails.innerHTML = html;
+  }
+  
+  funOpenModal('dayDetailModal');
+}
+
+function funGroupByMonth(data) {
+  const groups = {};
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'];
+  
+  data.forEach(record => {
+    const date = new Date(record.date);
+    const monthKey = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+    
+    if (!groups[monthKey]) {
+      groups[monthKey] = [];
+    }
+    groups[monthKey].push(record);
+  });
+  
+  return groups;
+}
+
+function funFormatDate(dateStr) {
+  const date = new Date(dateStr);
+  const day = date.getDate();
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  
+  return `${monthNames[date.getMonth()]} ${day}`;
+}
+
+function funFormatTime(timeStr) {
+  const date = new Date(timeStr);
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  
+  const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+  return `${hours}:${minutesStr} ${ampm}`;
+}
+
+function funGetDayName(dateStr) {
+  const date = new Date(dateStr);
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  return days[date.getDay()];
+}
+
+function funCalculateTotalHours(clockInStr, clockOutStr) {
+  if (!clockInStr || !clockOutStr) {
+    return '--';
+  }
+  
+  const clockIn = new Date(clockInStr);
+  const clockOut = new Date(clockOutStr);
+  const diffMs = clockOut - clockIn;
+  
+  if (diffMs < 0) {
+    return '--';
+  }
+  
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+  
+  if (diffHours === 0 && diffMinutes === 0) {
+    return '0h 0m';
+  }
+  
+  return `${diffHours}h ${diffMinutes}m`;
+}
+
+function funShowEmptyState() {
+  document.getElementById('loadingState').classList.add('hidden');
+  document.getElementById('emptyState').classList.remove('hidden');
+  document.getElementById('listViewContent').classList.add('hidden');
+  document.getElementById('calendarViewContent').classList.add('hidden');
+}
+
+function funHideLoadingState() {
+  document.getElementById('loadingState').classList.add('hidden');
+  document.getElementById('emptyState').classList.add('hidden');
+}
+
+function funOpenModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function funCloseModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+}
+
+// Set active navigation link
+if (typeof TemplateUtils !== 'undefined' && TemplateUtils.setActiveNavLink) {
+  TemplateUtils.setActiveNavLink('attendance_history');
+}
+</script></body></html>

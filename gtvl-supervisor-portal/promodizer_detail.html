@@ -1,0 +1,918 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>GTVL Supervisor Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-primary: #0F766E;
+        --color-primary-hover: #0D9488;
+        --color-secondary: #475569;
+        --color-accent: #D97706;
+        --color-surface: #FFFFFF;
+        --color-background: #F8FAFC;
+        --color-surface-variant: #F1F5F9;
+        --color-on-background: #0F172A;
+        --color-on-surface: #1E293B;
+        --color-border: #E2E8F0;
+        --color-success: #16A34A;
+        --color-warning: #F59E0B;
+        --color-error: #DC2626;
+        --color-info: #2563EB;
+
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+      }
+
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Promodizer Details - GTVL Supervisor Portal</title></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <rect x="68" y="68" width="264" height="264" rx="32" stroke="#0F766E" stroke-width="18"></rect>
+                  <rect x="109" y="143" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                  <rect x="206" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                </g>
+              </svg>
+            </div>
+            <h1 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">
+              GTVL Supervisor Portal
+            </h1>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 md:gap-3">
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-600 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-600 truncate"></div>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-[0.625rem] leading-4 font-normal font-semibold uppercase tracking-wider text-slate-600">
+            Main
+          </div>
+          <div class="space-y-1">
+            <a href="supervisor_dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="supervisor_dashboard">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="sales_recording.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sales_recording">
+              <i data-lucide="scan-barcode" class="w-5 h-5"></i>
+              <span>Record Sales</span>
+            </a>
+            <a href="sales_history.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sales_history">
+              <i data-lucide="history" class="w-5 h-5"></i>
+              <span>Sales History</span>
+            </a>
+            <a href="attendance_management.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="attendance_management">
+              <i data-lucide="calendar-check" class="w-5 h-5"></i>
+              <span>Attendance</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="py-6 border-b border-slate-100 last:border-b-0">
+          <div class="px-4 pb-2 text-[0.625rem] leading-4 font-normal font-semibold uppercase tracking-wider text-slate-600">
+            Team Management
+          </div>
+          <div class="space-y-1">
+            <a href="promodizer_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="promodizer_list">
+              <i data-lucide="users" class="w-5 h-5"></i>
+              <span>My Team</span>
+            </a>
+            <a href="add_promodizer.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="add_promodizer">
+              <i data-lucide="user-plus" class="w-5 h-5"></i>
+              <span>Add Promodizer</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="py-6 border-b border-slate-100 last:border-b-0">
+          <div class="px-4 pb-2 text-[0.625rem] leading-4 font-normal font-semibold uppercase tracking-wider text-slate-600">
+            Account
+          </div>
+          <div class="space-y-1">
+            <a href="supervisor_profile.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="supervisor_profile">
+              <i data-lucide="user-circle" class="w-5 h-5"></i>
+              <span>My Profile</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="app-main p-6" id="pageContent" role="main"><div class="space-y-6">
+  <!-- Header Section -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <button id="backButton" class="flex items-center justify-center w-10 h-10 rounded-lg border border-slate-200 hover:bg-slate-50 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Back to Team List">
+        <i data-lucide="arrow-left" class="w-5 h-5 text-slate-600"></i>
+      </button>
+      <div>
+        <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900">
+          Promodizer Details
+        </h1>
+        <p class="text-sm leading-[1.375rem] font-normal text-slate-600 mt-1">
+          Detailed information and performance overview
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div id="errorState" class="hidden">
+    <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+      <div class="w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+        <i data-lucide="user-x" class="w-6 h-6 text-red-600"></i>
+      </div>
+      <h3 class="text-base leading-6 font-semibold text-red-900 mb-2">
+        Promodizer Not Found
+      </h3>
+      <p class="text-sm leading-[1.375rem] font-normal text-red-700 mb-4">
+        The requested promodizer could not be found or is not allocated to your supervision.
+      </p>
+      <button id="errorBackButton" class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded hover:bg-red-700 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-600 focus-visible:outline-offset-2">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        Back to Team List
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div id="mainContent" class="space-y-6">
+    <!-- Profile Information Card -->
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200">
+      <div class="p-6">
+        <div class="flex items-start gap-4">
+          <div class="w-16 h-16 bg-teal-700 text-white rounded-full flex items-center justify-center text-xl font-bold shrink-0">
+            <span id="promodizerInitials"></span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+              <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">
+                <span id="promodizerName"></span>
+              </h2>
+              <span id="statusBadge" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium">
+              </span>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div class="flex items-center gap-2 text-sm text-slate-600">
+                <i data-lucide="badge" class="w-4 h-4"></i>
+                <span class="font-medium">Employee ID:</span>
+                <span id="employeeId"></span>
+              </div>
+              <div class="flex items-center gap-2 text-sm text-slate-600">
+                <i data-lucide="mail" class="w-4 h-4"></i>
+                <span class="font-medium">Email:</span>
+                <span id="promodizerEmail"></span>
+              </div>
+              <div class="flex items-center gap-2 text-sm text-slate-600">
+                <i data-lucide="phone" class="w-4 h-4"></i>
+                <span class="font-medium">Phone:</span>
+                <span id="promodizerPhone"></span>
+              </div>
+              <div class="flex items-center gap-2 text-sm text-slate-600">
+                <i data-lucide="calendar" class="w-4 h-4"></i>
+                <span class="font-medium">Allocated:</span>
+                <span id="allocatedDate"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Store Assignment Card -->
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200">
+      <div class="p-6">
+        <div class="flex items-center gap-2 mb-4">
+          <i data-lucide="store" class="w-5 h-5 text-teal-700"></i>
+          <h3 class="text-base leading-6 font-semibold text-slate-900">Store Assignment</h3>
+        </div>
+        
+        <div class="space-y-3">
+          <div>
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+              <span class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900" id="storeName"></span>
+              <span class="inline-flex items-center px-2 py-1 bg-slate-100 text-slate-700 text-xs font-medium rounded" id="storeCode"></span>
+            </div>
+          </div>
+          
+          <div class="flex items-start gap-2 text-sm text-slate-600">
+            <i data-lucide="map-pin" class="w-4 h-4 mt-0.5"></i>
+            <div id="storeAddress"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Performance Overview -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Sales Performance -->
+      <div class="bg-white rounded-lg shadow-sm border border-slate-200">
+        <div class="p-6">
+          <div class="flex items-center gap-2 mb-4">
+            <i data-lucide="trending-up" class="w-5 h-5 text-teal-700"></i>
+            <h3 class="text-base leading-6 font-semibold text-slate-900">Sales Performance</h3>
+          </div>
+          
+          <div class="space-y-4">
+            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <i data-lucide="shopping-cart" class="w-4 h-4 text-slate-600"></i>
+                <span class="text-sm font-medium text-slate-700">Total Sales Recorded</span>
+              </div>
+              <span class="text-xl font-bold text-teal-700" id="totalSales"></span>
+            </div>
+            
+            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <i data-lucide="calendar-days" class="w-4 h-4 text-slate-600"></i>
+                <span class="text-sm font-medium text-slate-700">This Month Sales</span>
+              </div>
+              <span class="text-xl font-bold text-amber-600" id="monthSales"></span>
+            </div>
+            
+            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <i data-lucide="clock" class="w-4 h-4 text-slate-600"></i>
+                <span class="text-sm font-medium text-slate-700">Last Sales Date</span>
+              </div>
+              <span class="text-sm font-medium text-slate-900" id="lastSalesDate"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attendance Summary -->
+      <div class="bg-white rounded-lg shadow-sm border border-slate-200">
+        <div class="p-6">
+          <div class="flex items-center gap-2 mb-4">
+            <i data-lucide="calendar-check" class="w-5 h-5 text-teal-700"></i>
+            <h3 class="text-base leading-6 font-semibold text-slate-900">Attendance Summary</h3>
+          </div>
+          
+          <div class="space-y-4">
+            <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+                <span class="text-sm font-medium text-green-700">Days Present (This Month)</span>
+              </div>
+              <span class="text-xl font-bold text-green-600" id="daysPresent"></span>
+            </div>
+            
+            <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <i data-lucide="x-circle" class="w-4 h-4 text-red-600"></i>
+                <span class="text-sm font-medium text-red-700">Days Absent (This Month)</span>
+              </div>
+              <span class="text-xl font-bold text-red-600" id="daysAbsent"></span>
+            </div>
+            
+            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <i data-lucide="calendar" class="w-4 h-4 text-slate-600"></i>
+                <span class="text-sm font-medium text-slate-700">Last Attendance</span>
+              </div>
+              <span class="text-sm font-medium text-slate-900" id="lastAttendanceDate"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils =
+          window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_sup_001");
+                    currentUserId = "usr_sup_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } =
+            state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail)
+            return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute(
+            "aria-expanded",
+            shouldOpen ? "true" : "false"
+          );
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active", "bg-teal-50", "text-teal-700");
+              link.classList.remove("text-slate-800");
+            } else {
+              link.classList.remove("active", "bg-teal-50", "text-teal-700");
+              link.classList.add("text-slate-800");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () =>
+            closeMobileSidebar()
+          );
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+// Utility: portal a modal by id (idempotent)
+function funPortalModalToBody(id) {
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+
+  // Set active navigation
+  if (typeof window.TemplateUtils?.setActiveNavLink === 'function') {
+    window.TemplateUtils.setActiveNavLink('promodizer_list');
+  }
+
+  funInitializePromodizerDetail();
+});
+
+function funInitializePromodizerDetail() {
+  try {
+    // Get promodizer ID from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const promodizerId = urlParams.get('id');
+    
+    if (!promodizerId) {
+      funShowError();
+      return;
+    }
+
+    // Get current supervisor
+    const currentUser = window.TemplateUtils?.UserUtils?.getCurrentUser();
+    if (!currentUser || currentUser.role !== 'supervisor') {
+      funShowError();
+      return;
+    }
+
+    // Load data from localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const stores = JSON.parse(localStorage.getItem('stores') || '[]');
+    const promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+    const salesRecords = JSON.parse(localStorage.getItem('salesRecords') || '[]');
+    const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+
+    // Find the promodizer
+    const promodizer = users.find(user => user.id === promodizerId && user.role === 'promodizer');
+    if (!promodizer) {
+      funShowError();
+      return;
+    }
+
+    // Find promodizer allocation to verify they're under current supervisor
+    const allocation = promodizerAllocations.find(alloc => 
+      alloc.promodizerId === promodizerId && alloc.supervisorId === currentUser.id
+    );
+    if (!allocation) {
+      funShowError();
+      return;
+    }
+
+    // Find the assigned store
+    const store = stores.find(s => s.id === allocation.storeId);
+    if (!store) {
+      funShowError();
+      return;
+    }
+
+    // Calculate performance metrics
+    const promodizerSales = salesRecords.filter(sale => sale.recordedById === promodizerId);
+    const promodizerAttendance = attendanceRecords.filter(att => att.userId === promodizerId);
+
+    // Current month calculation
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    
+    const thisMonthSales = promodizerSales.filter(sale => {
+      const saleDate = new Date(sale.recordedAt);
+      return saleDate.getMonth() === currentMonth && saleDate.getFullYear() === currentYear;
+    });
+
+    const thisMonthAttendance = promodizerAttendance.filter(att => {
+      const attDate = new Date(att.date);
+      return attDate.getMonth() === currentMonth && attDate.getFullYear() === currentYear;
+    });
+
+    const daysPresent = thisMonthAttendance.filter(att => att.status === 'present').length;
+    const daysAbsent = thisMonthAttendance.filter(att => att.status === 'absent').length;
+
+    // Get most recent dates
+    const lastSaleDate = promodizerSales.length > 0 ? 
+      Math.max(...promodizerSales.map(sale => new Date(sale.recordedAt).getTime())) : null;
+    
+    const lastAttendanceDate = promodizerAttendance.length > 0 ?
+      Math.max(...promodizerAttendance.map(att => new Date(att.date).getTime())) : null;
+
+    // Populate the UI
+    funPopulatePromodizerDetails({
+      promodizer,
+      store,
+      allocation,
+      totalSales: promodizerSales.length,
+      monthSales: thisMonthSales.length,
+      lastSaleDate: lastSaleDate ? new Date(lastSaleDate) : null,
+      daysPresent,
+      daysAbsent,
+      lastAttendanceDate: lastAttendanceDate ? new Date(lastAttendanceDate) : null
+    });
+
+    funShowMainContent();
+
+  } catch (error) {
+    console.error('Error loading promodizer details:', error);
+    funShowError();
+  }
+}
+
+function funPopulatePromodizerDetails(data) {
+  const { promodizer, store, allocation } = data;
+
+  // Promodizer profile
+  const initials = funGetUserInitials(promodizer);
+  const fullName = `${promodizer.firstName} ${promodizer.lastName}`;
+
+  document.getElementById('promodizerInitials').textContent = initials;
+  document.getElementById('promodizerName').textContent = fullName;
+  document.getElementById('employeeId').textContent = promodizer.employeeId || 'N/A';
+  document.getElementById('promodizerEmail').textContent = promodizer.email || 'N/A';
+  document.getElementById('promodizerPhone').textContent = promodizer.phone || 'N/A';
+
+  // Status badge
+  const statusBadge = document.getElementById('statusBadge');
+  if (promodizer.status === 'active') {
+    statusBadge.className = 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700';
+    statusBadge.textContent = 'Active';
+  } else {
+    statusBadge.className = 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700';
+    statusBadge.textContent = 'Inactive';
+  }
+
+  // Allocated date
+  const allocatedDate = new Date(allocation.allocatedAt);
+  document.getElementById('allocatedDate').textContent = funFormatDate(allocatedDate);
+
+  // Store information
+  document.getElementById('storeName').textContent = store.storeName;
+  document.getElementById('storeCode').textContent = store.storeCode;
+  
+  const fullAddress = `${store.address.street}, ${store.address.city}, ${store.address.state} ${store.address.zipCode}, ${store.address.country}`;
+  document.getElementById('storeAddress').textContent = fullAddress;
+
+  // Performance metrics
+  document.getElementById('totalSales').textContent = data.totalSales.toString();
+  document.getElementById('monthSales').textContent = data.monthSales.toString();
+  document.getElementById('lastSalesDate').textContent = data.lastSaleDate ? 
+    funFormatDate(data.lastSaleDate) : 'No sales recorded';
+
+  // Attendance metrics
+  document.getElementById('daysPresent').textContent = data.daysPresent.toString();
+  document.getElementById('daysAbsent').textContent = data.daysAbsent.toString();
+  document.getElementById('lastAttendanceDate').textContent = data.lastAttendanceDate ?
+    funFormatDate(data.lastAttendanceDate) : 'No attendance recorded';
+}
+
+function funGetUserInitials(user) {
+  if (!user) return '?';
+  const first = user.firstName?.charAt(0) || '';
+  const last = user.lastName?.charAt(0) || '';
+  return (first + last).toUpperCase() || 'U';
+}
+
+function funFormatDate(date) {
+  return date.toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: '2-digit', 
+    year: 'numeric'
+  });
+}
+
+function funShowError() {
+  document.getElementById('errorState').classList.remove('hidden');
+  document.getElementById('mainContent').classList.add('hidden');
+}
+
+function funShowMainContent() {
+  document.getElementById('errorState').classList.add('hidden');
+  document.getElementById('mainContent').classList.remove('hidden');
+}
+
+function funNavigateToTeamList() {
+  window.location.href = 'promodizer_list.html';
+}
+
+// Event listeners for navigation buttons
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('backButton')?.addEventListener('click', funNavigateToTeamList);
+  document.getElementById('errorBackButton')?.addEventListener('click', funNavigateToTeamList);
+});
+</script></body></html>

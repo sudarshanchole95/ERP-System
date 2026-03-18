@@ -1,0 +1,1507 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>Sales Analytics Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-primary: #0F766E;
+        --color-primary-hover: #0D9488;
+        --color-secondary: #475569;
+        --color-accent: #D97706;
+        --color-background: #F8FAFC;
+        --color-surface: #FFFFFF;
+        --color-surface-variant: #F1F5F9;
+        --color-on-background: #0F172A;
+        --color-on-surface: #1E293B;
+        --color-border: #E2E8F0;
+        --color-success: #16A34A;
+        --color-warning: #F59E0B;
+        --color-error: #DC2626;
+        --color-info: #2563EB;
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+      }
+
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Report Display - Sales Analytics Dashboard</title><script>
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+});
+</script></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="68" y="68" width="264" height="264" rx="32" stroke="#0F766E" stroke-width="18"></rect>
+                <rect x="109" y="143" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="109" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="109" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                <rect x="206" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="206" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">Sales Analytics Dashboard</h1>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 md:gap-3">
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-600 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-600 truncate"></div>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Analytics</div>
+          <div class="space-y-1">
+            <a href="dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="dashboard">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="sku_performance_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sku_performance">
+              <i data-lucide="package" class="w-5 h-5"></i>
+              <span>SKU Performance</span>
+            </a>
+            <a href="store_performance_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="store_performance">
+              <i data-lucide="store" class="w-5 h-5"></i>
+              <span>Store Performance</span>
+            </a>
+            <a href="staff_performance_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="staff_performance">
+              <i data-lucide="users" class="w-5 h-5"></i>
+              <span>Staff Performance</span>
+            </a>
+            <a href="transaction_history.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="transaction_history">
+              <i data-lucide="receipt" class="w-5 h-5"></i>
+              <span>Transaction History</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="py-6 border-b border-slate-100 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Tools</div>
+          <div class="space-y-1">
+            <a href="reports_configuration.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="reports">
+              <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+              <span>Reports</span>
+            </a>
+            <a href="settings.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="settings">
+              <i data-lucide="settings" class="w-5 h-5"></i>
+              <span>Settings</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="app-main p-6" id="pageContent" role="main"><div id="loadingState" class="flex items-center justify-center py-12">
+  <div class="flex items-center gap-3">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-700"></div>
+    <span class="text-slate-600">Generating report...</span>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div id="reportContent" class="hidden">
+  <!-- Breadcrumb Navigation -->
+  <nav class="flex items-center gap-2 text-sm mb-6" aria-label="Breadcrumb">
+    <a href="dashboard.html" class="text-teal-700 hover:text-teal-600 font-medium no-underline">Dashboard</a>
+    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+    <a href="reports_configuration.html" class="text-teal-700 hover:text-teal-600 font-medium no-underline">Reports</a>
+    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+    <span id="reportBreadcrumb" class="text-slate-600 font-medium"></span>
+  </nav>
+
+  <!-- Report Header -->
+  <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-6">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div class="flex-1">
+        <h1 id="reportTitle" class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900 mb-2"></h1>
+        <div class="flex flex-wrap items-center gap-4 text-sm text-slate-600">
+          <div class="flex items-center gap-2">
+            <i data-lucide="calendar" class="w-4 h-4"></i>
+            <span id="generationTime"></span>
+          </div>
+          <button id="toggleParametersBtn" class="flex items-center gap-2 text-teal-700 hover:text-teal-600 font-medium">
+            <i data-lucide="info" class="w-4 h-4"></i>
+            <span>Report Parameters</span>
+            <i data-lucide="chevron-down" class="w-4 h-4" id="parametersChevron"></i>
+          </button>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <button id="exportReportBtn" class="flex items-center gap-2 px-4 py-2 bg-teal-700 text-white rounded text-sm font-semibold hover:bg-teal-600 transition-colors duration-200">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          Export Report
+        </button>
+        <a href="reports_configuration.html" class="flex items-center gap-2 px-4 py-2 border border-slate-200 text-slate-700 rounded text-sm font-semibold hover:bg-slate-50 transition-colors duration-200 no-underline">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          Generate New Report
+        </a>
+        <button id="printReportBtn" class="flex items-center gap-2 px-4 py-2 border border-slate-200 text-slate-700 rounded text-sm font-semibold hover:bg-slate-50 transition-colors duration-200">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          Print Report
+        </button>
+      </div>
+    </div>
+
+    <!-- Report Parameters Panel -->
+    <div id="parametersPanel" class="hidden mt-4 pt-4 border-t border-slate-100">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div>
+          <div class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Date Range</div>
+          <div id="paramDateRange" class="text-sm text-slate-800"></div>
+        </div>
+        <div>
+          <div class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Group By</div>
+          <div id="paramGroupBy" class="text-sm text-slate-800"></div>
+        </div>
+        <div>
+          <div class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Metrics</div>
+          <div id="paramMetrics" class="text-sm text-slate-800"></div>
+        </div>
+        <div>
+          <div class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Filters</div>
+          <div id="paramFilters" class="text-sm text-slate-800"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report Summary -->
+  <div id="summarySection" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <!-- Summary cards will be dynamically generated -->
+  </div>
+
+  <!-- Report Table -->
+  <div class="bg-white rounded-lg shadow-sm border border-slate-200">
+    <div class="p-6 border-b border-slate-100">
+      <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Report Data</h2>
+    </div>
+    
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead id="reportTableHead" class="bg-slate-50">
+          <!-- Dynamic headers -->
+        </thead>
+        <tbody id="reportTableBody">
+          <!-- Dynamic data rows -->
+        </tbody>
+        <tfoot id="reportTableFoot" class="bg-slate-50 border-t-2 border-slate-200">
+          <!-- Grand totals -->
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="p-6 border-t border-slate-100">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="text-sm text-slate-600">
+          Showing <span id="pageStart">1</span> to <span id="pageEnd">50</span> of <span id="totalRows">0</span> results
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="prevPageBtn" class="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled="">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            Previous
+          </button>
+          <div id="pageNumbers" class="flex items-center gap-1">
+            <!-- Page numbers -->
+          </div>
+          <button id="nextPageBtn" class="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed">
+            Next
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Empty State -->
+<div id="emptyState" class="hidden text-center py-12">
+  <i data-lucide="file-x" class="w-12 h-12 text-slate-400 mx-auto mb-4"></i>
+  <h3 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900 mb-2">No Data Found</h3>
+  <p class="text-slate-600 mb-4">No sales data matches the selected report criteria.</p>
+  <a href="reports_configuration.html" class="inline-flex items-center gap-2 px-4 py-2 bg-teal-700 text-white rounded text-sm font-semibold hover:bg-teal-600 transition-colors duration-200 no-underline">
+    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+    Back to Report Configuration
+  </a>
+</div>
+
+<!-- Export Modal -->
+<div id="exportModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,42rem)] max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Export Report</h3>
+          <button id="closeExportModal" class="flex items-center justify-center w-8 h-8 rounded-full hover:bg-slate-100 transition-colors duration-200">
+            <i data-lucide="x" class="w-5 h-5 text-slate-600"></i>
+          </button>
+        </div>
+
+        <form id="exportForm">
+          <div class="space-y-6">
+            <div>
+              <label class="block text-sm font-semibold text-slate-900 mb-3">Export Format</label>
+              <div class="grid grid-cols-2 gap-3">
+                <label class="flex items-center p-4 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors duration-200">
+                  <input type="radio" name="exportFormat" value="csv" class="w-4 h-4 text-teal-700 border-slate-300 focus:ring-teal-700 focus:ring-2" checked="">
+                  <div class="ml-3">
+                    <div class="font-medium text-slate-900">CSV Format</div>
+                    <div class="text-xs text-slate-600">Comma-separated values</div>
+                  </div>
+                </label>
+                <label class="flex items-center p-4 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors duration-200">
+                  <input type="radio" name="exportFormat" value="json" class="w-4 h-4 text-teal-700 border-slate-300 focus:ring-teal-700 focus:ring-2">
+                  <div class="ml-3">
+                    <div class="font-medium text-slate-900">JSON Format</div>
+                    <div class="text-xs text-slate-600">JavaScript Object Notation</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label for="exportFileName" class="block text-sm font-semibold text-slate-900 mb-2">File Name</label>
+              <input type="text" id="exportFileName" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-teal-700 focus:border-teal-700" placeholder="Enter file name">
+            </div>
+
+            <div>
+              <label class="flex items-center">
+                <input type="checkbox" id="includeParameters" class="w-4 h-4 text-teal-700 border-slate-300 rounded focus:ring-teal-700 focus:ring-2">
+                <span class="ml-2 text-sm text-slate-900">Include report parameters in export</span>
+              </label>
+            </div>
+
+            <div class="bg-slate-50 rounded-lg p-4">
+              <div class="text-sm text-slate-600">
+                <div class="flex items-center justify-between">
+                  <span>Number of rows to export:</span>
+                  <span id="exportRowCount" class="font-medium text-slate-900">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-slate-100">
+            <button type="button" id="cancelExport" class="px-4 py-2 border border-slate-200 text-slate-700 rounded text-sm font-semibold hover:bg-slate-50 transition-colors duration-200">
+              Cancel
+            </button>
+            <button type="submit" class="px-4 py-2 bg-teal-700 text-white rounded text-sm font-semibold hover:bg-teal-600 transition-colors duration-200">
+              Export
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<style>
+@media print {
+  .no-print, #exportReportBtn, #printReportBtn, .pagination {
+    display: none !important;
+  }
+  
+  .app-header, .app-sidebar {
+    display: none !important;
+  }
+  
+  .app-main {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  body {
+    font-size: 12px;
+  }
+  
+  table {
+    page-break-inside: avoid;
+  }
+  
+  thead {
+    display: table-header-group;
+  }
+  
+  tfoot {
+    display: table-footer-group;
+  }
+}
+</style></main>
+
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils = window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_sales_001");
+                    currentUserId = "usr_sales_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent = TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent = TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } = state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail) return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent = TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent = TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active", "bg-teal-50", "text-teal-700");
+            } else {
+              link.classList.remove("active", "bg-teal-50", "text-teal-700");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () => closeMobileSidebar());
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+});
+</script>
+<script>
+// Report Display App
+const ReportDisplayApp = {
+  currentReportData: null,
+  reportConfig: null,
+  currentPage: 1,
+  rowsPerPage: 50,
+  sortColumn: null,
+  sortDirection: 'asc',
+  
+  init() {
+    this.initializeReportConfig();
+    this.generateReport();
+    this.bindEvents();
+  },
+
+  initializeReportConfig() {
+    // Get report configuration from URL parameters or session storage
+    const urlParams = new URLSearchParams(window.location.search);
+    const configFromUrl = urlParams.get('config');
+    
+    if (configFromUrl) {
+      try {
+        this.reportConfig = JSON.parse(decodeURIComponent(configFromUrl));
+      } catch (e) {
+        console.error('Error parsing URL config:', e);
+      }
+    }
+    
+    // Fallback to session storage
+    if (!this.reportConfig) {
+      const storedConfig = sessionStorage.getItem('reportConfig');
+      if (storedConfig) {
+        try {
+          this.reportConfig = JSON.parse(storedConfig);
+        } catch (e) {
+          console.error('Error parsing stored config:', e);
+        }
+      }
+    }
+
+    // Default configuration if none found
+    if (!this.reportConfig) {
+      this.reportConfig = {
+        reportType: 'sales_summary',
+        dateRange: { start: '2024-11-20', end: '2024-11-24' },
+        groupBy: 'sku',
+        metrics: ['totalQuantity', 'transactionCount'],
+        filters: {}
+      };
+    }
+  },
+
+  generateReport() {
+    setTimeout(() => {
+      try {
+        // Load data from localStorage
+        const salesRecords = JSON.parse(localStorage.getItem('salesRecords') || '[]');
+        const skus = JSON.parse(localStorage.getItem('skus') || '[]');
+        const stores = JSON.parse(localStorage.getItem('stores') || '[]');
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+
+        // Filter sales records by date range
+        const filteredRecords = this.funFilterRecordsByDateRange(salesRecords);
+        
+        if (filteredRecords.length === 0) {
+          this.funShowEmptyState();
+          return;
+        }
+
+        // Generate report data based on configuration
+        this.currentReportData = this.funProcessReportData(filteredRecords, skus, stores, users);
+        
+        this.funRenderReport();
+        this.funShowReportContent();
+      } catch (error) {
+        console.error('Error generating report:', error);
+        this.funShowEmptyState();
+      }
+    }, 1000);
+  },
+
+  funFilterRecordsByDateRange(records) {
+    const startDate = new Date(this.reportConfig.dateRange.start);
+    const endDate = new Date(this.reportConfig.dateRange.end);
+    endDate.setHours(23, 59, 59, 999); // Include full end date
+    
+    return records.filter(record => {
+      const recordDate = new Date(record.recordedAt);
+      return recordDate >= startDate && recordDate <= endDate;
+    });
+  },
+
+  funProcessReportData(records, skus, stores, users) {
+    const config = this.reportConfig;
+    const groupedData = {};
+    
+    records.forEach(record => {
+      record.scannedSkus.forEach(scannedSku => {
+        const sku = skus.find(s => s.id === scannedSku.skuId);
+        const store = stores.find(s => s.id === record.storeId);
+        const user = users.find(u => u.id === record.recordedById);
+        
+        let groupKey = '';
+        let groupDisplay = '';
+        
+        // Generate group key based on groupBy configuration
+        switch (config.groupBy) {
+          case 'sku':
+            groupKey = scannedSku.skuId;
+            groupDisplay = sku ? sku.productName : 'Unknown SKU';
+            break;
+          case 'store':
+            groupKey = record.storeId;
+            groupDisplay = store ? store.storeName : 'Unknown Store';
+            break;
+          case 'staff':
+            groupKey = record.recordedById;
+            groupDisplay = user ? `${user.firstName} ${user.lastName}` : 'Unknown Staff';
+            break;
+          case 'date':
+            const date = new Date(record.recordedAt);
+            groupKey = date.toISOString().split('T')[0];
+            groupDisplay = date.toLocaleDateString('en-IN', { 
+              day: '2-digit', 
+              month: '2-digit', 
+              year: 'numeric' 
+            });
+            break;
+          default:
+            groupKey = 'all';
+            groupDisplay = 'All Sales';
+        }
+        
+        if (!groupedData[groupKey]) {
+          groupedData[groupKey] = {
+            groupKey,
+            groupDisplay,
+            totalQuantity: 0,
+            transactionCount: 0,
+            uniqueTransactions: new Set(),
+            sku: sku,
+            store: store,
+            user: user,
+            records: []
+          };
+        }
+        
+        groupedData[groupKey].totalQuantity += scannedSku.quantity;
+        groupedData[groupKey].uniqueTransactions.add(record.id);
+        groupedData[groupKey].records.push({...record, scannedSku, sku, store, user});
+      });
+    });
+    
+    // Convert to array and calculate final metrics
+    return Object.values(groupedData).map(group => {
+      group.transactionCount = group.uniqueTransactions.size;
+      group.averageQuantityPerTransaction = group.totalQuantity / group.transactionCount;
+      delete group.uniqueTransactions; // Remove Set object
+      return group;
+    }).sort((a, b) => b.totalQuantity - a.totalQuantity); // Sort by quantity desc
+  },
+
+  funRenderReport() {
+    this.funRenderReportHeader();
+    this.funRenderReportParameters();
+    this.funRenderSummaryCards();
+    this.funRenderReportTable();
+    this.funUpdatePagination();
+  },
+
+  funRenderReportHeader() {
+    const config = this.reportConfig;
+    const reportTitle = this.funGetReportTitle();
+    const generationTime = new Date().toLocaleString('en-IN', {
+      day: '2-digit',
+      month: '2-digit', 
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    document.getElementById('reportTitle').textContent = reportTitle;
+    document.getElementById('reportBreadcrumb').textContent = reportTitle;
+    document.getElementById('generationTime').textContent = `Generated on ${generationTime}`;
+    document.getElementById('exportFileName').value = `report_${config.reportType}_${new Date().toISOString().split('T')[0]}`;
+  },
+
+  funGetReportTitle() {
+    const config = this.reportConfig;
+    const groupByLabels = {
+      'sku': 'SKU Performance',
+      'store': 'Store Performance', 
+      'staff': 'Staff Performance',
+      'date': 'Daily Sales'
+    };
+    return groupByLabels[config.groupBy] || 'Sales Report';
+  },
+
+  funRenderReportParameters() {
+    const config = this.reportConfig;
+    
+    document.getElementById('paramDateRange').textContent = 
+      `${config.dateRange.start} to ${config.dateRange.end}`;
+    
+    document.getElementById('paramGroupBy').textContent = 
+      config.groupBy.charAt(0).toUpperCase() + config.groupBy.slice(1);
+    
+    document.getElementById('paramMetrics').textContent = 
+      config.metrics.map(m => m.replace(/([A-Z])/g, ' $1').toLowerCase()).join(', ');
+    
+    document.getElementById('paramFilters').textContent = 
+      Object.keys(config.filters || {}).length > 0 ? 'Applied' : 'None';
+  },
+
+  funRenderSummaryCards() {
+    const data = this.currentReportData;
+    const summarySection = document.getElementById('summarySection');
+    
+    const totalQuantity = data.reduce((sum, item) => sum + item.totalQuantity, 0);
+    const totalTransactions = data.reduce((sum, item) => sum + item.transactionCount, 0);
+    const averagePerTransaction = totalTransactions > 0 ? (totalQuantity / totalTransactions).toFixed(1) : 0;
+    const topPerformer = data[0];
+    
+    const cards = [
+      {
+        title: 'Total Quantity',
+        value: totalQuantity.toLocaleString(),
+        icon: 'package',
+        color: 'text-blue-600'
+      },
+      {
+        title: 'Total Transactions',
+        value: totalTransactions.toLocaleString(),
+        icon: 'receipt',
+        color: 'text-green-600'
+      },
+      {
+        title: 'Avg. per Transaction',
+        value: averagePerTransaction,
+        icon: 'trending-up',
+        color: 'text-amber-600'
+      },
+      {
+        title: 'Top Performer',
+        value: topPerformer ? topPerformer.groupDisplay : 'N/A',
+        icon: 'award',
+        color: 'text-teal-600'
+      }
+    ];
+    
+    summarySection.innerHTML = cards.map(card => `
+      <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-3">
+          <div class="text-sm font-medium text-slate-600">${card.title}</div>
+          <i data-lucide="${card.icon}" class="w-5 h-5 ${card.color}"></i>
+        </div>
+        <div class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900">${card.value}</div>
+      </div>
+    `).join('');
+  },
+
+  funRenderReportTable() {
+    const config = this.reportConfig;
+    const headers = this.funGetTableHeaders();
+    
+    // Render table headers
+    const headerRow = headers.map(header => `
+      <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 cursor-pointer hover:bg-slate-100 transition-colors duration-200" 
+          data-column="${header.key}">
+        <div class="flex items-center gap-2">
+          <span>${header.label}</span>
+          ${this.sortColumn === header.key ? 
+            `<i data-lucide="chevron-${this.sortDirection === 'asc' ? 'up' : 'down'}" class="w-4 h-4"></i>` : 
+            '<i data-lucide="chevrons-up-down" class="w-4 h-4 opacity-50"></i>'
+          }
+        </div>
+      </th>
+    `).join('');
+    
+    document.getElementById('reportTableHead').innerHTML = `<tr>${headerRow}</tr>`;
+    
+    // Get paginated data
+    const paginatedData = this.funGetPaginatedData();
+    
+    // Render table rows
+    const rows = paginatedData.map((item, index) => {
+      const isEven = index % 2 === 0;
+      return `
+        <tr class="${isEven ? 'bg-white' : 'bg-slate-50'} hover:bg-slate-100 transition-colors duration-200">
+          ${headers.map(header => `
+            <td class="px-6 py-4 text-sm">
+              ${this.funRenderCellContent(item, header)}
+            </td>
+          `).join('')}
+        </tr>
+      `;
+    }).join('');
+    
+    document.getElementById('reportTableBody').innerHTML = rows;
+    
+    // Render grand totals
+    this.funRenderGrandTotals(headers);
+    
+    // Update export row count
+    document.getElementById('exportRowCount').textContent = this.currentReportData.length;
+  },
+
+  funGetTableHeaders() {
+    const config = this.reportConfig;
+    const headers = [];
+    
+    // Primary dimension column
+    switch (config.groupBy) {
+      case 'sku':
+        headers.push({ key: 'groupDisplay', label: 'SKU Name', linkType: 'sku' });
+        headers.push({ key: 'skuCode', label: 'SKU Code' });
+        headers.push({ key: 'category', label: 'Category' });
+        break;
+      case 'store':
+        headers.push({ key: 'groupDisplay', label: 'Store Name', linkType: 'store' });
+        headers.push({ key: 'storeCode', label: 'Store Code' });
+        headers.push({ key: 'city', label: 'City' });
+        break;
+      case 'staff':
+        headers.push({ key: 'groupDisplay', label: 'Staff Name', linkType: 'staff' });
+        headers.push({ key: 'employeeId', label: 'Employee ID' });
+        headers.push({ key: 'role', label: 'Role' });
+        break;
+      case 'date':
+        headers.push({ key: 'groupDisplay', label: 'Date' });
+        break;
+    }
+    
+    // Metric columns based on configuration
+    if (config.metrics.includes('totalQuantity')) {
+      headers.push({ key: 'totalQuantity', label: 'Total Quantity', format: 'number' });
+    }
+    if (config.metrics.includes('transactionCount')) {
+      headers.push({ key: 'transactionCount', label: 'Transactions', format: 'number' });
+    }
+    if (config.metrics.includes('averageQuantityPerTransaction')) {
+      headers.push({ key: 'averageQuantityPerTransaction', label: 'Avg. per Transaction', format: 'decimal' });
+    }
+    
+    return headers;
+  },
+
+  funRenderCellContent(item, header) {
+    let value = '';
+    
+    // Get value based on header key
+    switch (header.key) {
+      case 'groupDisplay':
+        value = item.groupDisplay;
+        break;
+      case 'skuCode':
+        value = item.sku?.skuCode || '-';
+        break;
+      case 'category':
+        value = item.sku?.category || '-';
+        break;
+      case 'storeCode':
+        value = item.store?.storeCode || '-';
+        break;
+      case 'city':
+        value = item.store?.address?.city || '-';
+        break;
+      case 'employeeId':
+        value = item.user?.employeeId || '-';
+        break;
+      case 'role':
+        value = item.user?.role ? item.user.role.charAt(0).toUpperCase() + item.user.role.slice(1) : '-';
+        break;
+      default:
+        value = item[header.key] || 0;
+    }
+    
+    // Format value
+    if (header.format === 'number' && typeof value === 'number') {
+      value = value.toLocaleString();
+    } else if (header.format === 'decimal' && typeof value === 'number') {
+      value = value.toFixed(1);
+    }
+    
+    // Add linking for primary dimension
+    if (header.linkType && header.key === 'groupDisplay') {
+      const linkUrl = this.funGetDetailPageUrl(header.linkType, item);
+      if (linkUrl) {
+        return `<a href="${linkUrl}" class="text-teal-700 hover:text-teal-600 font-medium no-underline">${value}</a>`;
+      }
+    }
+    
+    // Conditional formatting for numbers
+    if (header.format === 'number' && typeof item[header.key] === 'number') {
+      const totalItems = this.currentReportData.length;
+      const itemIndex = this.currentReportData.findIndex(d => d.groupKey === item.groupKey);
+      
+      if (itemIndex < totalItems * 0.2) { // Top 20%
+        return `<span class="font-semibold text-green-600">${value}</span>`;
+      } else if (itemIndex > totalItems * 0.8) { // Bottom 20%
+        return `<span class="text-amber-600">${value}</span>`;
+      }
+    }
+    
+    return `<span class="text-slate-800">${value}</span>`;
+  },
+
+  funGetDetailPageUrl(linkType, item) {
+    switch (linkType) {
+      case 'sku':
+        return item.sku ? `sku_detail.html?id=${item.sku.id}` : null;
+      case 'store':
+        return item.store ? `store_detail.html?id=${item.store.id}` : null;
+      case 'staff':
+        return item.user ? `staff_detail.html?id=${item.user.id}` : null;
+      default:
+        return null;
+    }
+  },
+
+  funRenderGrandTotals(headers) {
+    const data = this.currentReportData;
+    const totals = {};
+    
+    // Calculate totals for numeric columns
+    headers.forEach(header => {
+      if (header.format === 'number') {
+        totals[header.key] = data.reduce((sum, item) => sum + (item[header.key] || 0), 0);
+      } else if (header.format === 'decimal') {
+        const total = data.reduce((sum, item) => sum + (item[header.key] || 0), 0);
+        totals[header.key] = (total / data.length).toFixed(1);
+      }
+    });
+    
+    const totalRow = headers.map((header, index) => {
+      let content = '';
+      if (index === 0) {
+        content = `<span class="font-semibold text-slate-900">Grand Total</span>`;
+      } else if (totals[header.key] !== undefined) {
+        const value = header.format === 'number' ? 
+          totals[header.key].toLocaleString() : 
+          totals[header.key];
+        content = `<span class="font-semibold text-slate-900">${value}</span>`;
+      } else {
+        content = '-';
+      }
+      
+      return `<td class="px-6 py-4 text-sm">${content}</td>`;
+    }).join('');
+    
+    document.getElementById('reportTableFoot').innerHTML = `<tr>${totalRow}</tr>`;
+  },
+
+  funGetPaginatedData() {
+    let sortedData = [...this.currentReportData];
+    
+    // Apply sorting
+    if (this.sortColumn) {
+      sortedData.sort((a, b) => {
+        let aVal = this.funGetSortValue(a, this.sortColumn);
+        let bVal = this.funGetSortValue(b, this.sortColumn);
+        
+        if (typeof aVal === 'string') {
+          aVal = aVal.toLowerCase();
+          bVal = bVal.toLowerCase();
+        }
+        
+        if (this.sortDirection === 'asc') {
+          return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+        } else {
+          return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
+        }
+      });
+    }
+    
+    // Apply pagination
+    const startIndex = (this.currentPage - 1) * this.rowsPerPage;
+    const endIndex = startIndex + this.rowsPerPage;
+    
+    return sortedData.slice(startIndex, endIndex);
+  },
+
+  funGetSortValue(item, column) {
+    switch (column) {
+      case 'groupDisplay':
+        return item.groupDisplay;
+      case 'skuCode':
+        return item.sku?.skuCode || '';
+      case 'category':
+        return item.sku?.category || '';
+      case 'storeCode':
+        return item.store?.storeCode || '';
+      case 'city':
+        return item.store?.address?.city || '';
+      case 'employeeId':
+        return item.user?.employeeId || '';
+      case 'role':
+        return item.user?.role || '';
+      default:
+        return item[column] || 0;
+    }
+  },
+
+  funUpdatePagination() {
+    const totalRows = this.currentReportData.length;
+    const totalPages = Math.ceil(totalRows / this.rowsPerPage);
+    const startRow = ((this.currentPage - 1) * this.rowsPerPage) + 1;
+    const endRow = Math.min(this.currentPage * this.rowsPerPage, totalRows);
+    
+    document.getElementById('pageStart').textContent = startRow;
+    document.getElementById('pageEnd').textContent = endRow;
+    document.getElementById('totalRows').textContent = totalRows;
+    
+    document.getElementById('prevPageBtn').disabled = this.currentPage === 1;
+    document.getElementById('nextPageBtn').disabled = this.currentPage === totalPages;
+    
+    // Render page numbers
+    this.funRenderPageNumbers(totalPages);
+  },
+
+  funRenderPageNumbers(totalPages) {
+    const pageNumbers = document.getElementById('pageNumbers');
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    let html = '';
+    
+    for (let page = startPage; page <= endPage; page++) {
+      const isActive = page === this.currentPage;
+      html += `
+        <button class="w-8 h-8 flex items-center justify-center text-sm font-medium rounded ${
+          isActive 
+            ? 'bg-teal-700 text-white' 
+            : 'text-slate-700 hover:bg-slate-100'
+        } transition-colors duration-200" 
+        data-page="${page}">
+          ${page}
+        </button>
+      `;
+    }
+    
+    pageNumbers.innerHTML = html;
+  },
+
+  funShowReportContent() {
+    document.getElementById('loadingState').classList.add('hidden');
+    document.getElementById('reportContent').classList.remove('hidden');
+    
+    // Initialize Lucide icons
+    if (typeof window.lucide?.createIcons === 'function') {
+      window.lucide.createIcons();
+    }
+  },
+
+  funShowEmptyState() {
+    document.getElementById('loadingState').classList.add('hidden');
+    document.getElementById('emptyState').classList.remove('hidden');
+    
+    if (typeof window.lucide?.createIcons === 'function') {
+      window.lucide.createIcons();
+    }
+  },
+
+  funExportReport(format, fileName, includeParameters) {
+    const data = this.currentReportData;
+    const config = this.reportConfig;
+    
+    let exportContent = '';
+    let mimeType = '';
+    let fileExtension = '';
+    
+    if (format === 'csv') {
+      exportContent = this.funGenerateCSV(data, includeParameters);
+      mimeType = 'text/csv';
+      fileExtension = '.csv';
+    } else if (format === 'json') {
+      const exportData = includeParameters ? {
+        reportParameters: config,
+        generatedAt: new Date().toISOString(),
+        data: data
+      } : data;
+      exportContent = JSON.stringify(exportData, null, 2);
+      mimeType = 'application/json';
+      fileExtension = '.json';
+    }
+    
+    // Create download
+    const blob = new Blob([exportContent], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName + fileExtension;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  },
+
+  funGenerateCSV(data, includeParameters) {
+    const headers = this.funGetTableHeaders();
+    let csv = '';
+    
+    // Add parameters header if requested
+    if (includeParameters) {
+      csv += `# Report Parameters\n`;
+      csv += `# Generated: ${new Date().toISOString()}\n`;
+      csv += `# Date Range: ${this.reportConfig.dateRange.start} to ${this.reportConfig.dateRange.end}\n`;
+      csv += `# Group By: ${this.reportConfig.groupBy}\n`;
+      csv += `# Metrics: ${this.reportConfig.metrics.join(', ')}\n`;
+      csv += `\n`;
+    }
+    
+    // Add headers
+    csv += headers.map(h => h.label).join(',') + '\n';
+    
+    // Add data rows
+    data.forEach(item => {
+      const row = headers.map(header => {
+        const value = this.funGetSortValue(item, header.key);
+        // Escape commas and quotes in CSV
+        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+          return `"${value.replace(/"/g, '""')}"`;
+        }
+        return value;
+      });
+      csv += row.join(',') + '\n';
+    });
+    
+    return csv;
+  },
+
+  bindEvents() {
+    // Parameters toggle
+    document.getElementById('toggleParametersBtn')?.addEventListener('click', () => {
+      const panel = document.getElementById('parametersPanel');
+      const chevron = document.getElementById('parametersChevron');
+      const isHidden = panel.classList.contains('hidden');
+      
+      panel.classList.toggle('hidden');
+      chevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+    });
+
+    // Export modal
+    document.getElementById('exportReportBtn')?.addEventListener('click', () => {
+      document.getElementById('exportModal').classList.remove('hidden');
+    });
+
+    document.getElementById('closeExportModal')?.addEventListener('click', () => {
+      document.getElementById('exportModal').classList.add('hidden');
+    });
+
+    document.getElementById('cancelExport')?.addEventListener('click', () => {
+      document.getElementById('exportModal').classList.add('hidden');
+    });
+
+    // Export form
+    document.getElementById('exportForm')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const format = formData.get('exportFormat');
+      const fileName = document.getElementById('exportFileName').value || 'report';
+      const includeParameters = document.getElementById('includeParameters').checked;
+      
+      this.funExportReport(format, fileName, includeParameters);
+      document.getElementById('exportModal').classList.add('hidden');
+      
+      // Show success message
+      setTimeout(() => {
+        alert('Report exported successfully!');
+      }, 100);
+    });
+
+    // Print report
+    document.getElementById('printReportBtn')?.addEventListener('click', () => {
+      window.print();
+    });
+
+    // Table sorting
+    document.addEventListener('click', (e) => {
+      const header = e.target.closest('[data-column]');
+      if (header && this.currentReportData) {
+        const column = header.dataset.column;
+        
+        if (this.sortColumn === column) {
+          this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+          this.sortColumn = column;
+          this.sortDirection = 'asc';
+        }
+        
+        this.funRenderReportTable();
+        this.funUpdatePagination();
+        
+        if (typeof window.lucide?.createIcons === 'function') {
+          window.lucide.createIcons();
+        }
+      }
+    });
+
+    // Pagination
+    document.getElementById('prevPageBtn')?.addEventListener('click', () => {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+        this.funRenderReportTable();
+        this.funUpdatePagination();
+      }
+    });
+
+    document.getElementById('nextPageBtn')?.addEventListener('click', () => {
+      const totalPages = Math.ceil(this.currentReportData.length / this.rowsPerPage);
+      if (this.currentPage < totalPages) {
+        this.currentPage++;
+        this.funRenderReportTable();
+        this.funUpdatePagination();
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const pageButton = e.target.closest('[data-page]');
+      if (pageButton) {
+        this.currentPage = parseInt(pageButton.dataset.page);
+        this.funRenderReportTable();
+        this.funUpdatePagination();
+      }
+    });
+  }
+};
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  ReportDisplayApp.init();
+  
+  // Set active navigation
+  if (window.TemplateUtils && window.TemplateUtils.setActiveNavLink) {
+    window.TemplateUtils.setActiveNavLink('reports');
+  }
+});
+</script></body></html>

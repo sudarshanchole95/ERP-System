@@ -1,0 +1,1164 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>Sales Analytics Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-primary: #0F766E;
+        --color-primary-hover: #0D9488;
+        --color-secondary: #475569;
+        --color-accent: #D97706;
+        --color-background: #F8FAFC;
+        --color-surface: #FFFFFF;
+        --color-surface-variant: #F1F5F9;
+        --color-on-background: #0F172A;
+        --color-on-surface: #1E293B;
+        --color-border: #E2E8F0;
+        --color-success: #16A34A;
+        --color-warning: #F59E0B;
+        --color-error: #DC2626;
+        --color-info: #2563EB;
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+      }
+
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Transaction Details - Sales Analytics Dashboard</title></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="68" y="68" width="264" height="264" rx="32" stroke="#0F766E" stroke-width="18"></rect>
+                <rect x="109" y="143" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="109" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="109" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                <rect x="206" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                <rect x="206" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">Sales Analytics Dashboard</h1>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 md:gap-3">
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-600 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-600 truncate"></div>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Analytics</div>
+          <div class="space-y-1">
+            <a href="dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="dashboard">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="sku_performance_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sku_performance">
+              <i data-lucide="package" class="w-5 h-5"></i>
+              <span>SKU Performance</span>
+            </a>
+            <a href="store_performance_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="store_performance">
+              <i data-lucide="store" class="w-5 h-5"></i>
+              <span>Store Performance</span>
+            </a>
+            <a href="staff_performance_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="staff_performance">
+              <i data-lucide="users" class="w-5 h-5"></i>
+              <span>Staff Performance</span>
+            </a>
+            <a href="transaction_history.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="transaction_history">
+              <i data-lucide="receipt" class="w-5 h-5"></i>
+              <span>Transaction History</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="py-6 border-b border-slate-100 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Tools</div>
+          <div class="space-y-1">
+            <a href="reports_configuration.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="reports">
+              <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+              <span>Reports</span>
+            </a>
+            <a href="settings.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="settings">
+              <i data-lucide="settings" class="w-5 h-5"></i>
+              <span>Settings</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="app-main p-6" id="pageContent" role="main"><div class="mb-6">
+  <nav class="flex items-center gap-2 text-sm" aria-label="Breadcrumb">
+    <a href="dashboard.html" class="text-teal-700 hover:text-teal-600 font-medium no-underline">Dashboard</a>
+    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+    <a href="transaction_history.html" class="text-teal-700 hover:text-teal-600 font-medium no-underline">Transaction History</a>
+    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+    <span class="text-slate-600" id="breadcrumbTransactionId">Transaction</span>
+  </nav>
+</div>
+
+<!-- Page Header -->
+<div class="mb-8">
+  <div class="flex items-start justify-between gap-4 mb-4">
+    <div>
+      <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900" id="pageTitle">Transaction Details</h1>
+      <div class="flex items-center gap-4 mt-2">
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-medium text-slate-600">Submission ID:</span>
+          <span class="text-sm font-semibold text-slate-900" id="submissionId"></span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-medium text-slate-600">Status:</span>
+          <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800">
+            <i data-lucide="check-circle" class="w-3 h-3 mr-1"></i>
+            Complete
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="text-right">
+      <div class="text-sm text-slate-600">Recorded At</div>
+      <div class="text-base font-semibold text-slate-900" id="recordedTimestamp"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Two Column Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+  <!-- Left Column -->
+  <div class="space-y-6">
+    <!-- Store Information Card -->
+    <div class="bg-white rounded-lg border border-slate-200 p-6">
+      <h3 class="text-base leading-6 font-semibold text-slate-900 mb-4">Store Information</h3>
+      <div class="space-y-3">
+        <div>
+          <a href="#" id="storeNameLink" class="text-base font-medium text-teal-700 hover:text-teal-600 no-underline"></a>
+          <div class="text-sm text-slate-600" id="storeCode"></div>
+        </div>
+        <div>
+          <div class="text-sm font-medium text-slate-700">Address</div>
+          <div class="text-sm text-slate-600" id="storeAddress"></div>
+        </div>
+        <div>
+          <div class="text-sm font-medium text-slate-700">Contact Person</div>
+          <div class="text-sm text-slate-600" id="storeContact"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Staff Information Card -->
+    <div class="bg-white rounded-lg border border-slate-200 p-6">
+      <h3 class="text-base leading-6 font-semibold text-slate-900 mb-4">Staff Information</h3>
+      <div class="space-y-3">
+        <div>
+          <a href="#" id="staffNameLink" class="text-base font-medium text-teal-700 hover:text-teal-600 no-underline"></a>
+          <div class="flex items-center gap-2 mt-1">
+            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium" id="roleBadge"></span>
+            <span class="text-sm text-slate-600" id="employeeId"></span>
+          </div>
+        </div>
+        <div>
+          <div class="text-sm font-medium text-slate-700">Contact</div>
+          <div class="space-y-1">
+            <div class="text-sm text-slate-600" id="staffEmail"></div>
+            <div class="text-sm text-slate-600" id="staffPhone"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column -->
+  <div class="space-y-6">
+    <!-- Transaction Summary Card -->
+    <div class="bg-white rounded-lg border border-slate-200 p-6">
+      <h3 class="text-base leading-6 font-semibold text-slate-900 mb-4">Transaction Summary</h3>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="text-center p-4 bg-slate-50 rounded-lg">
+          <div class="text-xl font-bold text-slate-900" id="totalSkuCount">0</div>
+          <div class="text-sm text-slate-600">SKUs Scanned</div>
+        </div>
+        <div class="text-center p-4 bg-slate-50 rounded-lg">
+          <div class="text-xl font-bold text-slate-900" id="totalQuantity">0</div>
+          <div class="text-sm text-slate-600">Total Quantity</div>
+        </div>
+      </div>
+      <div class="mt-4 pt-4 border-t border-slate-100">
+        <div class="text-center p-4 bg-teal-50 rounded-lg">
+          <div class="text-2xl font-bold text-teal-700" id="grandTotalValue">₹0.00</div>
+          <div class="text-sm text-teal-600">Grand Total Value</div>
+        </div>
+      </div>
+      <div class="mt-4 pt-4 border-t border-slate-100 space-y-2">
+        <div class="flex justify-between text-sm">
+          <span class="text-slate-600">Recording Time:</span>
+          <span class="text-slate-900" id="recordingTime"></span>
+        </div>
+        <div class="flex justify-between text-sm" id="createdTimeRow" style="display: none;">
+          <span class="text-slate-600">Created Time:</span>
+          <span class="text-slate-900" id="createdTime"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scanned Items Table -->
+<div class="bg-white rounded-lg border border-slate-200 mb-8">
+  <div class="p-6 border-b border-slate-200">
+    <h3 class="text-base leading-6 font-semibold text-slate-900">Scanned Items</h3>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead class="bg-slate-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">SKU Code</th>
+          <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Barcode</th>
+          <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Product Name</th>
+          <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Category</th>
+          <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Unit Price</th>
+          <th class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">Quantity</th>
+          <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Line Total</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-slate-200" id="scannedItemsTable">
+        <!-- Table rows will be populated by JavaScript -->
+      </tbody>
+      <tfoot class="bg-slate-50">
+        <tr>
+          <td colspan="5" class="px-6 py-4 text-sm font-semibold text-slate-900">Grand Total</td>
+          <td class="px-6 py-4 text-center text-sm font-bold text-slate-900" id="footerTotalQuantity">0</td>
+          <td class="px-6 py-4 text-right text-sm font-bold text-slate-900" id="footerTotalValue">₹0.00</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<!-- Related Transactions Section -->
+<div class="bg-white rounded-lg border border-slate-200 mb-8" id="relatedTransactionsSection">
+  <div class="p-6 border-b border-slate-200">
+    <h3 class="text-base leading-6 font-semibold text-slate-900">Related Transactions</h3>
+    <p class="text-sm text-slate-600 mt-1">Other transactions from the same submission batch</p>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead class="bg-slate-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Transaction ID</th>
+          <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Staff</th>
+          <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Store</th>
+          <th class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">Items</th>
+          <th class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">Quantity</th>
+          <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Time</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-slate-200" id="relatedTransactionsTable">
+        <!-- Table rows will be populated by JavaScript -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Empty State for Related Transactions -->
+<div class="bg-white rounded-lg border border-slate-200 mb-8 hidden" id="relatedTransactionsEmpty">
+  <div class="p-6 border-b border-slate-200">
+    <h3 class="text-base leading-6 font-semibold text-slate-900">Related Transactions</h3>
+    <p class="text-sm text-slate-600 mt-1">Other transactions from the same submission batch</p>
+  </div>
+  <div class="p-8 text-center">
+    <i data-lucide="file-x" class="w-12 h-12 text-slate-400 mx-auto mb-4"></i>
+    <h4 class="text-base font-medium text-slate-900 mb-2">No Related Transactions</h4>
+    <p class="text-sm text-slate-600">This submission batch contains only this transaction.</p>
+  </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+  <button onclick="window.location.href='transaction_history.html'" class="flex items-center gap-2 px-4 py-2 bg-slate-600 text-white rounded font-medium hover:bg-slate-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2">
+    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+    Back to Transaction History
+  </button>
+  
+  <button onclick="funShowExportModal()" class="flex items-center gap-2 px-4 py-2 bg-teal-700 text-white rounded font-medium hover:bg-teal-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+    <i data-lucide="download" class="w-4 h-4"></i>
+    Export Transaction Details
+  </button>
+</div>
+
+<!-- Export Transaction Modal -->
+<div id="exportModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,28rem)] max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b border-slate-200">
+        <div class="flex items-center justify-between">
+          <h3 class="text-base font-semibold text-slate-900">Export Transaction Details</h3>
+          <button onclick="funHideExportModal()" class="p-1 hover:bg-slate-100 rounded transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+            <i data-lucide="x" class="w-5 h-5 text-slate-400"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="p-6">
+        <div class="space-y-4">
+          <div>
+            <p class="text-sm text-slate-600 mb-4">Select the format for exporting transaction details:</p>
+            
+            <div class="space-y-3">
+              <label class="flex items-center p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors duration-200">
+                <input type="radio" name="exportFormat" value="csv" class="w-4 h-4 text-teal-700 focus:ring-teal-500 focus:ring-2" checked="">
+                <div class="ml-3">
+                  <div class="text-sm font-medium text-slate-900">CSV Format</div>
+                  <div class="text-xs text-slate-600">Comma-separated values, compatible with Excel</div>
+                </div>
+              </label>
+              
+              <label class="flex items-center p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors duration-200">
+                <input type="radio" name="exportFormat" value="json" class="w-4 h-4 text-teal-700 focus:ring-teal-500 focus:ring-2">
+                <div class="ml-3">
+                  <div class="text-sm font-medium text-slate-900">JSON Format</div>
+                  <div class="text-xs text-slate-600">JavaScript Object Notation, for technical analysis</div>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <div class="p-3 bg-slate-50 rounded-lg">
+            <div class="text-xs font-medium text-slate-700 mb-1">Export file name:</div>
+            <div class="text-xs text-slate-600" id="exportFileName">transaction_[ID]_YYYY-MM-DD</div>
+          </div>
+          
+          <div class="p-3 bg-blue-50 rounded-lg">
+            <div class="flex items-start gap-2">
+              <i data-lucide="info" class="w-4 h-4 text-blue-600 mt-0.5"></i>
+              <div class="text-xs text-blue-800">
+                This will export the complete transaction record including all scanned items.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="p-6 border-t border-slate-200 flex justify-end gap-3">
+        <button onclick="funHideExportModal()" class="px-4 py-2 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2">
+          Cancel
+        </button>
+        <button onclick="funExportTransaction()" class="px-4 py-2 bg-teal-700 text-white rounded font-medium hover:bg-teal-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+          Export
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils = window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_sales_001");
+                    currentUserId = "usr_sales_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent = TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent = TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } = state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail) return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent = TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent = TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active", "bg-teal-50", "text-teal-700");
+            } else {
+              link.classList.remove("active", "bg-teal-50", "text-teal-700");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () => closeMobileSidebar());
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+// Utility: portal a modal by id (idempotent)
+function funPortalModalToBody(id) {
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+  
+  // Initialize page
+  funInitializeTransactionDetail();
+});
+
+// Global variables
+let currentTransaction = null;
+let allStores = [];
+let allUsers = [];
+let allSkus = [];
+
+// Initialize transaction detail page
+function funInitializeTransactionDetail() {
+  // Load data from localStorage
+  allStores = JSON.parse(localStorage.getItem('stores') || '[]');
+  allUsers = JSON.parse(localStorage.getItem('users') || '[]');
+  allSkus = JSON.parse(localStorage.getItem('skus') || '[]');
+  
+  // Get transaction ID from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const transactionId = urlParams.get('id');
+  
+  if (!transactionId) {
+    funShowError('No transaction ID provided');
+    return;
+  }
+  
+  // Load transaction
+  const salesRecords = JSON.parse(localStorage.getItem('salesRecords') || '[]');
+  currentTransaction = salesRecords.find(record => record.id === transactionId);
+  
+  if (!currentTransaction) {
+    funShowError('Transaction not found');
+    return;
+  }
+  
+  // Set active navigation
+  if (window.TemplateUtils?.setActiveNavLink) {
+    window.TemplateUtils.setActiveNavLink('transaction_history');
+  }
+  
+  // Populate page data
+  funPopulateTransactionData();
+  funPopulateScannedItems();
+  funPopulateRelatedTransactions();
+}
+
+// Populate transaction data
+function funPopulateTransactionData() {
+  if (!currentTransaction) return;
+  
+  // Find related data
+  const store = allStores.find(s => s.id === currentTransaction.storeId);
+  const staff = allUsers.find(u => u.id === currentTransaction.recordedById);
+  
+  // Page header
+  document.getElementById('pageTitle').textContent = `Transaction ${currentTransaction.id}`;
+  document.getElementById('breadcrumbTransactionId').textContent = `Transaction ${currentTransaction.id}`;
+  document.getElementById('submissionId').textContent = currentTransaction.submissionId;
+  document.getElementById('recordedTimestamp').textContent = funFormatDateTime(currentTransaction.recordedAt);
+  
+  // Store information
+  if (store) {
+    document.getElementById('storeNameLink').textContent = store.storeName;
+    document.getElementById('storeNameLink').href = `store_detail.html?id=${store.id}`;
+    document.getElementById('storeCode').textContent = store.storeCode;
+    document.getElementById('storeAddress').textContent = funFormatAddress(store.address);
+    document.getElementById('storeContact').textContent = store.contactPerson;
+  }
+  
+  // Staff information
+  if (staff) {
+    const fullName = `${staff.firstName} ${staff.lastName}`;
+    document.getElementById('staffNameLink').textContent = fullName;
+    document.getElementById('staffNameLink').href = `staff_detail.html?id=${staff.id}`;
+    
+    // Role badge
+    const roleBadge = document.getElementById('roleBadge');
+    const roleColors = {
+      'supervisor': 'bg-blue-100 text-blue-800',
+      'promodizer': 'bg-green-100 text-green-800',
+      'management': 'bg-purple-100 text-purple-800',
+      'salesOperations': 'bg-orange-100 text-orange-800'
+    };
+    roleBadge.className = `inline-flex items-center px-2 py-1 rounded text-xs font-medium ${roleColors[staff.role] || 'bg-gray-100 text-gray-800'}`;
+    roleBadge.textContent = funCapitalize(staff.role);
+    
+    document.getElementById('employeeId').textContent = staff.employeeId || 'N/A';
+    document.getElementById('staffEmail').textContent = staff.email;
+    document.getElementById('staffPhone').textContent = staff.phone;
+  }
+  
+  // Transaction summary
+  const totalSkuCount = currentTransaction.scannedSkus.length;
+  const totalQuantity = currentTransaction.scannedSkus.reduce((sum, item) => sum + item.quantity, 0);
+  let grandTotalValue = 0;
+  
+  currentTransaction.scannedSkus.forEach(scannedSku => {
+    const sku = allSkus.find(s => s.id === scannedSku.skuId);
+    if (sku) {
+      grandTotalValue += sku.unitPrice * scannedSku.quantity;
+    }
+  });
+  
+  document.getElementById('totalSkuCount').textContent = totalSkuCount;
+  document.getElementById('totalQuantity').textContent = totalQuantity;
+  document.getElementById('grandTotalValue').textContent = funFormatCurrency(grandTotalValue);
+  document.getElementById('recordingTime').textContent = funFormatDateTime(currentTransaction.recordedAt);
+  
+  // Show created time if different from recorded time
+  if (currentTransaction.createdAt !== currentTransaction.recordedAt) {
+    document.getElementById('createdTimeRow').style.display = 'flex';
+    document.getElementById('createdTime').textContent = funFormatDateTime(currentTransaction.createdAt);
+  }
+  
+  // Update footer totals
+  document.getElementById('footerTotalQuantity').textContent = totalQuantity;
+  document.getElementById('footerTotalValue').textContent = funFormatCurrency(grandTotalValue);
+  
+  // Update export filename preview
+  const dateStr = new Date().toISOString().split('T')[0];
+  document.getElementById('exportFileName').textContent = `transaction_${currentTransaction.id}_${dateStr}`;
+}
+
+// Populate scanned items table
+function funPopulateScannedItems() {
+  if (!currentTransaction) return;
+  
+  const tableBody = document.getElementById('scannedItemsTable');
+  tableBody.innerHTML = '';
+  
+  currentTransaction.scannedSkus.forEach(scannedSku => {
+    const sku = allSkus.find(s => s.id === scannedSku.skuId);
+    if (!sku) return;
+    
+    const lineTotal = sku.unitPrice * scannedSku.quantity;
+    
+    const row = document.createElement('tr');
+    row.className = 'hover:bg-slate-50 cursor-pointer transition-colors duration-150';
+    row.onclick = () => window.location.href = `sku_detail.html?id=${sku.id}`;
+    
+    row.innerHTML = `
+      <td class="px-6 py-4 text-sm font-medium text-slate-900">${sku.skuCode}</td>
+      <td class="px-6 py-4 text-sm text-slate-600">${scannedSku.barcode}</td>
+      <td class="px-6 py-4 text-sm text-slate-900">${sku.productName}</td>
+      <td class="px-6 py-4">
+        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+          ${sku.category}
+        </span>
+      </td>
+      <td class="px-6 py-4 text-sm text-slate-900 text-right">${funFormatCurrency(sku.unitPrice)}</td>
+      <td class="px-6 py-4 text-sm font-medium text-slate-900 text-center">${scannedSku.quantity}</td>
+      <td class="px-6 py-4 text-sm font-semibold text-slate-900 text-right">${funFormatCurrency(lineTotal)}</td>
+    `;
+    
+    tableBody.appendChild(row);
+  });
+}
+
+// Populate related transactions
+function funPopulateRelatedTransactions() {
+  if (!currentTransaction) return;
+  
+  const salesRecords = JSON.parse(localStorage.getItem('salesRecords') || '[]');
+  const relatedTransactions = salesRecords.filter(record => 
+    record.submissionId === currentTransaction.submissionId && 
+    record.id !== currentTransaction.id
+  );
+  
+  if (relatedTransactions.length === 0) {
+    document.getElementById('relatedTransactionsSection').classList.add('hidden');
+    document.getElementById('relatedTransactionsEmpty').classList.remove('hidden');
+    return;
+  }
+  
+  const tableBody = document.getElementById('relatedTransactionsTable');
+  tableBody.innerHTML = '';
+  
+  relatedTransactions.forEach(transaction => {
+    const store = allStores.find(s => s.id === transaction.storeId);
+    const staff = allUsers.find(u => u.id === transaction.recordedById);
+    const itemCount = transaction.scannedSkus.length;
+    const totalQuantity = transaction.scannedSkus.reduce((sum, item) => sum + item.quantity, 0);
+    
+    const row = document.createElement('tr');
+    row.className = 'hover:bg-slate-50 cursor-pointer transition-colors duration-150';
+    row.onclick = () => window.location.href = `transaction_detail.html?id=${transaction.id}`;
+    
+    row.innerHTML = `
+      <td class="px-6 py-4 text-sm font-medium text-teal-700">${transaction.id}</td>
+      <td class="px-6 py-4 text-sm text-slate-900">${staff ? `${staff.firstName} ${staff.lastName}` : 'Unknown'}</td>
+      <td class="px-6 py-4 text-sm text-slate-900">${store ? store.storeName : 'Unknown'}</td>
+      <td class="px-6 py-4 text-sm text-slate-900 text-center">${itemCount}</td>
+      <td class="px-6 py-4 text-sm text-slate-900 text-center">${totalQuantity}</td>
+      <td class="px-6 py-4 text-sm text-slate-600">${funFormatDateTime(transaction.recordedAt)}</td>
+    `;
+    
+    tableBody.appendChild(row);
+  });
+}
+
+// Show export modal
+function funShowExportModal() {
+  document.getElementById('exportModal').classList.remove('hidden');
+}
+
+// Hide export modal
+function funHideExportModal() {
+  document.getElementById('exportModal').classList.add('hidden');
+}
+
+// Export transaction
+function funExportTransaction() {
+  if (!currentTransaction) return;
+  
+  const format = document.querySelector('input[name="exportFormat"]:checked').value;
+  const dateStr = new Date().toISOString().split('T')[0];
+  const filename = `transaction_${currentTransaction.id}_${dateStr}`;
+  
+  let data, mimeType, extension;
+  
+  if (format === 'csv') {
+    data = funGenerateCSV();
+    mimeType = 'text/csv';
+    extension = 'csv';
+  } else {
+    data = funGenerateJSON();
+    mimeType = 'application/json';
+    extension = 'json';
+  }
+  
+  // Create and trigger download
+  const blob = new Blob([data], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${filename}.${extension}`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  // Hide modal
+  funHideExportModal();
+}
+
+// Generate CSV data
+function funGenerateCSV() {
+  if (!currentTransaction) return '';
+  
+  const store = allStores.find(s => s.id === currentTransaction.storeId);
+  const staff = allUsers.find(u => u.id === currentTransaction.recordedById);
+  
+  let csv = 'Transaction Export\n\n';
+  csv += 'Transaction Information\n';
+  csv += `Transaction ID,${currentTransaction.id}\n`;
+  csv += `Submission ID,${currentTransaction.submissionId}\n`;
+  csv += `Recorded At,${funFormatDateTime(currentTransaction.recordedAt)}\n`;
+  csv += `Store,${store ? store.storeName : 'Unknown'}\n`;
+  csv += `Staff,${staff ? `${staff.firstName} ${staff.lastName}` : 'Unknown'}\n`;
+  csv += `Role,${staff ? staff.role : 'Unknown'}\n\n`;
+  
+  csv += 'Scanned Items\n';
+  csv += 'SKU Code,Barcode,Product Name,Category,Unit Price,Quantity,Line Total\n';
+  
+  currentTransaction.scannedSkus.forEach(scannedSku => {
+    const sku = allSkus.find(s => s.id === scannedSku.skuId);
+    if (sku) {
+      const lineTotal = sku.unitPrice * scannedSku.quantity;
+      csv += `"${sku.skuCode}","${scannedSku.barcode}","${sku.productName}","${sku.category}",${sku.unitPrice},${scannedSku.quantity},${lineTotal}\n`;
+    }
+  });
+  
+  return csv;
+}
+
+// Generate JSON data
+function funGenerateJSON() {
+  if (!currentTransaction) return '';
+  
+  const store = allStores.find(s => s.id === currentTransaction.storeId);
+  const staff = allUsers.find(u => u.id === currentTransaction.recordedById);
+  
+  const exportData = {
+    transaction: {
+      id: currentTransaction.id,
+      submissionId: currentTransaction.submissionId,
+      recordedAt: currentTransaction.recordedAt,
+      createdAt: currentTransaction.createdAt,
+      recordedByRole: currentTransaction.recordedByRole
+    },
+    store: store ? {
+      id: store.id,
+      storeCode: store.storeCode,
+      storeName: store.storeName,
+      address: store.address,
+      contactPerson: store.contactPerson
+    } : null,
+    staff: staff ? {
+      id: staff.id,
+      firstName: staff.firstName,
+      lastName: staff.lastName,
+      email: staff.email,
+      phone: staff.phone,
+      role: staff.role,
+      employeeId: staff.employeeId
+    } : null,
+    scannedItems: currentTransaction.scannedSkus.map(scannedSku => {
+      const sku = allSkus.find(s => s.id === scannedSku.skuId);
+      return {
+        sku: sku ? {
+          id: sku.id,
+          skuCode: sku.skuCode,
+          productName: sku.productName,
+          category: sku.category,
+          unitPrice: sku.unitPrice
+        } : null,
+        barcode: scannedSku.barcode,
+        quantity: scannedSku.quantity,
+        lineTotal: sku ? sku.unitPrice * scannedSku.quantity : 0
+      };
+    }),
+    summary: {
+      totalSkuCount: currentTransaction.scannedSkus.length,
+      totalQuantity: currentTransaction.scannedSkus.reduce((sum, item) => sum + item.quantity, 0),
+      grandTotalValue: currentTransaction.scannedSkus.reduce((sum, scannedSku) => {
+        const sku = allSkus.find(s => s.id === scannedSku.skuId);
+        return sum + (sku ? sku.unitPrice * scannedSku.quantity : 0);
+      }, 0)
+    }
+  };
+  
+  return JSON.stringify(exportData, null, 2);
+}
+
+// Utility functions
+function funFormatDateTime(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleString('en-IN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  });
+}
+
+function funFormatAddress(address) {
+  if (!address) return 'N/A';
+  return `${address.street}, ${address.city}, ${address.state} ${address.zipCode}, ${address.country}`;
+}
+
+function funFormatCurrency(amount) {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR'
+  }).format(amount);
+}
+
+function funCapitalize(str) {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function funShowError(message) {
+  const container = document.querySelector('.max-w-7xl');
+  container.innerHTML = `
+    <div class="text-center py-12">
+      <i data-lucide="alert-circle" class="w-12 h-12 text-red-500 mx-auto mb-4"></i>
+      <h2 class="text-xl font-semibold text-slate-900 mb-2">Error</h2>
+      <p class="text-slate-600 mb-4">${message}</p>
+      <button onclick="window.location.href='transaction_history.html'" 
+              class="px-4 py-2 bg-teal-700 text-white rounded font-medium hover:bg-teal-600">
+        Back to Transaction History
+      </button>
+    </div>
+  `;
+  
+  // Trigger icon creation
+  if (window.lucide?.createIcons) {
+    window.lucide.createIcons();
+  }
+}
+</script></body></html>

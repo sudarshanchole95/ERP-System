@@ -1,0 +1,1288 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>GTVL Management Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        /* GTVL Brand Colors */
+        --color-primary: #0F766E; /* Teal-700 - Primary CTAs, navigation highlights */
+        --color-primary-hover: #0D9488; /* Teal-600 - Hover states */
+        --color-secondary: #475569; /* Slate-600 - Secondary elements */
+        --color-accent: #D97706; /* Amber-600 - Call-to-action highlights */
+        --color-surface: #FFFFFF; /* White - Cards, modals, panels */
+        --color-background: #F8FAFC; /* Slate-50 - Page backgrounds */
+        --color-surface-variant: #F1F5F9; /* Slate-100 - Alternate backgrounds */
+        --color-on-background: #0F172A; /* Slate-900 - Primary headings */
+        --color-on-surface: #1E293B; /* Slate-800 - Body text */
+        --color-border: #E2E8F0; /* Slate-200 - Borders */
+        --color-success: #16A34A; /* Green-600 - Success states */
+        --color-warning: #F59E0B; /* Amber-500 - Warning alerts */
+        --color-error: #DC2626; /* Red-600 - Error messages */
+        --color-info: #2563EB; /* Blue-600 - Info messages */
+
+        /* Layout Constants */
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      /* Smooth scrolling */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      /* Layout with CSS variables */
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      /* Mobile sidebar slide states */
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      /* Active nav link styling */
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+        background-color: #f0fdfa;
+        color: var(--color-primary);
+      }
+
+      /* Popover animation states */
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      /* Sidebar backdrop states */
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Promodizer List - GTVL Management Portal</title></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <!-- HEADER SECTION -->
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <!-- Left: Logo & Title -->
+        <div class="flex items-center gap-3">
+          <!-- Mobile Menu Toggle -->
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <!-- Logo -->
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <rect x="68" y="68" width="264" height="264" rx="32" stroke="#0F766E" stroke-width="18"></rect>
+                  <rect x="109" y="143" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                  <rect x="206" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                </g>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">
+              GTVL Management Portal
+            </h1>
+          </div>
+        </div>
+
+        <!-- Right: User Profile -->
+        <div class="flex items-center gap-2 md:gap-3">
+          <!-- User Profile Button -->
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-500 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- User Profile Popover -->
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <!-- User Info Section -->
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-500 truncate"></div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <!-- Main Navigation Section -->
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Management
+          </div>
+          <div class="space-y-1">
+            <a href="management_dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="management_dashboard">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="sku_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sku_list">
+              <i data-lucide="package" class="w-5 h-5"></i>
+              <span>SKUs</span>
+            </a>
+            <a href="store_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="store_list">
+              <i data-lucide="store" class="w-5 h-5"></i>
+              <span>Stores</span>
+            </a>
+            <a href="supervisor_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="supervisor_list">
+              <i data-lucide="user-check" class="w-5 h-5"></i>
+              <span>Supervisors</span>
+            </a>
+            <a href="promodizer_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="promodizer_list">
+              <i data-lucide="users" class="w-5 h-5"></i>
+              <span>Promodizers</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="app-main p-6" id="pageContent" role="main"><nav class="flex mb-6" aria-label="Breadcrumb">
+  <ol class="flex items-center space-x-1 text-sm text-slate-500">
+    <li>
+      <a href="management_dashboard.html" class="hover:text-teal-700 transition-colors duration-200">Dashboard</a>
+    </li>
+    <li>
+      <i data-lucide="chevron-right" class="w-4 h-4"></i>
+    </li>
+    <li class="text-slate-900 font-medium">Promodizers</li>
+  </ol>
+</nav>
+
+<!-- Page Header -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+  <div>
+    <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900 mb-2">Promodizers</h1>
+    <p class="text-sm leading-[1.375rem] text-slate-600">Manage promodizer accounts and store assignments</p>
+  </div>
+  <button onclick="funNavigateToCreatePromodizer()" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-teal-700 hover:bg-teal-600 text-white text-sm font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+    <i data-lucide="plus" class="w-4 h-4"></i>
+    Add New Promodizer
+  </button>
+</div>
+
+<!-- Quick Stats Section -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+  <div class="bg-white rounded-lg border border-slate-200 p-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-xs leading-[1.125rem] text-slate-500 font-medium">Total Promodizers</p>
+        <p id="totalPromosCount" class="text-xl font-bold text-slate-900">0</p>
+      </div>
+      <div class="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center">
+        <i data-lucide="users" class="w-4 h-4 text-teal-700"></i>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white rounded-lg border border-slate-200 p-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-xs leading-[1.125rem] text-slate-500 font-medium">Assigned to Stores</p>
+        <p id="assignedPromosCount" class="text-xl font-bold text-slate-900">0</p>
+      </div>
+      <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+        <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white rounded-lg border border-slate-200 p-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-xs leading-[1.125rem] text-slate-500 font-medium">Unassigned</p>
+        <p id="unassignedPromosCount" class="text-xl font-bold text-slate-900">0</p>
+      </div>
+      <div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+        <i data-lucide="alert-circle" class="w-4 h-4 text-amber-600"></i>
+      </div>
+    </div>
+  </div>
+  
+  <div class="bg-white rounded-lg border border-slate-200 p-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-xs leading-[1.125rem] text-slate-500 font-medium">Avg Stores per Promodizer</p>
+        <p id="avgStoresCount" class="text-xl font-bold text-slate-900">0.0</p>
+      </div>
+      <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+        <i data-lucide="bar-chart-3" class="w-4 h-4 text-blue-600"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filters and Search -->
+<div class="bg-white rounded-lg border border-slate-200 p-6 mb-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Search Input -->
+    <div>
+      <label for="searchInput" class="block text-sm font-medium text-slate-700 mb-1">Search</label>
+      <div class="relative">
+        <input type="text" id="searchInput" placeholder="Search by name or employee ID..." class="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+        <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Filter -->
+    <div>
+      <label for="statusFilter" class="block text-sm font-medium text-slate-700 mb-1">Status</label>
+      <select id="statusFilter" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+        <option value="all">All Statuses</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+    </div>
+
+    <!-- Assignment Filter -->
+    <div>
+      <label for="assignmentFilter" class="block text-sm font-medium text-slate-700 mb-1">Assignment Status</label>
+      <select id="assignmentFilter" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+        <option value="all">All</option>
+        <option value="assigned">Assigned</option>
+        <option value="unassigned">Unassigned</option>
+        <option value="multiple">Multiple Stores</option>
+      </select>
+    </div>
+
+    <!-- Clear Filters Button -->
+    <div class="flex items-end">
+      <button onclick="funClearFilters()" class="w-full px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors duration-200">
+        Clear Filters
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Promodizers Table -->
+<div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead class="bg-slate-50 border-b border-slate-200">
+        <tr>
+          <th class="px-6 py-3 text-left">
+            <button onclick="funSortTable('employeeId')" class="flex items-center gap-1 text-xs font-medium text-slate-500 uppercase tracking-wider hover:text-slate-700">
+              Employee ID
+              <i data-lucide="chevron-up-down" class="w-3 h-3"></i>
+            </button>
+          </th>
+          <th class="px-6 py-3 text-left">
+            <button onclick="funSortTable('name')" class="flex items-center gap-1 text-xs font-medium text-slate-500 uppercase tracking-wider hover:text-slate-700">
+              Name
+              <i data-lucide="chevron-up-down" class="w-3 h-3"></i>
+            </button>
+          </th>
+          <th class="px-6 py-3 text-left">
+            <button onclick="funSortTable('phone')" class="flex items-center gap-1 text-xs font-medium text-slate-500 uppercase tracking-wider hover:text-slate-700">
+              Phone
+              <i data-lucide="chevron-up-down" class="w-3 h-3"></i>
+            </button>
+          </th>
+          <th class="px-6 py-3 text-left">
+            <button onclick="funSortTable('email')" class="flex items-center gap-1 text-xs font-medium text-slate-500 uppercase tracking-wider hover:text-slate-700">
+              Email
+              <i data-lucide="chevron-up-down" class="w-3 h-3"></i>
+            </button>
+          </th>
+          <th class="px-6 py-3 text-left">
+            <button onclick="funSortTable('assignedStores')" class="flex items-center gap-1 text-xs font-medium text-slate-500 uppercase tracking-wider hover:text-slate-700">
+              Assigned Stores
+              <i data-lucide="chevron-up-down" class="w-3 h-3"></i>
+            </button>
+          </th>
+          <th class="px-6 py-3 text-left">
+            <button onclick="funSortTable('status')" class="flex items-center gap-1 text-xs font-medium text-slate-500 uppercase tracking-wider hover:text-slate-700">
+              Status
+              <i data-lucide="chevron-up-down" class="w-3 h-3"></i>
+            </button>
+          </th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="promosTableBody" class="divide-y divide-slate-200">
+        <!-- Table rows will be populated by JavaScript -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Empty State -->
+<div id="emptyState" class="hidden bg-white rounded-lg border border-slate-200 p-12 text-center">
+  <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+    <i data-lucide="users" class="w-6 h-6 text-slate-400"></i>
+  </div>
+  <h3 class="text-base font-semibold text-slate-900 mb-2">No promodizers found</h3>
+  <p class="text-sm text-slate-600 mb-6">Get started by adding your first promodizer to the system.</p>
+  <button onclick="funNavigateToCreatePromodizer()" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-teal-700 hover:bg-teal-600 text-white text-sm font-semibold rounded-lg transition-all duration-200">
+    <i data-lucide="plus" class="w-4 h-4"></i>
+    Add New Promodizer
+  </button>
+</div>
+
+<!-- Store Count Popover -->
+<div id="storePopover" class="absolute hidden bg-white border border-slate-200 rounded-lg shadow-lg z-50 w-80">
+  <div class="p-4">
+    <div class="flex items-center justify-between mb-3">
+      <h4 class="font-semibold text-slate-900">Assigned Stores</h4>
+      <button onclick="funHideStorePopover()" class="text-slate-400 hover:text-slate-600">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+    <div id="storePopoverContent" class="space-y-2 max-h-60 overflow-y-auto">
+      <!-- Store list will be populated by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<!-- Quick Allocate Modal -->
+<div id="quickAllocateModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,42rem)] max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Quick Store Allocation</h2>
+          <button onclick="funCloseQuickAllocateModal()" class="text-slate-400 hover:text-slate-600">
+            <i data-lucide="x" class="w-6 h-6"></i>
+          </button>
+        </div>
+
+        <div class="mb-6">
+          <h3 class="font-semibold text-slate-900 mb-2">Promodizer Details</h3>
+          <div class="bg-slate-50 rounded-lg p-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-xs text-slate-500 mb-1">Name</p>
+                <p id="allocatePromoName" class="font-medium text-slate-900"></p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-500 mb-1">Employee ID</p>
+                <p id="allocatePromoEmployeeId" class="font-medium text-slate-900"></p>
+              </div>
+            </div>
+            <div class="mt-3">
+              <p class="text-xs text-slate-500 mb-1">Currently Assigned To</p>
+              <div id="currentAssignments" class="text-sm text-slate-700">
+                <!-- Current assignments will be populated -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <h3 class="font-semibold text-slate-900 mb-3">Select Stores to Allocate</h3>
+          <div class="max-h-60 overflow-y-auto border border-slate-200 rounded-lg">
+            <div id="storeCheckboxList" class="p-3 space-y-2">
+              <!-- Store checkboxes will be populated -->
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-3 justify-end">
+          <button onclick="funCloseQuickAllocateModal()" class="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors duration-200">
+            Cancel
+          </button>
+          <button onclick="funSubmitQuickAllocate()" class="px-4 py-2 text-sm font-semibold text-white bg-teal-700 hover:bg-teal-600 rounded-lg transition-colors duration-200">
+            Allocate to Selected Stores
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteConfirmModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,28rem)] max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Delete Promodizer</h2>
+          <button onclick="funCloseDeleteModal()" class="text-slate-400 hover:text-slate-600">
+            <i data-lucide="x" class="w-6 h-6"></i>
+          </button>
+        </div>
+
+        <div class="mb-6">
+          <div class="bg-slate-50 rounded-lg p-4 mb-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-xs text-slate-500 mb-1">Name</p>
+                <p id="deletePromoName" class="font-medium text-slate-900"></p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-500 mb-1">Employee ID</p>
+                <p id="deletePromoEmployeeId" class="font-medium text-slate-900"></p>
+              </div>
+            </div>
+          </div>
+
+          <div id="deleteWarningSection" class="hidden">
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+              <div class="flex items-start gap-3">
+                <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600 mt-0.5"></i>
+                <div>
+                  <h4 class="font-medium text-amber-800 mb-2">Warning: Store Assignments Exist</h4>
+                  <p id="deleteWarningText" class="text-sm text-amber-700 mb-2"></p>
+                  <div id="assignedStoresList" class="text-sm text-amber-700">
+                    <!-- List of assigned stores -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="text-sm text-slate-600">This action cannot be undone. The promodizer will be permanently removed from the system.</p>
+        </div>
+
+        <div class="flex gap-3 justify-end">
+          <button onclick="funCloseDeleteModal()" class="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors duration-200">
+            Cancel
+          </button>
+          <button id="confirmDeleteBtn" onclick="funConfirmDelete()" class="px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors duration-200">
+            Delete Promodizer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success Toast -->
+<div id="successToast" class="fixed top-20 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+  <div class="flex items-center gap-2">
+    <i data-lucide="check-circle" class="w-4 h-4"></i>
+    <span id="toastMessage"></span>
+  </div>
+</div>
+
+</main>
+
+    <!-- JAVASCRIPT INITIALIZATION -->
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils =
+          window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_mgmt_001");
+                    currentUserId = "usr_mgmt_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } =
+            state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail)
+            return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute(
+            "aria-expanded",
+            shouldOpen ? "true" : "false"
+          );
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active");
+            } else {
+              link.classList.remove("active");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () =>
+            closeMobileSidebar()
+          );
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+// Utility: portal a modal by id (idempotent)
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+});
+
+// Global state
+let promodizers = [];
+let stores = [];
+let promodizerAllocations = [];
+let currentSortField = 'employeeId';
+let currentSortDirection = 'asc';
+let selectedPromodizerId = null;
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+  funLoadData();
+  funBindEvents();
+  funRenderStats();
+  funRenderTable();
+  
+  // Set active navigation
+  if (window.TemplateUtils && window.TemplateUtils.setActiveNavLink) {
+    window.TemplateUtils.setActiveNavLink('promodizer_list');
+  }
+});
+
+// Data loading functions
+function funLoadData() {
+  try {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    promodizers = users.filter(user => user.role === 'promodizer');
+    stores = JSON.parse(localStorage.getItem('stores') || '[]');
+    promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+  } catch (error) {
+    console.error('Error loading data:', error);
+    promodizers = [];
+    stores = [];
+    promodizerAllocations = [];
+  }
+}
+
+// Event binding
+function funBindEvents() {
+  document.getElementById('searchInput').addEventListener('input', funApplyFilters);
+  document.getElementById('statusFilter').addEventListener('change', funApplyFilters);
+  document.getElementById('assignmentFilter').addEventListener('change', funApplyFilters);
+  
+  // Close popover when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('#storePopover') && !e.target.closest('.store-count-badge')) {
+      funHideStorePopover();
+    }
+  });
+}
+
+// Stats calculation and rendering
+function funRenderStats() {
+  const totalPromos = promodizers.length;
+  const assignedPromos = promodizers.filter(promo => funGetAssignedStoreCount(promo.id) > 0).length;
+  const unassignedPromos = totalPromos - assignedPromos;
+  const totalAssignments = promodizerAllocations.length;
+  const avgStores = totalPromos > 0 ? (totalAssignments / totalPromos).toFixed(1) : '0.0';
+
+  document.getElementById('totalPromosCount').textContent = totalPromos;
+  document.getElementById('assignedPromosCount').textContent = assignedPromos;
+  document.getElementById('unassignedPromosCount').textContent = unassignedPromos;
+  document.getElementById('avgStoresCount').textContent = avgStores;
+}
+
+// Get assigned store count for a promodizer
+function funGetAssignedStoreCount(promodizerId) {
+  return promodizerAllocations.filter(alloc => alloc.promodizerId === promodizerId).length;
+}
+
+// Get assigned stores for a promodizer
+function funGetAssignedStores(promodizerId) {
+  const allocations = promodizerAllocations.filter(alloc => alloc.promodizerId === promodizerId);
+  return allocations.map(alloc => {
+    const store = stores.find(s => s.id === alloc.storeId);
+    return store || null;
+  }).filter(Boolean);
+}
+
+// Table rendering
+function funRenderTable() {
+  const tbody = document.getElementById('promosTableBody');
+  const filteredPromodizers = funGetFilteredPromodizers();
+  
+  if (filteredPromodizers.length === 0) {
+    tbody.innerHTML = '';
+    document.querySelector('table').parentElement.classList.add('hidden');
+    document.getElementById('emptyState').classList.remove('hidden');
+    return;
+  }
+
+  document.querySelector('table').parentElement.classList.remove('hidden');
+  document.getElementById('emptyState').classList.add('hidden');
+
+  tbody.innerHTML = filteredPromodizers.map(promo => {
+    const assignedStoreCount = funGetAssignedStoreCount(promo.id);
+    const badgeColor = assignedStoreCount === 0 ? 'bg-slate-100 text-slate-600' : 
+                     assignedStoreCount <= 2 ? 'bg-blue-100 text-blue-600' : 
+                     'bg-green-100 text-green-600';
+    
+    const statusBadge = promo.status === 'active' ? 
+      'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-600';
+
+    return `
+      <tr class="hover:bg-slate-50">
+        <td class="px-6 py-4 text-sm font-medium text-slate-900">${promo.employeeId}</td>
+        <td class="px-6 py-4 text-sm text-slate-900">${promo.firstName} ${promo.lastName}</td>
+        <td class="px-6 py-4 text-sm text-slate-600">${promo.phone}</td>
+        <td class="px-6 py-4 text-sm text-slate-600">${promo.email}</td>
+        <td class="px-6 py-4">
+          ${assignedStoreCount > 0 ? 
+            `<button onclick="funShowStorePopover(event, '${promo.id}')" class="store-count-badge inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${badgeColor} hover:bg-opacity-80 transition-colors cursor-pointer">
+              ${assignedStoreCount} store${assignedStoreCount !== 1 ? 's' : ''}
+            </button>` :
+            `<span class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${badgeColor}">
+              0 stores
+            </span>`
+          }
+        </td>
+        <td class="px-6 py-4">
+          <span class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${statusBadge}">
+            ${promo.status.charAt(0).toUpperCase() + promo.status.slice(1)}
+          </span>
+        </td>
+        <td class="px-6 py-4">
+          <div class="flex items-center gap-2">
+            <button onclick="funNavigateToDetails('${promo.id}')" class="p-1 text-slate-400 hover:text-teal-600 transition-colors" title="View Details">
+              <i data-lucide="eye" class="w-4 h-4"></i>
+            </button>
+            <button onclick="funNavigateToEdit('${promo.id}')" class="p-1 text-slate-400 hover:text-blue-600 transition-colors" title="Edit">
+              <i data-lucide="pencil" class="w-4 h-4"></i>
+            </button>
+            <button onclick="funOpenQuickAllocateModal('${promo.id}')" class="p-1 text-slate-400 hover:text-green-600 transition-colors" title="Quick Allocate">
+              <i data-lucide="link" class="w-4 h-4"></i>
+            </button>
+            <button onclick="funOpenDeleteModal('${promo.id}')" class="p-1 text-slate-400 hover:text-red-600 transition-colors" title="Delete">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  // Reinitialize Lucide icons
+  if (window.lucide && window.lucide.createIcons) {
+    window.lucide.createIcons();
+  }
+}
+
+// Filtering
+function funGetFilteredPromodizers() {
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  const statusFilter = document.getElementById('statusFilter').value;
+  const assignmentFilter = document.getElementById('assignmentFilter').value;
+
+  return promodizers.filter(promo => {
+    // Search filter
+    const matchesSearch = searchTerm === '' || 
+      `${promo.firstName} ${promo.lastName}`.toLowerCase().includes(searchTerm) ||
+      promo.employeeId.toLowerCase().includes(searchTerm);
+
+    // Status filter
+    const matchesStatus = statusFilter === 'all' || promo.status === statusFilter;
+
+    // Assignment filter
+    const assignedStoreCount = funGetAssignedStoreCount(promo.id);
+    let matchesAssignment = true;
+    if (assignmentFilter === 'assigned') {
+      matchesAssignment = assignedStoreCount > 0;
+    } else if (assignmentFilter === 'unassigned') {
+      matchesAssignment = assignedStoreCount === 0;
+    } else if (assignmentFilter === 'multiple') {
+      matchesAssignment = assignedStoreCount > 2;
+    }
+
+    return matchesSearch && matchesStatus && matchesAssignment;
+  }).sort((a, b) => {
+    let aVal, bVal;
+    
+    switch (currentSortField) {
+      case 'name':
+        aVal = `${a.firstName} ${a.lastName}`;
+        bVal = `${b.firstName} ${b.lastName}`;
+        break;
+      case 'assignedStores':
+        aVal = funGetAssignedStoreCount(a.id);
+        bVal = funGetAssignedStoreCount(b.id);
+        break;
+      default:
+        aVal = a[currentSortField] || '';
+        bVal = b[currentSortField] || '';
+    }
+
+    if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+    if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+
+    if (currentSortDirection === 'asc') {
+      return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+    } else {
+      return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
+    }
+  });
+}
+
+function funApplyFilters() {
+  funRenderTable();
+}
+
+function funClearFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('statusFilter').value = 'all';
+  document.getElementById('assignmentFilter').value = 'all';
+  funRenderTable();
+}
+
+// Sorting
+function funSortTable(field) {
+  if (currentSortField === field) {
+    currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+  } else {
+    currentSortField = field;
+    currentSortDirection = 'asc';
+  }
+  funRenderTable();
+}
+
+// Store popover
+function funShowStorePopover(event, promodizerId) {
+  const popover = document.getElementById('storePopover');
+  const content = document.getElementById('storePopoverContent');
+  
+  const assignedStores = funGetAssignedStores(promodizerId);
+  
+  content.innerHTML = assignedStores.map(store => `
+    <div class="flex items-center justify-between py-2 px-3 bg-slate-50 rounded-lg">
+      <div>
+        <p class="font-medium text-slate-900">${store.storeName}</p>
+        <p class="text-xs text-slate-500">${store.storeCode} • ${store.address.city}, ${store.address.state}</p>
+      </div>
+      <button onclick="funNavigateToStoreDetails('${store.id}')" class="text-teal-600 hover:text-teal-700">
+        <i data-lucide="external-link" class="w-4 h-4"></i>
+      </button>
+    </div>
+  `).join('');
+
+  const rect = event.target.getBoundingClientRect();
+  popover.style.left = `${rect.left}px`;
+  popover.style.top = `${rect.bottom + 8}px`;
+  popover.classList.remove('hidden');
+
+  if (window.lucide && window.lucide.createIcons) {
+    window.lucide.createIcons();
+  }
+}
+
+function funHideStorePopover() {
+  document.getElementById('storePopover').classList.add('hidden');
+}
+
+// Quick Allocate Modal
+function funOpenQuickAllocateModal(promodizerId) {
+  selectedPromodizerId = promodizerId;
+  const promo = promodizers.find(p => p.id === promodizerId);
+  const assignedStores = funGetAssignedStores(promodizerId);
+  
+  document.getElementById('allocatePromoName').textContent = `${promo.firstName} ${promo.lastName}`;
+  document.getElementById('allocatePromoEmployeeId').textContent = promo.employeeId;
+  
+  const currentAssignments = document.getElementById('currentAssignments');
+  if (assignedStores.length > 0) {
+    currentAssignments.innerHTML = assignedStores.map(store => 
+      `<span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mr-1 mb-1">${store.storeName}</span>`
+    ).join('');
+  } else {
+    currentAssignments.innerHTML = '<span class="text-slate-400 text-xs">No current assignments</span>';
+  }
+
+  // Populate store checkboxes
+  const checkboxList = document.getElementById('storeCheckboxList');
+  const assignedStoreIds = assignedStores.map(s => s.id);
+  
+  checkboxList.innerHTML = stores.map(store => `
+    <label class="flex items-center gap-3 p-2 hover:bg-slate-50 rounded cursor-pointer">
+      <input type="checkbox" value="${store.id}" ${assignedStoreIds.includes(store.id) ? 'checked disabled' : ''} 
+             class="w-4 h-4 text-teal-600 border-slate-300 rounded focus:ring-teal-500">
+      <div class="flex-1">
+        <p class="font-medium text-slate-900">${store.storeName}</p>
+        <p class="text-xs text-slate-500">${store.storeCode} • ${store.address.city}, ${store.address.state}</p>
+      </div>
+    </label>
+  `).join('');
+
+  document.getElementById('quickAllocateModal').classList.remove('hidden');
+}
+
+function funCloseQuickAllocateModal() {
+  document.getElementById('quickAllocateModal').classList.add('hidden');
+  selectedPromodizerId = null;
+}
+
+function funSubmitQuickAllocate() {
+  const selectedStoreIds = Array.from(document.querySelectorAll('#storeCheckboxList input[type="checkbox"]:checked:not(:disabled)'))
+    .map(checkbox => checkbox.value);
+
+  if (selectedStoreIds.length === 0) {
+    alert('Please select at least one store to allocate.');
+    return;
+  }
+
+  try {
+    // Create new allocation records
+    const newAllocations = selectedStoreIds.map(storeId => ({
+      id: `proalc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      promodizerId: selectedPromodizerId,
+      storeId: storeId,
+      supervisorId: null, // Could be enhanced to assign supervisor
+      allocatedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString()
+    }));
+
+    // Update local storage
+    promodizerAllocations.push(...newAllocations);
+    localStorage.setItem('promodizerAllocations', JSON.stringify(promodizerAllocations));
+
+    funCloseQuickAllocateModal();
+    funShowToast(`Successfully allocated to ${selectedStoreIds.length} store(s)`);
+    funRenderStats();
+    funRenderTable();
+  } catch (error) {
+    console.error('Error allocating promodizer:', error);
+    alert('Error allocating promodizer. Please try again.');
+  }
+}
+
+// Delete Modal
+function funOpenDeleteModal(promodizerId) {
+  selectedPromodizerId = promodizerId;
+  const promo = promodizers.find(p => p.id === promodizerId);
+  const assignedStores = funGetAssignedStores(promodizerId);
+  
+  document.getElementById('deletePromoName').textContent = `${promo.firstName} ${promo.lastName}`;
+  document.getElementById('deletePromoEmployeeId').textContent = promo.employeeId;
+  
+  const warningSection = document.getElementById('deleteWarningSection');
+  const warningText = document.getElementById('deleteWarningText');
+  const storesList = document.getElementById('assignedStoresList');
+  
+  if (assignedStores.length > 0) {
+    warningSection.classList.remove('hidden');
+    warningText.textContent = `This promodizer is assigned to ${assignedStores.length} store(s). Deleting will remove all assignments.`;
+    storesList.innerHTML = assignedStores.map(store => 
+      `<div class="text-sm">• ${store.storeName} (${store.storeCode})</div>`
+    ).join('');
+  } else {
+    warningSection.classList.add('hidden');
+  }
+
+  document.getElementById('deleteConfirmModal').classList.remove('hidden');
+}
+
+function funCloseDeleteModal() {
+  document.getElementById('deleteConfirmModal').classList.add('hidden');
+  selectedPromodizerId = null;
+}
+
+function funConfirmDelete() {
+  if (!selectedPromodizerId) return;
+
+  try {
+    // Remove promodizer allocations
+    const updatedAllocations = promodizerAllocations.filter(alloc => alloc.promodizerId !== selectedPromodizerId);
+    localStorage.setItem('promodizerAllocations', JSON.stringify(updatedAllocations));
+
+    // Remove promodizer from users
+    const updatedUsers = JSON.parse(localStorage.getItem('users') || '[]')
+      .filter(user => user.id !== selectedPromodizerId);
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+
+    // Update local data
+    funLoadData();
+    
+    funCloseDeleteModal();
+    funShowToast('Promodizer deleted successfully');
+    funRenderStats();
+    funRenderTable();
+  } catch (error) {
+    console.error('Error deleting promodizer:', error);
+    alert('Error deleting promodizer. Please try again.');
+  }
+}
+
+// Navigation functions
+function funNavigateToCreatePromodizer() {
+  window.location.href = 'promodizer_create.html';
+}
+
+function funNavigateToDetails(promodizerId) {
+  window.location.href = `promodizer_details.html?id=${promodizerId}`;
+}
+
+function funNavigateToEdit(promodizerId) {
+  window.location.href = `promodizer_edit.html?id=${promodizerId}`;
+}
+
+function funNavigateToStoreDetails(storeId) {
+  window.location.href = `store_details.html?id=${storeId}`;
+}
+
+// Toast notification
+function funShowToast(message) {
+  const toast = document.getElementById('successToast');
+  const messageEl = document.getElementById('toastMessage');
+  
+  messageEl.textContent = message;
+  toast.classList.remove('translate-x-full');
+  
+  setTimeout(() => {
+    toast.classList.add('translate-x-full');
+  }, 3000);
+}
+</script></body></html>

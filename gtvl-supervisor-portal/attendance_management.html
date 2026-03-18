@@ -1,0 +1,1231 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>GTVL Supervisor Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-primary: #0F766E;
+        --color-primary-hover: #0D9488;
+        --color-secondary: #475569;
+        --color-accent: #D97706;
+        --color-surface: #FFFFFF;
+        --color-background: #F8FAFC;
+        --color-surface-variant: #F1F5F9;
+        --color-on-background: #0F172A;
+        --color-on-surface: #1E293B;
+        --color-border: #E2E8F0;
+        --color-success: #16A34A;
+        --color-warning: #F59E0B;
+        --color-error: #DC2626;
+        --color-info: #2563EB;
+
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+      }
+
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Attendance Management - GTVL Supervisor Portal</title></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <rect x="68" y="68" width="264" height="264" rx="32" stroke="#0F766E" stroke-width="18"></rect>
+                  <rect x="109" y="143" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                  <rect x="206" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                </g>
+              </svg>
+            </div>
+            <h1 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">
+              GTVL Supervisor Portal
+            </h1>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 md:gap-3">
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-600 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-600 truncate"></div>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-[0.625rem] leading-4 font-normal font-semibold uppercase tracking-wider text-slate-600">
+            Main
+          </div>
+          <div class="space-y-1">
+            <a href="supervisor_dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="supervisor_dashboard">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="sales_recording.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sales_recording">
+              <i data-lucide="scan-barcode" class="w-5 h-5"></i>
+              <span>Record Sales</span>
+            </a>
+            <a href="sales_history.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sales_history">
+              <i data-lucide="history" class="w-5 h-5"></i>
+              <span>Sales History</span>
+            </a>
+            <a href="attendance_management.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="attendance_management">
+              <i data-lucide="calendar-check" class="w-5 h-5"></i>
+              <span>Attendance</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="py-6 border-b border-slate-100 last:border-b-0">
+          <div class="px-4 pb-2 text-[0.625rem] leading-4 font-normal font-semibold uppercase tracking-wider text-slate-600">
+            Team Management
+          </div>
+          <div class="space-y-1">
+            <a href="promodizer_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="promodizer_list">
+              <i data-lucide="users" class="w-5 h-5"></i>
+              <span>My Team</span>
+            </a>
+            <a href="add_promodizer.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="add_promodizer">
+              <i data-lucide="user-plus" class="w-5 h-5"></i>
+              <span>Add Promodizer</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="py-6 border-b border-slate-100 last:border-b-0">
+          <div class="px-4 pb-2 text-[0.625rem] leading-4 font-normal font-semibold uppercase tracking-wider text-slate-600">
+            Account
+          </div>
+          <div class="space-y-1">
+            <a href="supervisor_profile.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="supervisor_profile">
+              <i data-lucide="user-circle" class="w-5 h-5"></i>
+              <span>My Profile</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="app-main p-6" id="pageContent" role="main"><div class="space-y-6">
+  <!-- Header Section -->
+  <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900">Attendance Management</h1>
+        <p class="text-sm leading-[1.375rem] font-normal text-slate-600 mt-1">Track your daily attendance and view attendance history</p>
+      </div>
+      <div class="text-right">
+        <div class="text-sm leading-[1.375rem] font-normal text-slate-600">Today</div>
+        <div id="currentDate" class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Today's Attendance Section -->
+  <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-8 h-8 bg-teal-700 rounded-lg flex items-center justify-center">
+        <i data-lucide="calendar-check" class="w-5 h-5 text-white"></i>
+      </div>
+      <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900">Today's Attendance</h2>
+    </div>
+
+    <!-- Attendance Status Display -->
+    <div id="attendanceStatusSection">
+      <!-- Will be populated by JavaScript -->
+    </div>
+  </div>
+
+  <!-- Calendar and History Section -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Calendar View -->
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-base leading-6 font-semibold text-slate-900">Calendar View</h3>
+        <div class="flex items-center gap-2">
+          <button id="prevMonthBtn" class="p-2 hover:bg-slate-100 rounded-lg transition-colors">
+            <i data-lucide="chevron-left" class="w-5 h-5 text-slate-600"></i>
+          </button>
+          <div id="currentMonthYear" class="text-sm leading-[1.375rem] font-semibold text-slate-900 min-w-[120px] text-center"></div>
+          <button id="nextMonthBtn" class="p-2 hover:bg-slate-100 rounded-lg transition-colors">
+            <i data-lucide="chevron-right" class="w-5 h-5 text-slate-600"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Calendar Grid -->
+      <div id="calendarGrid" class="grid grid-cols-7 gap-1">
+        <!-- Will be populated by JavaScript -->
+      </div>
+
+      <!-- Legend -->
+      <div class="flex items-center justify-center gap-6 mt-4 pt-4 border-t border-slate-100">
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-green-600 rounded-full"></div>
+          <span class="text-xs leading-[1.125rem] font-normal text-slate-600">Present</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-red-600 rounded-full"></div>
+          <span class="text-xs leading-[1.125rem] font-normal text-slate-600">Absent</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-slate-300 rounded-full"></div>
+          <span class="text-xs leading-[1.125rem] font-normal text-slate-600">Not Marked</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly Statistics -->
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+      <h3 class="text-base leading-6 font-semibold text-slate-900 mb-6">Monthly Summary</h3>
+      
+      <div class="space-y-4">
+        <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+              <i data-lucide="check" class="w-4 h-4 text-white"></i>
+            </div>
+            <span class="text-sm leading-[1.375rem] font-semibold text-slate-900">Days Present</span>
+          </div>
+          <span id="daysPresentCount" class="text-[1.25rem] leading-[1.75rem] font-semibold text-green-600">0</span>
+        </div>
+
+        <div class="flex items-center justify-between p-4 bg-red-50 rounded-lg">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+              <i data-lucide="x" class="w-4 h-4 text-white"></i>
+            </div>
+            <span class="text-sm leading-[1.375rem] font-semibold text-slate-900">Days Absent</span>
+          </div>
+          <span id="daysAbsentCount" class="text-[1.25rem] leading-[1.75rem] font-semibold text-red-600">0</span>
+        </div>
+
+        <div class="flex items-center justify-between p-4 bg-teal-50 rounded-lg">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-teal-700 rounded-lg flex items-center justify-center">
+              <i data-lucide="percent" class="w-4 h-4 text-white"></i>
+            </div>
+            <span class="text-sm leading-[1.375rem] font-semibold text-slate-900">Attendance Rate</span>
+          </div>
+          <span id="attendanceRate" class="text-[1.25rem] leading-[1.75rem] font-semibold text-teal-700">0%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Attendance History Table -->
+  <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+    <h3 class="text-base leading-6 font-semibold text-slate-900 mb-6">Attendance History</h3>
+    
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-slate-200">
+            <th class="text-left py-3 px-4 text-sm leading-[1.375rem] font-semibold text-slate-900">Date</th>
+            <th class="text-left py-3 px-4 text-sm leading-[1.375rem] font-semibold text-slate-900">Status</th>
+            <th class="text-left py-3 px-4 text-sm leading-[1.375rem] font-semibold text-slate-900">Clock In Time</th>
+            <th class="text-left py-3 px-4 text-sm leading-[1.375rem] font-semibold text-slate-900">Clock Out Time</th>
+          </tr>
+        </thead>
+        <tbody id="attendanceHistoryTable">
+          <!-- Will be populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <div id="noAttendanceData" class="text-center py-12 hidden">
+      <div class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="calendar-x" class="w-6 h-6 text-slate-400"></i>
+      </div>
+      <p class="text-sm leading-[1.375rem] font-normal text-slate-600">No attendance records found for this month</p>
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div id="successModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,28rem)] max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="text-center mb-6">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="check-circle" class="w-8 h-8 text-green-600"></i>
+          </div>
+          <h2 id="successModalTitle" class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900 mb-2">Attendance Recorded</h2>
+          <div class="space-y-2">
+            <p class="text-sm leading-[1.375rem] font-normal text-slate-600">
+              <span class="font-semibold">Date:</span> <span id="successModalDate"></span>
+            </p>
+            <p class="text-sm leading-[1.375rem] font-normal text-slate-600">
+              <span class="font-semibold">Status:</span> <span id="successModalStatus"></span>
+            </p>
+            <p class="text-sm leading-[1.375rem] font-normal text-slate-600">
+              <span class="font-semibold">Time:</span> <span id="successModalTime"></span>
+            </p>
+          </div>
+        </div>
+
+        <div class="flex gap-3">
+          <button id="viewHistoryBtn" class="flex-1 px-4 py-2 bg-teal-700 hover:bg-teal-600 text-white text-sm leading-[1.375rem] font-semibold rounded-lg transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            View History
+          </button>
+          <button id="closeSuccessModalBtn" class="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-900 text-sm leading-[1.375rem] font-semibold rounded-lg transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils =
+          window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_sup_001");
+                    currentUserId = "usr_sup_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } =
+            state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail)
+            return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute(
+            "aria-expanded",
+            shouldOpen ? "true" : "false"
+          );
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active", "bg-teal-50", "text-teal-700");
+              link.classList.remove("text-slate-800");
+            } else {
+              link.classList.remove("active", "bg-teal-50", "text-teal-700");
+              link.classList.add("text-slate-800");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () =>
+            closeMobileSidebar()
+          );
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+// Utility: portal a modal by id (idempotent)
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+
+  // Set active navigation
+  if (window.TemplateUtils && window.TemplateUtils.setActiveNavLink) {
+    window.TemplateUtils.setActiveNavLink('attendance_management');
+  }
+
+  // Initialize attendance management
+  funInitAttendanceManagement();
+});
+
+function funInitAttendanceManagement() {
+  // Get current user and store
+  const currentUser = funGetCurrentUser();
+  if (!currentUser || currentUser.role !== 'supervisor') {
+    console.error('Access denied: Only supervisors can access attendance management');
+    return;
+  }
+
+  const primaryStore = funGetPrimaryStore(currentUser.id);
+  
+  // Initialize current date display
+  funDisplayCurrentDate();
+  
+  // Initialize today's attendance section
+  funInitTodayAttendance(currentUser.id, primaryStore?.id);
+  
+  // Initialize calendar
+  const currentDate = new Date();
+  funInitCalendar(currentDate.getFullYear(), currentDate.getMonth(), currentUser.id);
+  
+  // Initialize event listeners
+  funInitEventListeners(currentUser.id);
+}
+
+function funGetCurrentUser() {
+  try {
+    let currentUserId = localStorage.getItem('currentUserId');
+    if (!currentUserId) {
+      localStorage.setItem('currentUserId', 'usr_sup_001');
+      currentUserId = 'usr_sup_001';
+    }
+
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    return users.find(user => user.id === currentUserId) || null;
+  } catch (error) {
+    console.error('Error retrieving user data:', error);
+    return null;
+  }
+}
+
+function funGetPrimaryStore(supervisorId) {
+  try {
+    const supervisorAllocations = JSON.parse(localStorage.getItem('supervisorAllocations') || '[]');
+    const stores = JSON.parse(localStorage.getItem('stores') || '[]');
+    
+    const allocation = supervisorAllocations.find(alloc => alloc.supervisorId === supervisorId);
+    if (!allocation) return null;
+    
+    return stores.find(store => store.id === allocation.storeId) || null;
+  } catch (error) {
+    console.error('Error retrieving primary store:', error);
+    return null;
+  }
+}
+
+function funDisplayCurrentDate() {
+  const currentDateEl = document.getElementById('currentDate');
+  if (!currentDateEl) return;
+  
+  const today = new Date();
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  currentDateEl.textContent = today.toLocaleDateString('en-US', options);
+}
+
+function funInitTodayAttendance(userId, storeId) {
+  const attendanceStatusSection = document.getElementById('attendanceStatusSection');
+  if (!attendanceStatusSection) return;
+
+  const today = new Date().toISOString().split('T')[0];
+  const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+  
+  const todayRecord = attendanceRecords.find(record => 
+    record.userId === userId && 
+    record.date.split('T')[0] === today
+  );
+
+  if (todayRecord) {
+    // Show existing attendance
+    attendanceStatusSection.innerHTML = `
+      <div class="flex items-center justify-between p-4 rounded-lg ${todayRecord.status === 'present' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 ${todayRecord.status === 'present' ? 'bg-green-600' : 'bg-red-600'} rounded-lg flex items-center justify-center">
+            <i data-lucide="${todayRecord.status === 'present' ? 'check' : 'x'}" class="w-5 h-5 text-white"></i>
+          </div>
+          <div>
+            <p class="text-sm leading-[1.375rem] font-semibold ${todayRecord.status === 'present' ? 'text-green-900' : 'text-red-900'}">
+              Today's Status: ${todayRecord.status === 'present' ? 'Present' : 'Absent'}
+            </p>
+            <p class="text-xs leading-[1.125rem] font-normal ${todayRecord.status === 'present' ? 'text-green-700' : 'text-red-700'}">
+              Marked at ${funFormatTime(todayRecord.clockInTime)}
+            </p>
+          </div>
+        </div>
+        <button id="updateAttendanceBtn" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-900 text-sm leading-[1.375rem] font-semibold rounded-lg transition-colors">
+          Update
+        </button>
+      </div>
+    `;
+
+    // Add update functionality
+    const updateBtn = document.getElementById('updateAttendanceBtn');
+    if (updateBtn) {
+      updateBtn.addEventListener('click', () => {
+        funShowAttendanceForm(userId, storeId, todayRecord);
+      });
+    }
+  } else {
+    // Show attendance marking form
+    funShowAttendanceForm(userId, storeId, null);
+  }
+}
+
+function funShowAttendanceForm(userId, storeId, existingRecord) {
+  const attendanceStatusSection = document.getElementById('attendanceStatusSection');
+  if (!attendanceStatusSection) return;
+
+  const isUpdate = !!existingRecord;
+  const currentStatus = existingRecord ? existingRecord.status : 'present';
+
+  attendanceStatusSection.innerHTML = `
+    <div class="space-y-4">
+      <div class="flex items-center gap-4">
+        <span class="text-sm leading-[1.375rem] font-semibold text-slate-900">
+          ${isUpdate ? 'Update' : 'Mark'} Today's Attendance:
+        </span>
+        <div class="flex gap-2">
+          <button id="presentBtn" class="px-4 py-2 rounded-lg text-sm leading-[1.375rem] font-semibold transition-colors ${currentStatus === 'present' ? 'bg-green-600 text-white' : 'bg-slate-100 text-slate-900 hover:bg-slate-200'}">
+            Present
+          </button>
+          <button id="absentBtn" class="px-4 py-2 rounded-lg text-sm leading-[1.375rem] font-semibold transition-colors ${currentStatus === 'absent' ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-900 hover:bg-slate-200'}">
+            Absent
+          </button>
+        </div>
+      </div>
+      
+      <div class="flex gap-3">
+        <button id="saveAttendanceBtn" class="px-6 py-2 bg-teal-700 hover:bg-teal-600 text-white text-sm leading-[1.375rem] font-semibold rounded-lg transition-colors">
+          ${isUpdate ? 'Update' : 'Save'} Attendance
+        </button>
+        ${isUpdate ? `
+          <button id="cancelUpdateBtn" class="px-6 py-2 bg-slate-100 hover:bg-slate-200 text-slate-900 text-sm leading-[1.375rem] font-semibold rounded-lg transition-colors">
+            Cancel
+          </button>
+        ` : ''}
+      </div>
+    </div>
+  `;
+
+  let selectedStatus = currentStatus;
+
+  // Status toggle functionality
+  const presentBtn = document.getElementById('presentBtn');
+  const absentBtn = document.getElementById('absentBtn');
+  
+  if (presentBtn) {
+    presentBtn.addEventListener('click', () => {
+      selectedStatus = 'present';
+      presentBtn.className = 'px-4 py-2 rounded-lg text-sm leading-[1.375rem] font-semibold transition-colors bg-green-600 text-white';
+      absentBtn.className = 'px-4 py-2 rounded-lg text-sm leading-[1.375rem] font-semibold transition-colors bg-slate-100 text-slate-900 hover:bg-slate-200';
+    });
+  }
+  
+  if (absentBtn) {
+    absentBtn.addEventListener('click', () => {
+      selectedStatus = 'absent';
+      absentBtn.className = 'px-4 py-2 rounded-lg text-sm leading-[1.375rem] font-semibold transition-colors bg-red-600 text-white';
+      presentBtn.className = 'px-4 py-2 rounded-lg text-sm leading-[1.375rem] font-semibold transition-colors bg-slate-100 text-slate-900 hover:bg-slate-200';
+    });
+  }
+
+  // Save functionality
+  const saveBtn = document.getElementById('saveAttendanceBtn');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', () => {
+      funSaveAttendance(userId, storeId, selectedStatus, existingRecord);
+    });
+  }
+
+  // Cancel functionality
+  const cancelBtn = document.getElementById('cancelUpdateBtn');
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', () => {
+      funInitTodayAttendance(userId, storeId);
+    });
+  }
+}
+
+function funSaveAttendance(userId, storeId, status, existingRecord) {
+  try {
+    const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+    const now = new Date().toISOString();
+    const today = new Date().toISOString().split('T')[0];
+
+    if (existingRecord) {
+      // Update existing record
+      const recordIndex = attendanceRecords.findIndex(record => record.id === existingRecord.id);
+      if (recordIndex !== -1) {
+        attendanceRecords[recordIndex] = {
+          ...attendanceRecords[recordIndex],
+          status: status,
+          updatedAt: now
+        };
+      }
+    } else {
+      // Create new record
+      const newRecord = {
+        id: `att_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        userId: userId,
+        userRole: 'supervisor',
+        date: today + 'T00:00:00Z',
+        storeId: storeId,
+        clockInTime: now,
+        clockOutTime: null,
+        status: status,
+        createdAt: now,
+        updatedAt: now
+      };
+      attendanceRecords.push(newRecord);
+    }
+
+    localStorage.setItem('attendanceRecords', JSON.stringify(attendanceRecords));
+    
+    // Show success modal
+    funShowSuccessModal(status, now, existingRecord ? 'updated' : 'recorded');
+    
+    // Refresh the display
+    funInitTodayAttendance(userId, storeId);
+    
+    // Refresh calendar and statistics
+    const currentDate = new Date();
+    funInitCalendar(currentDate.getFullYear(), currentDate.getMonth(), userId);
+
+  } catch (error) {
+    console.error('Error saving attendance:', error);
+    alert('Error saving attendance. Please try again.');
+  }
+}
+
+function funShowSuccessModal(status, timestamp, action) {
+  const modal = document.getElementById('successModal');
+  const title = document.getElementById('successModalTitle');
+  const date = document.getElementById('successModalDate');
+  const statusEl = document.getElementById('successModalStatus');
+  const time = document.getElementById('successModalTime');
+
+  if (!modal) return;
+
+  title.textContent = action === 'updated' ? 'Attendance Updated' : 'Attendance Recorded';
+  date.textContent = new Date().toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+  statusEl.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+  statusEl.className = status === 'present' ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold';
+  time.textContent = funFormatTime(timestamp);
+
+  modal.classList.remove('hidden');
+}
+
+function funInitCalendar(year, month, userId) {
+  funUpdateCalendarHeader(year, month);
+  funRenderCalendar(year, month, userId);
+  funUpdateMonthlyStats(year, month, userId);
+  funUpdateAttendanceHistory(year, month, userId);
+}
+
+function funUpdateCalendarHeader(year, month) {
+  const monthYearEl = document.getElementById('currentMonthYear');
+  if (!monthYearEl) return;
+
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'];
+  
+  monthYearEl.textContent = `${monthNames[month]} ${year}`;
+}
+
+function funRenderCalendar(year, month, userId) {
+  const calendarGrid = document.getElementById('calendarGrid');
+  if (!calendarGrid) return;
+
+  const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+  const userRecords = attendanceRecords.filter(record => record.userId === userId);
+
+  // Clear existing content
+  calendarGrid.innerHTML = '';
+
+  // Add day headers
+  const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  dayHeaders.forEach(day => {
+    const headerEl = document.createElement('div');
+    headerEl.className = 'text-center py-2 text-xs leading-[1.125rem] font-semibold text-slate-600';
+    headerEl.textContent = day;
+    calendarGrid.appendChild(headerEl);
+  });
+
+  // Get first day of month and number of days
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  // Add empty cells for days before month starts
+  for (let i = 0; i < firstDay; i++) {
+    const emptyCell = document.createElement('div');
+    emptyCell.className = 'h-10';
+    calendarGrid.appendChild(emptyCell);
+  }
+
+  // Add days of the month
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dayEl = document.createElement('div');
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    
+    // Find attendance record for this date
+    const dayRecord = userRecords.find(record => 
+      record.date.split('T')[0] === dateStr
+    );
+
+    let statusClass = 'bg-slate-300'; // Not marked
+    if (dayRecord) {
+      statusClass = dayRecord.status === 'present' ? 'bg-green-600' : 'bg-red-600';
+    }
+
+    const today = new Date();
+    const isToday = dateStr === today.toISOString().split('T')[0];
+
+    dayEl.className = `h-10 flex items-center justify-center text-sm relative ${
+      isToday ? 'bg-teal-50 text-teal-700 font-semibold rounded-lg' : 'text-slate-900'
+    }`;
+    
+    dayEl.innerHTML = `
+      ${day}
+      ${dayRecord ? `<div class="absolute top-1 right-1 w-2 h-2 ${statusClass} rounded-full"></div>` : ''}
+    `;
+    
+    calendarGrid.appendChild(dayEl);
+  }
+}
+
+function funUpdateMonthlyStats(year, month, userId) {
+  const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+  
+  // Filter records for current month
+  const monthRecords = attendanceRecords.filter(record => {
+    if (record.userId !== userId) return false;
+    const recordDate = new Date(record.date);
+    return recordDate.getFullYear() === year && recordDate.getMonth() === month;
+  });
+
+  const presentDays = monthRecords.filter(record => record.status === 'present').length;
+  const absentDays = monthRecords.filter(record => record.status === 'absent').length;
+  const totalDays = presentDays + absentDays;
+  const attendanceRate = totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
+
+  // Update UI
+  const daysPresentEl = document.getElementById('daysPresentCount');
+  const daysAbsentEl = document.getElementById('daysAbsentCount');
+  const attendanceRateEl = document.getElementById('attendanceRate');
+
+  if (daysPresentEl) daysPresentEl.textContent = presentDays;
+  if (daysAbsentEl) daysAbsentEl.textContent = absentDays;
+  if (attendanceRateEl) attendanceRateEl.textContent = `${attendanceRate}%`;
+}
+
+function funUpdateAttendanceHistory(year, month, userId) {
+  const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+  const historyTable = document.getElementById('attendanceHistoryTable');
+  const noDataEl = document.getElementById('noAttendanceData');
+  
+  if (!historyTable || !noDataEl) return;
+
+  // Filter records for current month
+  const monthRecords = attendanceRecords
+    .filter(record => {
+      if (record.userId !== userId) return false;
+      const recordDate = new Date(record.date);
+      return recordDate.getFullYear() === year && recordDate.getMonth() === month;
+    })
+    .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by date descending
+
+  if (monthRecords.length === 0) {
+    historyTable.innerHTML = '';
+    noDataEl.classList.remove('hidden');
+  } else {
+    noDataEl.classList.add('hidden');
+    
+    historyTable.innerHTML = monthRecords.map(record => `
+      <tr class="border-b border-slate-100 hover:bg-slate-50">
+        <td class="py-3 px-4 text-sm leading-[1.375rem] font-normal text-slate-900">
+          ${funFormatDate(record.date)}
+        </td>
+        <td class="py-3 px-4">
+          <span class="inline-flex items-center gap-2 px-2 py-1 rounded text-xs leading-[1.125rem] font-semibold ${
+            record.status === 'present' 
+              ? 'bg-green-100 text-green-800' 
+              : 'bg-red-100 text-red-800'
+          }">
+            <i data-lucide="${record.status === 'present' ? 'check' : 'x'}" class="w-3 h-3"></i>
+            ${record.status === 'present' ? 'Present' : 'Absent'}
+          </span>
+        </td>
+        <td class="py-3 px-4 text-sm leading-[1.375rem] font-normal text-slate-600">
+          ${record.clockInTime ? funFormatTime(record.clockInTime) : '-'}
+        </td>
+        <td class="py-3 px-4 text-sm leading-[1.375rem] font-normal text-slate-600">
+          ${record.clockOutTime ? funFormatTime(record.clockOutTime) : '-'}
+        </td>
+      </tr>
+    `).join('');
+
+    // Re-initialize Lucide icons
+    if (window.lucide && window.lucide.createIcons) {
+      window.lucide.createIcons();
+    }
+  }
+}
+
+function funInitEventListeners(userId) {
+  // Calendar navigation
+  const prevMonthBtn = document.getElementById('prevMonthBtn');
+  const nextMonthBtn = document.getElementById('nextMonthBtn');
+  
+  let currentDate = new Date();
+  let currentYear = currentDate.getFullYear();
+  let currentMonth = currentDate.getMonth();
+
+  if (prevMonthBtn) {
+    prevMonthBtn.addEventListener('click', () => {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
+      funInitCalendar(currentYear, currentMonth, userId);
+    });
+  }
+
+  if (nextMonthBtn) {
+    nextMonthBtn.addEventListener('click', () => {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      funInitCalendar(currentYear, currentMonth, userId);
+    });
+  }
+
+  // Success modal handlers
+  const viewHistoryBtn = document.getElementById('viewHistoryBtn');
+  const closeSuccessModalBtn = document.getElementById('closeSuccessModalBtn');
+  const successModal = document.getElementById('successModal');
+
+  if (viewHistoryBtn) {
+    viewHistoryBtn.addEventListener('click', () => {
+      if (successModal) {
+        successModal.classList.add('hidden');
+      }
+      // Scroll to calendar section
+      const calendarSection = document.querySelector('.grid.grid-cols-1.lg\\:grid-cols-2');
+      if (calendarSection) {
+        calendarSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  }
+
+  if (closeSuccessModalBtn) {
+    closeSuccessModalBtn.addEventListener('click', () => {
+      if (successModal) {
+        successModal.classList.add('hidden');
+      }
+    });
+  }
+
+  // Close modal on backdrop click
+  if (successModal) {
+    successModal.addEventListener('click', (e) => {
+      if (e.target === successModal) {
+        successModal.classList.add('hidden');
+      }
+    });
+  }
+}
+
+function funFormatDate(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+}
+
+function funFormatTime(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
+}
+</script></body></html>

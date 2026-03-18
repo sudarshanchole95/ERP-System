@@ -1,0 +1,1031 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>GTVL Promodizer Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-primary: #0f766e;
+        --color-primary-hover: #0d9488;
+        --color-secondary: #475569;
+        --color-accent: #d97706;
+        --color-surface: #ffffff;
+        --color-background: #f8fafc;
+        --color-surface-variant: #f1f5f9;
+        --color-on-background: #0f172a;
+        --color-on-surface: #1e293b;
+        --color-border: #e2e8f0;
+        --color-success: #16a34a;
+        --color-warning: #f59e0b;
+        --color-error: #dc2626;
+        --color-info: #2563eb;
+
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+      }
+
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>Attendance - GTVL Promodizer Portal</title></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-teal-700 rounded-lg flex items-center justify-center">
+              <svg width="20" height="20" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <rect x="68" y="68" width="264" height="264" rx="32" stroke="#FFFFFF" stroke-width="18"></rect>
+                  <rect x="109" y="143" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="109" y="194" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="109" y="245" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                  <rect x="206" y="194" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                  <rect x="206" y="245" width="71" height="33" rx="8" fill="#FFFFFF"></rect>
+                </g>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">
+              GTVL Promodizer Portal
+            </h1>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 md:gap-3">
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-600 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-600 truncate"></div>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-600">
+            Main
+          </div>
+          <div class="space-y-1">
+            <a href="dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="dashboard">
+              <i data-lucide="home" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="record_sales.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="record_sales">
+              <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+              <span>Record Sales</span>
+            </a>
+            <a href="sales_history.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sales_history">
+              <i data-lucide="history" class="w-5 h-5"></i>
+              <span>Sales History</span>
+            </a>
+            <a href="attendance.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="attendance">
+              <i data-lucide="clock" class="w-5 h-5"></i>
+              <span>Attendance</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="py-6 border-b border-slate-100 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-600">
+            Records
+          </div>
+          <div class="space-y-1">
+            <a href="attendance_history.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="attendance_history">
+              <i data-lucide="calendar" class="w-5 h-5"></i>
+              <span>Attendance History</span>
+            </a>
+            <a href="my_stores.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="my_stores">
+              <i data-lucide="map-pin" class="w-5 h-5"></i>
+              <span>My Stores</span>
+            </a>
+            <a href="my_profile.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="my_profile">
+              <i data-lucide="user" class="w-5 h-5"></i>
+              <span>My Profile</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="app-main p-6" id="pageContent" role="main"><div class="flex items-center justify-between mb-6">
+  <div class="flex items-center gap-4">
+    <button onclick="window.history.back()" class="flex items-center justify-center w-10 h-10 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+      <i data-lucide="arrow-left" class="w-5 h-5"></i>
+    </button>
+    <div>
+      <h1 class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900">Attendance</h1>
+    </div>
+  </div>
+  <a href="dashboard.html" class="flex items-center justify-center w-10 h-10 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+    <i data-lucide="home" class="w-5 h-5"></i>
+  </a>
+</div>
+
+<!-- Main Content Card -->
+<div class="max-w-2xl mx-auto">
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <!-- Date Header -->
+    <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+      <div class="text-center">
+        <div id="currentDate" class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900"></div>
+        <div class="text-sm text-slate-600 mt-1">Today's Attendance</div>
+      </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="p-6">
+      <!-- STATE 1: Not Clocked In -->
+      <div id="stateNotClockedIn" class="hidden text-center space-y-6">
+        <div class="flex items-center justify-center w-16 h-16 bg-blue-50 rounded-full mx-auto">
+          <i data-lucide="clock" class="w-8 h-8 text-blue-600"></i>
+        </div>
+        
+        <div>
+          <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900 mb-2">You have not clocked in today</h2>
+          <p class="text-sm text-slate-600">Select your store location and clock in to start your work day</p>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label for="storeSelect" class="block text-sm font-medium text-slate-800 mb-2">Store Location</label>
+            <select id="storeSelect" class="w-full px-4 py-3 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus-visible:outline-none bg-white">
+              <option value="">Select a store...</option>
+            </select>
+          </div>
+
+          <button id="clockInButton" disabled="" class="w-full bg-teal-700 hover:bg-teal-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold py-4 px-6 rounded-lg text-base transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <div class="flex items-center justify-center gap-2">
+              <i data-lucide="clock" class="w-5 h-5"></i>
+              Clock In
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- STATE 2: Clocked In -->
+      <div id="stateClockedIn" class="hidden text-center space-y-6">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div class="flex items-center justify-center gap-2 text-blue-800">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+            <span class="font-semibold">Clocked In</span>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="grid grid-cols-1 gap-4">
+            <div class="bg-slate-50 rounded-lg p-4">
+              <div class="text-xs font-medium text-slate-600 uppercase tracking-wider mb-1">Clock-in Time</div>
+              <div id="clockInTime" class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900"></div>
+            </div>
+            
+            <div class="bg-slate-50 rounded-lg p-4">
+              <div class="text-xs font-medium text-slate-600 uppercase tracking-wider mb-1">Store Location</div>
+              <div id="currentStore" class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900"></div>
+            </div>
+
+            <div class="bg-teal-50 border border-teal-200 rounded-lg p-4">
+              <div class="text-xs font-medium text-teal-700 uppercase tracking-wider mb-1">Working Time</div>
+              <div id="elapsedTime" class="text-[1.25rem] leading-[1.75rem] font-semibold text-teal-800"></div>
+            </div>
+          </div>
+
+          <button id="clockOutButton" class="w-full bg-teal-700 hover:bg-teal-600 text-white font-semibold py-4 px-6 rounded-lg text-base transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <div class="flex items-center justify-center gap-2">
+              <i data-lucide="clock" class="w-5 h-5"></i>
+              Clock Out
+            </div>
+          </button>
+
+          <p class="text-sm text-slate-600">Clock out when you finish your work day</p>
+        </div>
+      </div>
+
+      <!-- STATE 3: Clocked Out -->
+      <div id="stateClockedOut" class="hidden text-center space-y-6">
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div class="flex items-center justify-center gap-2 text-green-800">
+            <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+            <span class="font-semibold">Attendance Complete for Today</span>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="grid grid-cols-1 gap-4">
+            <div class="bg-slate-50 rounded-lg p-4">
+              <div class="text-xs font-medium text-slate-600 uppercase tracking-wider mb-1">Clock-in Time</div>
+              <div id="finalClockInTime" class="text-base font-semibold text-slate-900"></div>
+            </div>
+            
+            <div class="bg-slate-50 rounded-lg p-4">
+              <div class="text-xs font-medium text-slate-600 uppercase tracking-wider mb-1">Clock-out Time</div>
+              <div id="finalClockOutTime" class="text-base font-semibold text-slate-900"></div>
+            </div>
+
+            <div class="bg-slate-50 rounded-lg p-4">
+              <div class="text-xs font-medium text-slate-600 uppercase tracking-wider mb-1">Store Location</div>
+              <div id="finalStore" class="text-base font-semibold text-slate-900"></div>
+            </div>
+
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+              <div class="text-xs font-medium text-green-700 uppercase tracking-wider mb-1">Total Hours Worked</div>
+              <div id="totalHours" class="text-[1.25rem] leading-[1.75rem] font-semibold text-green-800"></div>
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <p class="text-sm text-slate-600 mb-4">Thank you for your work today!</p>
+            <a href="attendance_history.html" class="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium py-3 px-6 rounded-lg transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+              <i data-lucide="calendar" class="w-4 h-4"></i>
+              View Attendance History
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils =
+          window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_promo_001");
+                    currentUserId = "usr_promo_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } =
+            state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail)
+            return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute(
+            "aria-expanded",
+            shouldOpen ? "true" : "false"
+          );
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active");
+            } else {
+              link.classList.remove("active");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () =>
+            closeMobileSidebar()
+          );
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+// Utility: portal a modal by id (idempotent)
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+});
+
+// Attendance Management
+class AttendanceManager {
+  constructor() {
+    this.currentUser = this.funGetCurrentUser();
+    this.currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    this.elapsedTimeInterval = null;
+    this.funInitialize();
+  }
+
+  funGetCurrentUser() {
+    try {
+      let currentUserId = localStorage.getItem('currentUserId');
+      if (!currentUserId) {
+        localStorage.setItem('currentUserId', 'usr_promo_001');
+        currentUserId = 'usr_promo_001';
+      }
+      
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      return users.find(user => user.id === currentUserId) || null;
+    } catch (error) {
+      console.error('Error retrieving user data:', error);
+      return null;
+    }
+  }
+
+  funGetUserStores() {
+    try {
+      const promodizerAllocations = JSON.parse(localStorage.getItem('promodizerAllocations') || '[]');
+      const stores = JSON.parse(localStorage.getItem('stores') || '[]');
+      
+      const userAllocations = promodizerAllocations.filter(
+        allocation => allocation.promodizerId === this.currentUser.id
+      );
+      
+      return userAllocations.map(allocation => {
+        const store = stores.find(store => store.id === allocation.storeId);
+        return store;
+      }).filter(Boolean);
+    } catch (error) {
+      console.error('Error getting user stores:', error);
+      return [];
+    }
+  }
+
+  funGetTodaysAttendance() {
+    try {
+      const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+      const todayISO = new Date(this.currentDate + 'T00:00:00Z').toISOString();
+      
+      return attendanceRecords.find(record => 
+        record.userId === this.currentUser.id && 
+        record.date.split('T')[0] === this.currentDate
+      );
+    } catch (error) {
+      console.error('Error getting today\'s attendance:', error);
+      return null;
+    }
+  }
+
+  funGetAttendanceState() {
+    const todaysRecord = this.funGetTodaysAttendance();
+    
+    if (!todaysRecord) {
+      return 'not_clocked_in';
+    } else if (todaysRecord.clockInTime && !todaysRecord.clockOutTime) {
+      return 'clocked_in';
+    } else if (todaysRecord.clockInTime && todaysRecord.clockOutTime) {
+      return 'clocked_out';
+    }
+    
+    return 'not_clocked_in';
+  }
+
+  funFormatTime(isoString) {
+    return new Date(isoString).toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+  }
+
+  funCalculateElapsedTime(clockInTime) {
+    const now = new Date();
+    const clockIn = new Date(clockInTime);
+    const diffMs = now - clockIn;
+    
+    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (hours === 0) {
+      return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+    } else {
+      return `${hours} hour${hours !== 1 ? 's' : ''} ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+    }
+  }
+
+  funCalculateTotalHours(clockInTime, clockOutTime) {
+    const clockIn = new Date(clockInTime);
+    const clockOut = new Date(clockOutTime);
+    const diffMs = clockOut - clockIn;
+    
+    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    
+    return `${hours} hour${hours !== 1 ? 's' : ''} ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+  }
+
+  funGetStoreName(storeId) {
+    try {
+      const stores = JSON.parse(localStorage.getItem('stores') || '[]');
+      const store = stores.find(s => s.id === storeId);
+      return store ? store.storeName : 'Unknown Store';
+    } catch (error) {
+      console.error('Error getting store name:', error);
+      return 'Unknown Store';
+    }
+  }
+
+  funUpdateElapsedTime() {
+    const todaysRecord = this.funGetTodaysAttendance();
+    if (todaysRecord && todaysRecord.clockInTime && !todaysRecord.clockOutTime) {
+      const elapsedTimeElement = document.getElementById('elapsedTime');
+      if (elapsedTimeElement) {
+        elapsedTimeElement.textContent = this.funCalculateElapsedTime(todaysRecord.clockInTime);
+      }
+    }
+  }
+
+  funStartElapsedTimeUpdater() {
+    this.funStopElapsedTimeUpdater();
+    this.funUpdateElapsedTime();
+    this.elapsedTimeInterval = setInterval(() => {
+      this.funUpdateElapsedTime();
+    }, 60000); // Update every minute
+  }
+
+  funStopElapsedTimeUpdater() {
+    if (this.elapsedTimeInterval) {
+      clearInterval(this.elapsedTimeInterval);
+      this.elapsedTimeInterval = null;
+    }
+  }
+
+  funClockIn(storeId) {
+    try {
+      const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+      const now = new Date().toISOString();
+      
+      const newRecord = {
+        id: `att_${Date.now()}`,
+        userId: this.currentUser.id,
+        userRole: 'promodizer',
+        date: new Date(this.currentDate + 'T00:00:00Z').toISOString(),
+        storeId: storeId,
+        clockInTime: now,
+        clockOutTime: null,
+        status: 'present',
+        createdAt: now,
+        updatedAt: now
+      };
+
+      attendanceRecords.push(newRecord);
+      localStorage.setItem('attendanceRecords', JSON.stringify(attendanceRecords));
+      
+      // Refresh to show new state
+      this.funRenderState();
+      
+      return true;
+    } catch (error) {
+      console.error('Error clocking in:', error);
+      return false;
+    }
+  }
+
+  funClockOut() {
+    try {
+      const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+      const todaysRecord = this.funGetTodaysAttendance();
+      
+      if (!todaysRecord) {
+        throw new Error('No attendance record found for today');
+      }
+      
+      const now = new Date().toISOString();
+      const recordIndex = attendanceRecords.findIndex(record => record.id === todaysRecord.id);
+      
+      if (recordIndex === -1) {
+        throw new Error('Could not find attendance record to update');
+      }
+      
+      attendanceRecords[recordIndex].clockOutTime = now;
+      attendanceRecords[recordIndex].updatedAt = now;
+      
+      localStorage.setItem('attendanceRecords', JSON.stringify(attendanceRecords));
+      
+      // Stop the elapsed time updater
+      this.funStopElapsedTimeUpdater();
+      
+      // Refresh to show new state
+      this.funRenderState();
+      
+      return true;
+    } catch (error) {
+      console.error('Error clocking out:', error);
+      return false;
+    }
+  }
+
+  funRenderNotClockedInState() {
+    const userStores = this.funGetUserStores();
+    const storeSelect = document.getElementById('storeSelect');
+    const clockInButton = document.getElementById('clockInButton');
+    
+    // Populate stores dropdown
+    storeSelect.innerHTML = '<option value="">Select a store...</option>';
+    userStores.forEach(store => {
+      const option = document.createElement('option');
+      option.value = store.id;
+      option.textContent = store.storeName;
+      storeSelect.appendChild(option);
+    });
+    
+    // Enable/disable clock in button based on selection
+    storeSelect.addEventListener('change', () => {
+      clockInButton.disabled = !storeSelect.value;
+    });
+    
+    // Handle clock in
+    clockInButton.addEventListener('click', () => {
+      if (storeSelect.value) {
+        if (this.funClockIn(storeSelect.value)) {
+          // Success handled by funRenderState call in funClockIn
+        } else {
+          alert('Failed to clock in. Please try again.');
+        }
+      }
+    });
+    
+    // Show this state
+    document.getElementById('stateNotClockedIn').classList.remove('hidden');
+  }
+
+  funRenderClockedInState() {
+    const todaysRecord = this.funGetTodaysAttendance();
+    
+    // Populate data
+    document.getElementById('clockInTime').textContent = this.funFormatTime(todaysRecord.clockInTime);
+    document.getElementById('currentStore').textContent = this.funGetStoreName(todaysRecord.storeId);
+    
+    // Start elapsed time updater
+    this.funStartElapsedTimeUpdater();
+    
+    // Handle clock out
+    const clockOutButton = document.getElementById('clockOutButton');
+    clockOutButton.addEventListener('click', () => {
+      if (confirm('Are you sure you want to clock out?')) {
+        if (this.funClockOut()) {
+          // Success handled by funRenderState call in funClockOut
+        } else {
+          alert('Failed to clock out. Please try again.');
+        }
+      }
+    });
+    
+    // Show this state
+    document.getElementById('stateClockedIn').classList.remove('hidden');
+  }
+
+  funRenderClockedOutState() {
+    const todaysRecord = this.funGetTodaysAttendance();
+    
+    // Populate data
+    document.getElementById('finalClockInTime').textContent = this.funFormatTime(todaysRecord.clockInTime);
+    document.getElementById('finalClockOutTime').textContent = this.funFormatTime(todaysRecord.clockOutTime);
+    document.getElementById('finalStore').textContent = this.funGetStoreName(todaysRecord.storeId);
+    document.getElementById('totalHours').textContent = this.funCalculateTotalHours(todaysRecord.clockInTime, todaysRecord.clockOutTime);
+    
+    // Show this state
+    document.getElementById('stateClockedOut').classList.remove('hidden');
+  }
+
+  funRenderState() {
+    // Hide all states first
+    document.getElementById('stateNotClockedIn').classList.add('hidden');
+    document.getElementById('stateClockedIn').classList.add('hidden');
+    document.getElementById('stateClockedOut').classList.add('hidden');
+    
+    // Clear any existing event listeners by cloning elements
+    const clockInButton = document.getElementById('clockInButton');
+    const clockOutButton = document.getElementById('clockOutButton');
+    const storeSelect = document.getElementById('storeSelect');
+    
+    if (clockInButton) {
+      const newClockInButton = clockInButton.cloneNode(true);
+      clockInButton.parentNode.replaceChild(newClockInButton, clockInButton);
+    }
+    
+    if (clockOutButton) {
+      const newClockOutButton = clockOutButton.cloneNode(true);
+      clockOutButton.parentNode.replaceChild(newClockOutButton, clockOutButton);
+    }
+    
+    if (storeSelect) {
+      const newStoreSelect = storeSelect.cloneNode(true);
+      storeSelect.parentNode.replaceChild(newStoreSelect, storeSelect);
+    }
+    
+    // Stop any existing intervals
+    this.funStopElapsedTimeUpdater();
+    
+    // Determine and render appropriate state
+    const state = this.funGetAttendanceState();
+    
+    switch (state) {
+      case 'not_clocked_in':
+        this.funRenderNotClockedInState();
+        break;
+      case 'clocked_in':
+        this.funRenderClockedInState();
+        break;
+      case 'clocked_out':
+        this.funRenderClockedOutState();
+        break;
+    }
+  }
+
+  funInitialize() {
+    if (!this.currentUser) {
+      console.error('No current user found');
+      return;
+    }
+    
+    // Set current date
+    const dateOptions = { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    };
+    document.getElementById('currentDate').textContent = 
+      new Date().toLocaleDateString('en-US', dateOptions);
+    
+    // Set active nav
+    if (window.TemplateUtils?.setActiveNavLink) {
+      window.TemplateUtils.setActiveNavLink('attendance');
+    }
+    
+    // Render initial state
+    this.funRenderState();
+  }
+}
+
+// Initialize attendance manager when DOM is loaded
+let attendanceManager = new AttendanceManager();
+</script></body></html>

@@ -1,0 +1,967 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <title>GTVL Management Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        /* GTVL Brand Colors */
+        --color-primary: #0F766E; /* Teal-700 - Primary CTAs, navigation highlights */
+        --color-primary-hover: #0D9488; /* Teal-600 - Hover states */
+        --color-secondary: #475569; /* Slate-600 - Secondary elements */
+        --color-accent: #D97706; /* Amber-600 - Call-to-action highlights */
+        --color-surface: #FFFFFF; /* White - Cards, modals, panels */
+        --color-background: #F8FAFC; /* Slate-50 - Page backgrounds */
+        --color-surface-variant: #F1F5F9; /* Slate-100 - Alternate backgrounds */
+        --color-on-background: #0F172A; /* Slate-900 - Primary headings */
+        --color-on-surface: #1E293B; /* Slate-800 - Body text */
+        --color-border: #E2E8F0; /* Slate-200 - Borders */
+        --color-success: #16A34A; /* Green-600 - Success states */
+        --color-warning: #F59E0B; /* Amber-500 - Warning alerts */
+        --color-error: #DC2626; /* Red-600 - Error messages */
+        --color-info: #2563EB; /* Blue-600 - Info messages */
+
+        /* Layout Constants */
+        --header-height: 4rem;
+        --sidebar-width: 16rem;
+      }
+
+      /* Smooth scrolling */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      /* Layout with CSS variables */
+      .app-header {
+        height: var(--header-height);
+      }
+      .app-sidebar {
+        top: var(--header-height);
+        width: var(--sidebar-width);
+        height: calc(100vh - var(--header-height));
+      }
+      .app-main {
+        margin-top: var(--header-height);
+        min-height: calc(100vh - var(--header-height));
+      }
+      @media (min-width: 768px) {
+        .app-main {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      /* Mobile sidebar slide states */
+      @media (max-width: 767px) {
+        .app-sidebar {
+          left: calc(-1 * var(--sidebar-width));
+          transition: left 0.3s ease-in-out;
+        }
+        .app-sidebar.open {
+          left: 0;
+        }
+      }
+
+      /* Active nav link styling */
+      .nav-link.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: calc(1rem - 3px);
+        background-color: #f0fdfa;
+        color: var(--color-primary);
+      }
+
+      /* Popover animation states */
+      .popover {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out,
+          visibility 0.2s ease-in-out;
+      }
+      .popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      /* Sidebar backdrop states */
+      .sidebar-backdrop {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  <title>SKU Details - GTVL Management Portal</title><script>
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+});
+</script></head>
+  <body class="bg-slate-50 text-slate-800 overflow-x-hidden">
+    <!-- HEADER SECTION -->
+    <header class="app-header fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <div class="h-full max-w-[1920px] mx-auto px-4 md:px-6 flex justify-between items-center">
+        <!-- Left: Logo & Title -->
+        <div class="flex items-center gap-3">
+          <!-- Mobile Menu Toggle -->
+          <button id="mobileMenuToggle" class="flex items-center justify-center w-10 h-10 rounded-md text-slate-600 hover:bg-slate-100 hover:text-teal-700 transition-all duration-200 cursor-pointer border-0 bg-transparent md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+
+          <!-- Logo -->
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <rect x="68" y="68" width="264" height="264" rx="32" stroke="#0F766E" stroke-width="18"></rect>
+                  <rect x="109" y="143" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="109" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="143" width="71" height="33" rx="8" fill="#D97706"></rect>
+                  <rect x="206" y="194" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                  <rect x="206" y="245" width="71" height="33" rx="8" fill="#0F766E"></rect>
+                </g>
+              </svg>
+            </div>
+            <h1 class="text-lg md:text-xl font-bold text-slate-900">
+              GTVL Management Portal
+            </h1>
+          </div>
+        </div>
+
+        <!-- Right: User Profile -->
+        <div class="flex items-center gap-2 md:gap-3">
+          <!-- User Profile Button -->
+          <button id="userProfileButton" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-transparent hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2" aria-label="User profile menu" aria-expanded="false" aria-haspopup="true">
+            <div id="userAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+            <div class="hidden sm:flex flex-col items-start">
+              <div id="userName" class="text-sm font-medium text-slate-900"></div>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-500 hidden sm:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- User Profile Popover -->
+    <div id="userProfilePopover" class="popover absolute top-[4.5rem] right-4 md:right-6 w-72 bg-white border border-slate-200 rounded-lg shadow-xl z-50" role="dialog" aria-labelledby="popoverUserName" data-portal="body">
+      <div class="p-4">
+        <!-- User Info Section -->
+        <div class="flex items-center gap-3 pb-3 mb-3 border-b border-slate-100">
+          <div id="popoverUserAvatar" class="w-8 h-8 bg-teal-700 text-white rounded-full flex items-center justify-center text-sm font-semibold shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <div id="popoverUserName" class="font-semibold text-slate-900 truncate"></div>
+            <div id="popoverUserEmail" class="text-xs text-slate-500 truncate"></div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="space-y-1">
+          <button id="signOutButton" class="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 focus-visible:outline-offset-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop fixed inset-0 bg-black/50 z-20 md:hidden" style="top: var(--header-height)"></div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside id="sidebar" class="app-sidebar fixed left-0 bg-white border-r border-slate-200 overflow-y-auto z-30 transition-transform duration-300 ease-in-out">
+      <nav class="p-4" role="navigation" aria-label="Main navigation">
+        <!-- Main Navigation Section -->
+        <div class="py-6 border-b border-slate-100 first:pt-0 last:border-b-0">
+          <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Management
+          </div>
+          <div class="space-y-1">
+            <a href="management_dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline active bg-teal-50 text-teal-700" data-page="management_dashboard">
+              <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="sku_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="sku_list">
+              <i data-lucide="package" class="w-5 h-5"></i>
+              <span>SKUs</span>
+            </a>
+            <a href="store_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="store_list">
+              <i data-lucide="store" class="w-5 h-5"></i>
+              <span>Stores</span>
+            </a>
+            <a href="supervisor_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="supervisor_list">
+              <i data-lucide="user-check" class="w-5 h-5"></i>
+              <span>Supervisors</span>
+            </a>
+            <a href="promodizer_list.html" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-700 rounded-lg transition-all duration-200 no-underline" data-page="promodizer_list">
+              <i data-lucide="users" class="w-5 h-5"></i>
+              <span>Promodizers</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="app-main p-6" id="pageContent" role="main"><div class="space-y-6">
+  <!-- Breadcrumb Navigation -->
+  <nav class="flex items-center space-x-2 text-sm" aria-label="Breadcrumb">
+    <a href="management_dashboard.html" class="text-teal-700 hover:text-teal-600 no-underline font-medium">Dashboard</a>
+    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+    <a href="sku_list.html" class="text-teal-700 hover:text-teal-600 no-underline font-medium">SKUs</a>
+    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+    <span id="breadcrumbSkuCode" class="text-slate-500"></span>
+  </nav>
+
+  <!-- Sales History Warning Banner -->
+  <div id="salesWarningBanner" class="hidden bg-amber-50 border border-amber-200 rounded-lg p-4">
+    <div class="flex items-start gap-3">
+      <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600 mt-0.5 shrink-0"></i>
+      <div class="flex-1">
+        <h4 class="text-sm font-semibold text-amber-800">Sales History Alert</h4>
+        <p class="text-sm text-amber-700 mt-1">This SKU has existing sales history. Consider the impact before making changes.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="flex items-center gap-4">
+      <h1 id="pageTitle" class="text-[1.75rem] leading-[2.25rem] font-bold text-slate-900"></h1>
+      <span id="statusBadge" class="px-3 py-1 text-xs font-semibold rounded-full"></span>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="flex items-center gap-3">
+      <a href="sku_list.html" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-colors duration-200 no-underline">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        Back to List
+      </a>
+      <button id="editSkuButton" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-teal-700 rounded-lg hover:bg-teal-600 transition-colors duration-200">
+        <i data-lucide="edit-2" class="w-4 h-4"></i>
+        Edit SKU
+      </button>
+      <button id="deleteSkuButton" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors duration-200">
+        <i data-lucide="trash-2" class="w-4 h-4"></i>
+        Delete SKU
+      </button>
+    </div>
+  </div>
+
+  <!-- SKU Details Card -->
+  <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+    <div class="p-6">
+      <!-- Product Information Section -->
+      <div class="mb-8">
+        <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900 mb-4">Product Information</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Product Name</label>
+            <p id="productName" class="text-sm text-slate-900 p-3 bg-slate-50 rounded-lg border border-slate-200"></p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Barcode</label>
+            <p id="barcode" class="text-sm text-slate-900 p-3 bg-slate-50 rounded-lg border border-slate-200 font-mono"></p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Category</label>
+            <p id="category" class="text-sm text-slate-900 p-3 bg-slate-50 rounded-lg border border-slate-200"></p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">SKU Code</label>
+            <p id="skuCode" class="text-sm text-slate-900 p-3 bg-slate-50 rounded-lg border border-slate-200 font-mono"></p>
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-slate-700 mb-2">Description</label>
+            <p id="description" class="text-sm text-slate-900 p-3 bg-slate-50 rounded-lg border border-slate-200 min-h-[4rem]"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing Section -->
+      <div class="mb-8">
+        <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900 mb-4">Pricing</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Unit Price</label>
+            <p id="unitPrice" class="text-sm text-slate-900 p-3 bg-slate-50 rounded-lg border border-slate-200 font-semibold"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Metadata Section -->
+      <div>
+        <h2 class="text-[1.25rem] leading-[1.75rem] font-semibold text-slate-900 mb-4">Metadata</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Created Date</label>
+            <p id="createdAt" class="text-sm text-slate-900 p-3 bg-slate-50 rounded-lg border border-slate-200"></p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Last Updated</label>
+            <p id="updatedAt" class="text-sm text-slate-900 p-3 bg-slate-50 rounded-lg border border-slate-200"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" data-portal="body" class="fixed inset-0 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4 bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-[min(92vw,28rem)] max-h-[90vh] overflow-y-auto">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between p-6 border-b border-slate-200">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
+            <i data-lucide="trash-2" class="w-5 h-5 text-red-600"></i>
+          </div>
+          <h3 class="text-base font-semibold text-slate-900">Delete SKU</h3>
+        </div>
+        <button id="closeDeleteModal" class="flex items-center justify-center w-8 h-8 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors duration-200">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6">
+        <p class="text-sm text-slate-700 mb-4">Are you sure you want to delete this SKU? This action cannot be undone.</p>
+        
+        <!-- SKU Details -->
+        <div class="bg-slate-50 rounded-lg p-4 mb-4 space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-medium text-slate-500">SKU Code</span>
+            <span id="deleteModalSkuCode" class="text-sm font-semibold text-slate-900"></span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-medium text-slate-500">Barcode</span>
+            <span id="deleteModalBarcode" class="text-sm text-slate-700 font-mono"></span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-medium text-slate-500">Product Name</span>
+            <span id="deleteModalProductName" class="text-sm text-slate-900 text-right"></span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-medium text-slate-500">Sales Records</span>
+            <span id="deleteModalSalesCount" class="text-sm font-semibold text-slate-900"></span>
+          </div>
+        </div>
+
+        <!-- Sales Warning -->
+        <div id="deleteModalSalesWarning" class="hidden bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
+          <div class="flex items-start gap-2">
+            <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 mt-0.5 shrink-0"></i>
+            <div class="text-xs text-amber-800">
+              <p class="font-medium">Warning: This SKU has existing sales records</p>
+              <p class="mt-1">Deleting this SKU will affect historical sales data integrity.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 bg-slate-50">
+        <button id="cancelDeleteButton" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-colors duration-200">
+          Cancel
+        </button>
+        <button id="confirmDeleteButton" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors duration-200">
+          <span class="flex items-center gap-2">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+            Delete SKU
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+    <!-- JAVASCRIPT INITIALIZATION -->
+    <script src="app.js"></script>
+    <script src="app_data.js"></script>
+    <script id="container-script">
+      (function () {
+        const TemplateUtils = (window.TemplateUtils =
+          window.TemplateUtils || {});
+
+        TemplateUtils.UserUtils =
+          TemplateUtils.UserUtils ||
+          (function createUserUtils() {
+            return {
+              getCurrentUser() {
+                try {
+                  let currentUserId = localStorage.getItem("currentUserId");
+                  if (!currentUserId) {
+                    localStorage.setItem("currentUserId", "usr_mgmt_001");
+                    currentUserId = "usr_mgmt_001";
+                  }
+
+                  const users = JSON.parse(localStorage.getItem("users") || "[]");
+                  return users.find(user => user.id === currentUserId) || null;
+                } catch (error) {
+                  console.error("Error retrieving user data:", error);
+                  return null;
+                }
+              },
+              signOut() {
+                try {
+                  localStorage.removeItem("currentUserId");
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error signing out:", error);
+                }
+              },
+              getUserDisplayName(user) {
+                if (!user) return "Guest";
+                return user.firstName && user.lastName
+                  ? `${user.firstName} ${user.lastName}`
+                  : user.firstName || user.lastName || "User";
+              },
+              getUserInitials(user) {
+                if (!user) return "?";
+                const first = user.firstName?.charAt(0) || "";
+                const last = user.lastName?.charAt(0) || "";
+                return (first + last).toUpperCase() || "U";
+              },
+            };
+          })();
+
+        if (TemplateUtils.__bootstrapped) {
+          if (typeof window.lucide?.createIcons === "function") {
+            window.lucide.createIcons();
+          }
+          return;
+        }
+
+        TemplateUtils.__bootstrapped = true;
+
+        const state = {
+          popoverVisible: false,
+          sidebarOpen: false,
+          resizeTimer: null,
+          observerFrame: null,
+          refs: {},
+        };
+
+        function ready(fn) {
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", fn, { once: true });
+          } else if (typeof queueMicrotask === "function") {
+            queueMicrotask(fn);
+          } else {
+            Promise.resolve().then(fn);
+          }
+        }
+
+        function safeLucide(callback) {
+          if (typeof window.lucide?.createIcons === "function") {
+            callback();
+          }
+        }
+
+        function cacheRefs() {
+          state.refs = {
+            userProfileButton: document.getElementById("userProfileButton"),
+            userProfilePopover: document.getElementById("userProfilePopover"),
+            userAvatar: document.getElementById("userAvatar"),
+            userName: document.getElementById("userName"),
+            popoverUserAvatar: document.getElementById("popoverUserAvatar"),
+            popoverUserName: document.getElementById("popoverUserName"),
+            popoverUserEmail: document.getElementById("popoverUserEmail"),
+            signOutButton: document.getElementById("signOutButton"),
+            mobileMenuToggle: document.getElementById("mobileMenuToggle"),
+            sidebar: document.getElementById("sidebar"),
+            sidebarBackdrop: document.getElementById("sidebarBackdrop"),
+            navLinks: document.querySelectorAll(".nav-link"),
+            pageContent: document.getElementById("pageContent"),
+          };
+        }
+
+        function initializeUserProfile() {
+          const { userAvatar, userName } = state.refs;
+          if (!userAvatar || !userName) return;
+
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          if (currentUser) {
+            userAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            userName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+          } else {
+            userAvatar.textContent = "?";
+            userName.textContent = "Guest";
+          }
+        }
+
+        function populatePopover() {
+          const currentUser = TemplateUtils.UserUtils.getCurrentUser();
+          const { popoverUserAvatar, popoverUserName, popoverUserEmail } =
+            state.refs;
+          if (!popoverUserAvatar || !popoverUserName || !popoverUserEmail)
+            return;
+
+          if (currentUser) {
+            popoverUserAvatar.textContent =
+              TemplateUtils.UserUtils.getUserInitials(currentUser);
+            popoverUserName.textContent =
+              TemplateUtils.UserUtils.getUserDisplayName(currentUser);
+            popoverUserEmail.textContent = currentUser.email || "No email";
+          } else {
+            popoverUserAvatar.textContent = "?";
+            popoverUserName.textContent = "Guest";
+            popoverUserEmail.textContent = "Not logged in";
+          }
+        }
+
+        function toggleUserPopover(forceClose = false) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (!userProfilePopover || !userProfileButton) return;
+
+          const shouldOpen = forceClose ? false : !state.popoverVisible;
+          if (shouldOpen) {
+            populatePopover();
+            userProfilePopover.classList.add("visible");
+            userProfileButton.setAttribute("aria-expanded", "true");
+            state.popoverVisible = true;
+            const firstButton = userProfilePopover.querySelector("button");
+            if (firstButton) {
+              setTimeout(() => firstButton.focus(), 50);
+            }
+          } else {
+            userProfilePopover.classList.remove("visible");
+            userProfileButton.setAttribute("aria-expanded", "false");
+            state.popoverVisible = false;
+          }
+        }
+
+        function hideUserPopover() {
+          if (state.popoverVisible) {
+            toggleUserPopover(true);
+          }
+        }
+
+        function toggleMobileSidebar(forceClose = false) {
+          const { sidebar, sidebarBackdrop, mobileMenuToggle } = state.refs;
+          if (!sidebar || !sidebarBackdrop || !mobileMenuToggle) return;
+
+          const shouldOpen = forceClose ? false : !state.sidebarOpen;
+          state.sidebarOpen = shouldOpen;
+
+          sidebar.classList.toggle("open", shouldOpen);
+          sidebarBackdrop.classList.toggle("active", shouldOpen);
+          mobileMenuToggle.setAttribute(
+            "aria-expanded",
+            shouldOpen ? "true" : "false"
+          );
+          document.body.style.overflow = shouldOpen ? "hidden" : "";
+        }
+
+        function closeMobileSidebar() {
+          if (state.sidebarOpen) {
+            toggleMobileSidebar(true);
+          }
+        }
+
+        function setActiveNavLink(pageId) {
+          if (!pageId) return;
+          const { navLinks } = state.refs;
+          navLinks?.forEach((link) => {
+            if (link.dataset.page === pageId) {
+              link.classList.add("active");
+            } else {
+              link.classList.remove("active");
+            }
+          });
+        }
+
+        TemplateUtils.setActiveNavLink = setActiveNavLink;
+        TemplateUtils.closeMobileSidebar = closeMobileSidebar;
+
+        function handleDocumentClick(event) {
+          const { userProfilePopover, userProfileButton } = state.refs;
+          if (
+            state.popoverVisible &&
+            userProfilePopover &&
+            userProfileButton &&
+            !userProfilePopover.contains(event.target) &&
+            !userProfileButton.contains(event.target)
+          ) {
+            hideUserPopover();
+          }
+        }
+
+        function handleKeydown(event) {
+          if (event.key !== "Escape") return;
+          if (state.popoverVisible) {
+            hideUserPopover();
+            state.refs.userProfileButton?.focus();
+          }
+          if (state.sidebarOpen) {
+            closeMobileSidebar();
+            state.refs.mobileMenuToggle?.focus();
+          }
+        }
+
+        function handleResize() {
+          clearTimeout(state.resizeTimer);
+          state.resizeTimer = setTimeout(() => {
+            if (window.innerWidth >= 768) {
+              closeMobileSidebar();
+            }
+          }, 200);
+        }
+
+        function bindEvents() {
+          const {
+            userProfileButton,
+            mobileMenuToggle,
+            sidebarBackdrop,
+            signOutButton,
+            navLinks,
+          } = state.refs;
+
+          userProfileButton?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleUserPopover();
+          });
+
+          mobileMenuToggle?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            toggleMobileSidebar();
+          });
+
+          sidebarBackdrop?.addEventListener("click", () =>
+            closeMobileSidebar()
+          );
+
+          signOutButton?.addEventListener("click", () => {
+            if (confirm("Are you sure you want to sign out?")) {
+              TemplateUtils.UserUtils.signOut();
+            }
+          });
+
+          navLinks?.forEach((link) => {
+            link.addEventListener("click", () => closeMobileSidebar());
+          });
+
+          document.addEventListener("click", handleDocumentClick);
+          document.addEventListener("keydown", handleKeydown);
+          window.addEventListener("resize", handleResize);
+        }
+
+        function initializePortalTargets() {
+          document.querySelectorAll('[data-portal="body"]').forEach((node) => {
+            if (node.parentElement !== document.body) {
+              document.body.appendChild(node);
+            }
+          });
+        }
+
+        function observePageContent() {
+          const { pageContent } = state.refs;
+          if (!pageContent || typeof MutationObserver !== "function") return;
+
+          const observer = new MutationObserver(() => {
+            if (state.observerFrame) return;
+            state.observerFrame = requestAnimationFrame(() => {
+              state.observerFrame = null;
+              safeLucide(() => window.lucide.createIcons());
+            });
+          });
+
+          observer.observe(pageContent, { childList: true, subtree: true });
+          state.observer = observer;
+        }
+
+        function bootstrap() {
+          cacheRefs();
+          initializePortalTargets();
+          initializeUserProfile();
+          bindEvents();
+          safeLucide(() => window.lucide.createIcons());
+          observePageContent();
+        }
+
+        ready(bootstrap);
+      })();
+    </script>
+  
+
+<script>
+function funPortalModalToBody(id){
+  const el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) document.body.appendChild(el);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-portal any modal declaring data-portal="body"
+  document.querySelectorAll('[data-portal="body"]').forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Get SKU ID from URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const skuId = urlParams.get('id');
+  
+  if (!skuId) {
+    alert('SKU ID not provided');
+    window.location.href = 'sku_list.html';
+    return;
+  }
+
+  // Load SKU data
+  let currentSku = null;
+  let salesRecordCount = 0;
+
+  function funLoadSkuData() {
+    try {
+      const skus = JSON.parse(localStorage.getItem('skus') || '[]');
+      currentSku = skus.find(sku => sku.id === skuId);
+      
+      if (!currentSku) {
+        alert('SKU not found');
+        window.location.href = 'sku_list.html';
+        return;
+      }
+
+      // Count sales records for this SKU
+      const salesRecords = JSON.parse(localStorage.getItem('salesRecords') || '[]');
+      salesRecordCount = salesRecords.filter(record => 
+        record.scannedSkus.some(scannedSku => scannedSku.skuId === skuId)
+      ).length;
+
+      funPopulateSkuDetails();
+      funShowSalesWarningIfNeeded();
+      
+    } catch (error) {
+      console.error('Error loading SKU data:', error);
+      alert('Error loading SKU data');
+      window.location.href = 'sku_list.html';
+    }
+  }
+
+  function funPopulateSkuDetails() {
+    if (!currentSku) return;
+
+    // Page title and breadcrumb
+    document.getElementById('pageTitle').textContent = currentSku.skuCode;
+    document.getElementById('breadcrumbSkuCode').textContent = currentSku.skuCode;
+
+    // Status badge
+    const statusBadge = document.getElementById('statusBadge');
+    if (currentSku.status === 'active') {
+      statusBadge.textContent = 'Active';
+      statusBadge.className = 'px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800';
+    } else {
+      statusBadge.textContent = 'Inactive';
+      statusBadge.className = 'px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800';
+    }
+
+    // Product information
+    document.getElementById('productName').textContent = currentSku.productName || 'N/A';
+    document.getElementById('barcode').textContent = currentSku.barcode || 'N/A';
+    document.getElementById('category').textContent = currentSku.category || 'N/A';
+    document.getElementById('skuCode').textContent = currentSku.skuCode || 'N/A';
+    document.getElementById('description').textContent = currentSku.description || 'No description available';
+
+    // Pricing
+    const unitPrice = document.getElementById('unitPrice');
+    if (currentSku.unitPrice !== null && currentSku.unitPrice !== undefined) {
+      unitPrice.textContent = `₹${currentSku.unitPrice.toFixed(2)}`;
+    } else {
+      unitPrice.textContent = 'N/A';
+    }
+
+    // Metadata
+    const createdAt = document.getElementById('createdAt');
+    const updatedAt = document.getElementById('updatedAt');
+    
+    if (currentSku.createdAt) {
+      createdAt.textContent = funFormatDate(currentSku.createdAt);
+    } else {
+      createdAt.textContent = 'N/A';
+    }
+    
+    if (currentSku.updatedAt) {
+      updatedAt.textContent = funFormatDate(currentSku.updatedAt);
+    } else {
+      updatedAt.textContent = 'N/A';
+    }
+  }
+
+  function funFormatDate(dateString) {
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'Invalid Date';
+      
+      return date.toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      });
+    } catch (error) {
+      return 'Invalid Date';
+    }
+  }
+
+  function funShowSalesWarningIfNeeded() {
+    const warningBanner = document.getElementById('salesWarningBanner');
+    if (salesRecordCount > 0) {
+      warningBanner.classList.remove('hidden');
+    }
+  }
+
+  function funSetupEventListeners() {
+    // Edit button
+    const editButton = document.getElementById('editSkuButton');
+    if (editButton) {
+      editButton.addEventListener('click', function() {
+        window.location.href = `sku_edit.html?id=${skuId}`;
+      });
+    }
+
+    // Delete button
+    const deleteButton = document.getElementById('deleteSkuButton');
+    if (deleteButton) {
+      deleteButton.addEventListener('click', function() {
+        funShowDeleteModal();
+      });
+    }
+
+    // Modal close buttons
+    const closeModalButton = document.getElementById('closeDeleteModal');
+    const cancelButton = document.getElementById('cancelDeleteButton');
+    
+    if (closeModalButton) {
+      closeModalButton.addEventListener('click', funHideDeleteModal);
+    }
+    
+    if (cancelButton) {
+      cancelButton.addEventListener('click', funHideDeleteModal);
+    }
+
+    // Confirm delete button
+    const confirmDeleteButton = document.getElementById('confirmDeleteButton');
+    if (confirmDeleteButton) {
+      confirmDeleteButton.addEventListener('click', funDeleteSku);
+    }
+
+    // Close modal on backdrop click
+    const deleteModal = document.getElementById('deleteModal');
+    if (deleteModal) {
+      deleteModal.addEventListener('click', function(e) {
+        if (e.target === deleteModal) {
+          funHideDeleteModal();
+        }
+      });
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        funHideDeleteModal();
+      }
+    });
+  }
+
+  function funShowDeleteModal() {
+    if (!currentSku) return;
+
+    // Populate modal with SKU details
+    document.getElementById('deleteModalSkuCode').textContent = currentSku.skuCode;
+    document.getElementById('deleteModalBarcode').textContent = currentSku.barcode;
+    document.getElementById('deleteModalProductName').textContent = currentSku.productName;
+    document.getElementById('deleteModalSalesCount').textContent = salesRecordCount.toString();
+
+    // Show/hide sales warning
+    const salesWarning = document.getElementById('deleteModalSalesWarning');
+    if (salesRecordCount > 0) {
+      salesWarning.classList.remove('hidden');
+    } else {
+      salesWarning.classList.add('hidden');
+    }
+
+    // Show modal
+    const deleteModal = document.getElementById('deleteModal');
+    deleteModal.classList.remove('hidden');
+    
+    // Focus on confirm button
+    setTimeout(() => {
+      const confirmButton = document.getElementById('confirmDeleteButton');
+      if (confirmButton) {
+        confirmButton.focus();
+      }
+    }, 100);
+  }
+
+  function funHideDeleteModal() {
+    const deleteModal = document.getElementById('deleteModal');
+    deleteModal.classList.add('hidden');
+  }
+
+  function funDeleteSku() {
+    if (!currentSku) return;
+
+    try {
+      // Get current SKUs
+      const skus = JSON.parse(localStorage.getItem('skus') || '[]');
+      
+      // Remove the SKU
+      const updatedSkus = skus.filter(sku => sku.id !== skuId);
+      
+      // Save updated SKUs
+      localStorage.setItem('skus', JSON.stringify(updatedSkus));
+      
+      // Store success message for the list page
+      sessionStorage.setItem('skuListMessage', `SKU ${currentSku.skuCode} has been successfully deleted.`);
+      sessionStorage.setItem('skuListMessageType', 'success');
+      
+      // Redirect to SKU list
+      window.location.href = 'sku_list.html';
+      
+    } catch (error) {
+      console.error('Error deleting SKU:', error);
+      alert('Error deleting SKU. Please try again.');
+    }
+  }
+
+  // Initialize the page
+  funLoadSkuData();
+  funSetupEventListeners();
+
+  // Set active nav link
+  if (window.TemplateUtils && window.TemplateUtils.setActiveNavLink) {
+    window.TemplateUtils.setActiveNavLink('sku_list');
+  }
+});
+</script></body></html>
